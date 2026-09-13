@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { staffDownload, staffRequest, type StaffApplicationListItem } from "@/lib/staff";
 
 const fieldClass =
@@ -18,9 +18,12 @@ export function StaffApplicationList() {
   const t = useTranslations("staff");
   const ta = useTranslations("admission");
   const locale = useLocale();
+  const router = useRouter();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
   const [applyingClass, setApplyingClass] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [sort, setSort] = useState("-created_at");
   const [classes, setClasses] = useState<string[]>([]);
   const [rows, setRows] = useState<StaffApplicationListItem[]>([]);
@@ -32,10 +35,12 @@ export function StaffApplicationList() {
     if (q.trim()) params.set("q", q.trim());
     if (status) params.set("status", status);
     if (applyingClass) params.set("applying_class", applyingClass);
+    if (dateFrom) params.set("date_from", dateFrom);
+    if (dateTo) params.set("date_to", dateTo);
     if (sort) params.set("sort", sort);
     const qs = params.toString();
     return qs ? `?${qs}` : "";
-  }, [q, status, applyingClass, sort]);
+  }, [q, status, applyingClass, dateFrom, dateTo, sort]);
 
   useEffect(() => {
     setLoading(true);
@@ -48,6 +53,10 @@ export function StaffApplicationList() {
         setRows(data.results);
         setCount(data.count);
         setClasses(data.classes);
+      })
+      .catch(() => {
+        setRows([]);
+        setCount(0);
       })
       .finally(() => setLoading(false));
   }, [query]);
@@ -99,6 +108,24 @@ export function StaffApplicationList() {
             ))}
           </select>
         </label>
+        <label className="text-sm">
+          {t("dateFrom")}
+          <input
+            type="date"
+            className={fieldClass}
+            value={dateFrom}
+            onChange={(event) => setDateFrom(event.target.value)}
+          />
+        </label>
+        <label className="text-sm">
+          {t("dateTo")}
+          <input
+            type="date"
+            className={fieldClass}
+            value={dateTo}
+            onChange={(event) => setDateTo(event.target.value)}
+          />
+        </label>
         <label className="text-sm md:col-span-2">
           {t("sort")}
           <select className={fieldClass} value={sort} onChange={(event) => setSort(event.target.value)}>
@@ -122,8 +149,14 @@ export function StaffApplicationList() {
             <p className="font-mono text-xs text-igqs-gold">{row.application_id}</p>
             <h2 className="mt-1 font-display text-2xl">{row.student_name}</h2>
             <p className="mt-1 text-sm text-igqs-muted">{row.guardian_name} · {row.applying_class}</p>
+            <p className="mt-2 text-sm">
+              BDT {Number(row.payment_amount).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}
+            </p>
             <p className={`mt-2 text-sm ${statusClass(row.status)}`}>
               {row.status === "approved" ? ta("approved") : row.status === "rejected" ? ta("rejected") : ta("pending")}
+            </p>
+            <p className="mt-1 text-xs text-igqs-muted">
+              {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
             </p>
             <Link href={`/staff/applications/${row.application_id}`} className="mt-3 inline-block text-sm text-igqs-gold underline">
               {t("review")}
@@ -136,34 +169,42 @@ export function StaffApplicationList() {
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
             <tr>
-              <th className="px-4 py-3">{t("applicationId")}</th>
               <th className="px-4 py-3">{t("student")}</th>
-              <th className="px-4 py-3">{t("guardian")}</th>
               <th className="px-4 py-3">{t("applyingClass")}</th>
-              <th className="px-4 py-3">{t("transaction")}</th>
+              <th className="px-4 py-3">{t("amount")}</th>
               <th className="px-4 py-3">{t("status")}</th>
-              <th className="px-4 py-3" />
+              <th className="px-4 py-3">{t("date")}</th>
+              <th className="px-4 py-3">{t("action")}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.application_id} className="border-t border-igqs-gold/10">
-                <td className="px-4 py-3 font-mono text-xs">
-                  <div>{row.application_id}</div>
-                  <div className="text-igqs-muted">{row.receipt_id}</div>
-                </td>
+              <tr
+                key={row.application_id}
+                className="cursor-pointer border-t border-igqs-gold/10 hover:bg-igqs-sand/30 dark:hover:bg-white/5"
+                onClick={() => router.push(`/staff/applications/${row.application_id}`)}
+              >
                 <td className="px-4 py-3">
                   {row.student_name}
                   <div className="text-igqs-muted">{row.mobile}</div>
+                  <div className="font-mono text-xs text-igqs-gold">{row.application_id}</div>
                 </td>
-                <td className="px-4 py-3">{row.guardian_name}</td>
                 <td className="px-4 py-3">{row.applying_class}</td>
-                <td className="px-4 py-3 font-mono text-xs">{row.transaction_id}</td>
+                <td className="px-4 py-3">
+                  BDT {Number(row.payment_amount).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}
+                </td>
                 <td className={`px-4 py-3 ${statusClass(row.status)}`}>
                   {row.status === "approved" ? ta("approved") : row.status === "rejected" ? ta("rejected") : ta("pending")}
                 </td>
+                <td className="px-4 py-3 text-sm">
+                  {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
+                </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/staff/applications/${row.application_id}`} className="text-igqs-gold underline">
+                  <Link
+                    href={`/staff/applications/${row.application_id}`}
+                    className="text-igqs-gold underline"
+                    onClick={(event) => event.stopPropagation()}
+                  >
                     {t("review")}
                   </Link>
                 </td>

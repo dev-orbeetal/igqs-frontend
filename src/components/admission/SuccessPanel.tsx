@@ -4,11 +4,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { apiUrl } from "@/lib/api";
-import {
-  ApplicationReceiptCard,
-  type ApplicationDetail,
-} from "@/components/admission/ApplicationReceiptCard";
+import { apiUrl, type ApplicationDetail } from "@/lib/api";
+import { PaymentStatusStep } from "@/components/admission/PaymentStatusStep";
 
 export function SuccessPanel() {
   const t = useTranslations("admission");
@@ -16,6 +13,7 @@ export function SuccessPanel() {
   const params = useSearchParams();
   const id = params.get("id");
   const [data, setData] = useState<ApplicationDetail | null>(null);
+  const [loading, setLoading] = useState(Boolean(id));
 
   useEffect(() => {
     if (!id) return;
@@ -23,20 +21,13 @@ export function SuccessPanel() {
       cache: "no-store",
     })
       .then((res) => (res.ok ? res.json() : null))
-      .then(setData);
+      .then((payload) => setData(payload))
+      .finally(() => setLoading(false));
   }, [id, locale]);
 
   return (
     <div>
-      <ApplicationReceiptCard
-        data={data}
-        fallbackApplicationId={id ?? undefined}
-        kicker={t("successTitle")}
-        heading={t("confirmationHeading")}
-        intro={t("successBody")}
-        showEmailNote
-        showViewPdf
-      />
+      <PaymentStatusStep data={data} processing={loading} />
       <p className="mt-6 text-center text-sm text-igqs-muted print:hidden">
         {t("lostReceiptHint")}{" "}
         <Link href="/admission/receipt" className="text-igqs-gold underline">

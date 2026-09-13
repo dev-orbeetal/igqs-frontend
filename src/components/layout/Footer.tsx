@@ -31,6 +31,9 @@ export async function Footer({ site }: { site?: SiteSettings | null }) {
             <Link href="/admission" className="transition-colors duration-500 hover:text-igqs-gold">
               {t("admission")}
             </Link>
+            <Link href="/admission/payments" className="transition-colors duration-500 hover:text-igqs-gold">
+              {t("myPayments")}
+            </Link>
             <Link href="/admission/receipt" className="transition-colors duration-500 hover:text-igqs-gold">
               {t("receipt")}
             </Link>

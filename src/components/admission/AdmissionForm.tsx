@@ -1,12 +1,35 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
-import { useRouter } from "@/i18n/navigation";
-import { apiPost, type AdmissionInfo, type ClassOption } from "@/lib/api";
+import { Link } from "@/i18n/navigation";
+import {
+  apiGet,
+  apiPost,
+  parseApiError,
+  type AdmissionFeeInfo,
+  type AdmissionInfo,
+  type ApplicationDetail,
+  type ClassOption,
+} from "@/lib/api";
+import {
+  clearGuardianSession,
+  getGuardianSession,
+  isBdPhone,
+  normalizeBdPhone,
+  setGuardianSession,
+} from "@/lib/guardian";
+import { AdmissionStepper } from "./AdmissionStepper";
+import { ClassSelectStep } from "./ClassSelectStep";
+import { CLASS_LABEL_KEYS, loadDraft, saveDraft, type AdmissionClassSlug, type WizardForm } from "./fields";
+import { PaymentStatusStep } from "./PaymentStatusStep";
+import { PaymentSummaryStep } from "./PaymentSummaryStep";
+import { PhoneVerifyStep } from "./PhoneVerifyStep";
+import { StudentInfoStep } from "./StudentInfoStep";
 
-const fieldClass =
-  "mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2";
+function todayIso() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export function AdmissionForm({
   classes,
@@ -17,311 +40,313 @@ export function AdmissionForm({
 }) {
   const t = useTranslations("admission");
   const tc = useTranslations("common");
-  const router = useRouter();
   const [step, setStep] = useState(0);
-  const [error, setError] = useState("");
+  const [form, setForm] = useState<WizardForm>({});
+  const [files, setFiles] = useState<{ photo?: File; birth?: File; screenshot?: File }>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState("");
+  const [otp, setOtp] = useState("");
+  const [debugOtp, setDebugOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [verifiedPhone, setVerifiedPhone] = useState("");
   const [sending, setSending] = useState(false);
-  const [form, setForm] = useState<Record<string, string>>({});
-  const [files, setFiles] = useState<{
-    photo?: File;
-    birth?: File;
-    screenshot?: File;
-  }>({});
+  const [processing, setProcessing] = useState(false);
+  const [application, setApplication] = useState<ApplicationDetail | null>(null);
 
-  const steps = [t("stepStudent"), t("stepGuardian"), t("stepMore"), t("stepPayment")];
+  useEffect(() => {
+    const draft = loadDraft();
+    setForm((prev) => ({ payment_date: todayIso(), payment_method: "bkash", ...draft, ...prev }));
+    const session = getGuardianSession();
+    if (session) {
+      setVerifiedPhone(session.phone);
+      setForm((prev) => ({ ...prev, mobile: prev.mobile || session.phone }));
+    }
+  }, []);
+
+  useEffect(() => {
+    saveDraft(form);
+  }, [form]);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = window.setTimeout(() => setCountdown((value) => value - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [countdown]);
 
   function setField(name: string, value: string) {
     setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: "" }));
   }
 
-  const applicableFee = useMemo(() => {
-    const selected = classes.find((c) => c.name === form.applying_class);
-    const match = info?.fees.find((fee) => fee.grade_slug && fee.grade_slug === selected?.slug);
+  const applicableFee = useMemo<AdmissionFeeInfo | null>(() => {
+    const match = info?.fees.find((fee) => fee.grade_slug && fee.grade_slug === form.applying_class_slug);
     return match ?? info?.default_fee ?? null;
-  }, [classes, form.applying_class, info]);
+  }, [form.applying_class_slug, info]);
 
-  const studentValid = useMemo(
-    () =>
-      Boolean(
-        form.student_name &&
-          form.student_name_bn &&
-          form.date_of_birth &&
-          form.gender &&
-          form.applying_class &&
-          form.student_address &&
-          files.photo &&
-          files.birth
-      ),
-    [form, files]
+  const classLabel = form.applying_class_slug
+    ? t(CLASS_LABEL_KEYS[form.applying_class_slug as AdmissionClassSlug] ?? "selectClass")
+    : form.applying_class;
+
+  const infoValid = Boolean(
+    form.student_name &&
+      form.student_name_bn &&
+      form.date_of_birth &&
+      form.gender &&
+      form.applying_class &&
+      form.student_address &&
+      form.father_name &&
+      form.mother_name &&
+      form.guardian_name &&
+      form.father_occupation &&
+      form.mobile &&
+      form.email &&
+      form.guardian_address &&
+      form.emergency_contact &&
+      files.photo &&
+      files.birth
   );
 
-  const guardianValid = useMemo(
-    () =>
-      Boolean(
-        form.father_name &&
-          form.mother_name &&
-          form.guardian_name &&
-          form.father_occupation &&
-          form.mobile &&
-          form.email &&
-          form.guardian_address &&
-          form.emergency_contact
-      ),
-    [form]
-  );
+  const phoneVerified = Boolean(verifiedPhone && normalizeBdPhone(form.mobile || "") === verifiedPhone);
+  const receiptReady = application?.status === "approved";
 
-  const paymentValid = useMemo(
-    () =>
-      Boolean(
-        form.payment_method &&
-          form.transaction_id &&
-          form.payment_amount &&
-          form.payment_date &&
-          form.payer_mobile
-      ),
-    [form]
-  );
-
-  function goToPayment() {
-    if (applicableFee && !form.payment_amount) {
-      setField("payment_amount", String(Number(applicableFee.amount)));
+  async function sendOtp() {
+    setOtpError("");
+    const phone = normalizeBdPhone(form.mobile || "");
+    if (!isBdPhone(phone)) {
+      setOtpError(t("otpInvalidPhone"));
+      return;
     }
-    setStep(3);
+    setField("mobile", phone);
+    setSendingOtp(true);
+    try {
+      const result = await apiPost("/api/admissions/otp/send/", { phone });
+      setDebugOtp(result.debug_otp || "");
+      setCountdown(result.resend_in || 60);
+    } catch (error) {
+      const parsed = parseApiError(error);
+      setOtpError(parsed.form || parsed.code || t("otpIncorrect"));
+    } finally {
+      setSendingOtp(false);
+    }
   }
 
-  async function submit() {
+  async function verifyOtp() {
+    setOtpError("");
+    setVerifyingOtp(true);
+    try {
+      const phone = normalizeBdPhone(form.mobile || "");
+      const result = await apiPost("/api/admissions/otp/verify/", { phone, otp });
+      setGuardianSession({ token: result.token, phone: result.phone });
+      setVerifiedPhone(result.phone);
+      setField("mobile", result.phone);
+      setOtp("");
+    } catch (error) {
+      const parsed = parseApiError(error);
+      if (parsed.code === "otp_expired") setOtpError(t("otpExpired"));
+      else if (parsed.code === "otp_incorrect") setOtpError(t("otpIncorrect"));
+      else setOtpError(parsed.form || t("otpIncorrect"));
+    } finally {
+      setVerifyingOtp(false);
+    }
+  }
+
+  function resetPhone() {
+    clearGuardianSession();
+    setVerifiedPhone("");
+    setOtp("");
+    setDebugOtp("");
+  }
+
+  async function submitPayment() {
+    const session = getGuardianSession();
+    if (!session || !phoneVerified || sending) return;
     setSending(true);
-    setError("");
+    setFormError("");
+    setFieldErrors({});
     const data = new FormData();
-    Object.entries(form).forEach(([k, v]) => data.append(k, v));
+    Object.entries(form).forEach(([key, value]) => data.append(key, value));
+    if (applicableFee) data.set("payment_amount", String(Number(applicableFee.amount)));
+    data.set("mobile", session.phone);
+    data.set("payer_mobile", session.phone);
+    if (!form.payment_method) data.set("payment_method", "bkash");
     if (files.photo) data.append("student_photo", files.photo);
     if (files.birth) data.append("birth_certificate", files.birth);
     if (files.screenshot) data.append("payment_screenshot", files.screenshot);
     try {
-      const result = await apiPost("/api/admissions/apply/", data);
-      router.push(`/admission/success?id=${result.application_id}`);
-    } catch {
-      setError(t("error"));
+      setProcessing(true);
+      setStep(4);
+      const result = (await apiPost("/api/admissions/apply/", data, session.token)) as ApplicationDetail;
+      setApplication(result);
+      window.setTimeout(() => setProcessing(false), 900);
+    } catch (error) {
+      setProcessing(false);
+      setStep(3);
+      const parsed = parseApiError(error);
+      setFieldErrors(parsed.fields);
+      setFormError(parsed.form || t("error"));
+    } finally {
       setSending(false);
     }
   }
 
+  useEffect(() => {
+    if (step !== 4 || !application || application.status !== "pending") return;
+    const id = application.application_id;
+    const timer = window.setInterval(() => {
+      apiGet<ApplicationDetail>(`/api/admissions/applications/${encodeURIComponent(id)}/`, "bn").then((latest) => {
+        if (latest) setApplication(latest);
+      });
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [step, application]);
+
+  function goNext() {
+    setFormError("");
+    if (step === 0 && !form.applying_class_slug) {
+      setFormError(t("continueWithoutClass"));
+      return;
+    }
+    if (step === 1 && !infoValid) {
+      const missing: Record<string, string> = {};
+      if (!files.photo) missing.student_photo = t("fileMissing");
+      if (!files.birth) missing.birth_certificate = t("fileMissing");
+      setFieldErrors(missing);
+      setFormError(!files.photo || !files.birth ? t("reattachFiles") : t("requiredField"));
+      return;
+    }
+    if (step === 2 && !phoneVerified) {
+      setOtpError(t("otpInvalidPhone"));
+      return;
+    }
+    if (step === 1 && phoneVerified) {
+      setStep(3);
+      return;
+    }
+    setStep((value) => value + 1);
+  }
+
+  function goBack() {
+    if (step === 3 && phoneVerified) {
+      setStep(1);
+      return;
+    }
+    setStep((value) => Math.max(0, value - 1));
+  }
+
+  function retry() {
+    setApplication(null);
+    setProcessing(false);
+    setStep(3);
+  }
+
+  const canContinue =
+    step === 0
+      ? Boolean(form.applying_class_slug)
+      : step === 1
+        ? infoValid
+        : step === 2
+          ? phoneVerified
+          : false;
+
   return (
-    <div className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18] sm:p-8">
-      <ol className="mb-8 grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4 sm:text-sm">
-        {steps.map((label, i) => (
-          <li
-            key={label}
-            className={`rounded-full px-2 py-2.5 leading-tight ${
-              i === step
-                ? "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
-                : "bg-igqs-sand/70 dark:bg-white/5"
-            }`}
-          >
-            <span className="block font-medium">{i + 1}</span>
-            <span>{label}</span>
-          </li>
-        ))}
-      </ol>
-
-      {step === 0 && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <h2 className="sm:col-span-2 font-display text-2xl">{t("studentInfo")}</h2>
-          <label className="text-sm">
-            {t("studentName")}
-            <input className={fieldClass} required value={form.student_name ?? ""} onChange={(e) => setField("student_name", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("studentNameBn")}
-            <input className={fieldClass} required value={form.student_name_bn ?? ""} onChange={(e) => setField("student_name_bn", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("dob")}
-            <input type="date" className={fieldClass} required value={form.date_of_birth ?? ""} onChange={(e) => setField("date_of_birth", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("gender")}
-            <select className={fieldClass} required value={form.gender ?? ""} onChange={(e) => setField("gender", e.target.value)}>
-              <option value="">{t("selectGender")}</option>
-              <option value="male">{t("male")}</option>
-              <option value="female">{t("female")}</option>
-            </select>
-          </label>
-          <label className="text-sm">
-            {t("previousClass")}
-            <input className={fieldClass} value={form.previous_class ?? ""} onChange={(e) => setField("previous_class", e.target.value)} />
-            <span className="mt-1 block text-xs text-igqs-muted">({tc("optional")})</span>
-          </label>
-          <label className="text-sm">
-            {t("applyingClass")}
-            <select className={fieldClass} required value={form.applying_class ?? ""} onChange={(e) => setField("applying_class", e.target.value)}>
-              <option value="">{t("selectClass")}</option>
-              {classes.map((c) => (
-                <option key={c.slug} value={c.name}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm sm:col-span-2">
-            {t("address")}
-            <textarea className={fieldClass} required value={form.student_address ?? ""} onChange={(e) => setField("student_address", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("photo")}
-            <input type="file" accept="image/*" required className={`${fieldClass} min-h-11`} onChange={(e) => setFiles((f) => ({ ...f, photo: e.target.files?.[0] }))} />
-            <span className="mt-1 block text-xs text-igqs-muted">{t("fileHint")}</span>
-          </label>
-          <label className="text-sm">
-            {t("birthCertificate")}
-            <input type="file" required className={`${fieldClass} min-h-11`} onChange={(e) => setFiles((f) => ({ ...f, birth: e.target.files?.[0] }))} />
-            <span className="mt-1 block text-xs text-igqs-muted">{t("fileHint")}</span>
-          </label>
-        </div>
-      )}
-
-      {step === 1 && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <h2 className="sm:col-span-2 font-display text-2xl">{t("guardianInfo")}</h2>
-          <label className="text-sm">
-            {t("fatherName")}
-            <input className={fieldClass} required value={form.father_name ?? ""} onChange={(e) => setField("father_name", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("motherName")}
-            <input className={fieldClass} required value={form.mother_name ?? ""} onChange={(e) => setField("mother_name", e.target.value)} />
-          </label>
-          <label className="text-sm sm:col-span-2">
-            {t("guardianName")}
-            <input className={fieldClass} required value={form.guardian_name ?? ""} onChange={(e) => setField("guardian_name", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("fatherOccupation")}
-            <input className={fieldClass} required value={form.father_occupation ?? ""} onChange={(e) => setField("father_occupation", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("motherOccupation")} <span className="text-igqs-muted">({tc("optional")})</span>
-            <input className={fieldClass} value={form.mother_occupation ?? ""} onChange={(e) => setField("mother_occupation", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("mobile")}
-            <input className={fieldClass} required value={form.mobile ?? ""} onChange={(e) => setField("mobile", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("email")}
-            <input type="email" className={fieldClass} required value={form.email ?? ""} onChange={(e) => setField("email", e.target.value)} />
-          </label>
-          <label className="text-sm sm:col-span-2">
-            {t("guardianAddress")}
-            <textarea className={fieldClass} required value={form.guardian_address ?? ""} onChange={(e) => setField("guardian_address", e.target.value)} />
-          </label>
-          <label className="text-sm sm:col-span-2">
-            {t("emergency")}
-            <input className={fieldClass} required value={form.emergency_contact ?? ""} onChange={(e) => setField("emergency_contact", e.target.value)} />
-          </label>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="grid gap-4">
-          <h2 className="font-display text-2xl">{t("moreInfo")}</h2>
-          <label className="text-sm">
-            {t("previousAcademic")} <span className="text-igqs-muted">({tc("optional")})</span>
-            <textarea className={fieldClass} value={form.previous_academic_info ?? ""} onChange={(e) => setField("previous_academic_info", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("special")} <span className="text-igqs-muted">({tc("optional")})</span>
-            <textarea className={fieldClass} value={form.special_requirements ?? ""} onChange={(e) => setField("special_requirements", e.target.value)} />
-          </label>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <h2 className="sm:col-span-2 font-display text-2xl">{t("paymentInfo")}</h2>
-          {applicableFee && (
-            <p className="sm:col-span-2 rounded-2xl bg-igqs-sand/50 px-4 py-3 text-sm dark:bg-white/5">
-              {applicableFee.label}: <strong>{applicableFee.display}</strong>
-            </p>
-          )}
-          <fieldset className="sm:col-span-2">
-            <legend className="text-sm">{t("paymentMethod")}</legend>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              {(info?.methods ?? []).map((method) => (
-                <label
-                  key={method.code}
-                  className={`cursor-pointer rounded-2xl border px-4 py-3 text-sm ${
-                    form.payment_method === method.code
-                      ? "border-igqs-gold bg-igqs-gold/15"
-                      : "border-igqs-gold/30"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="payment_method"
-                    className="mr-2"
-                    checked={form.payment_method === method.code}
-                    onChange={() => setField("payment_method", method.code)}
-                  />
-                  {method.name}
-                  <span className="mt-1 block break-all font-mono text-xs text-igqs-muted">{method.account_number}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <label className="text-sm">
-            {t("transactionId")}
-            <input className={fieldClass} required value={form.transaction_id ?? ""} onChange={(e) => setField("transaction_id", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("paymentAmount")}
-            <input className={fieldClass} type="number" min="1" required value={form.payment_amount ?? ""} onChange={(e) => setField("payment_amount", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("paymentDate")}
-            <input type="date" className={fieldClass} required value={form.payment_date ?? ""} onChange={(e) => setField("payment_date", e.target.value)} />
-          </label>
-          <label className="text-sm">
-            {t("payerMobile")}
-            <input className={fieldClass} required value={form.payer_mobile ?? ""} onChange={(e) => setField("payer_mobile", e.target.value)} />
-          </label>
-          <label className="text-sm sm:col-span-2">
-            {t("screenshot")} <span className="text-igqs-muted">({t("screenshotOptional")})</span>
-            <input type="file" accept="image/*" className={fieldClass} onChange={(e) => setFiles((f) => ({ ...f, screenshot: e.target.files?.[0] }))} />
-          </label>
-        </div>
-      )}
-
-      {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
-
-      <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-        {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="min-h-11 rounded-full border border-igqs-gold/40 px-5 py-2.5 text-sm">
-            {tc("back")}
-          </button>
-        ) : (
-          <span />
-        )}
-        {step < 3 ? (
-          <button
-            type="button"
-            disabled={(step === 0 && !studentValid) || (step === 1 && !guardianValid)}
-            onClick={() => (step === 2 ? goToPayment() : setStep((s) => s + 1))}
-            className="min-h-11 rounded-full bg-igqs-green px-5 py-2.5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
-          >
-            {tc("next")}
-          </button>
-        ) : (
-          <button
-            type="button"
-            disabled={sending || !paymentValid}
-            onClick={submit}
-            className="min-h-11 rounded-full bg-igqs-green px-5 py-2.5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
-          >
-            {sending ? tc("sending") : tc("submit")}
-          </button>
-        )}
+    <div className="rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18]">
+      <div className="px-4 pt-5 sm:px-7 sm:pt-7">
+        <AdmissionStepper step={step} receiptReady={Boolean(receiptReady)} />
       </div>
+      <div className="px-4 py-6 pb-28 sm:px-7">
+        {step === 0 && (
+          <ClassSelectStep
+            classes={classes}
+            selectedSlug={form.applying_class_slug ?? ""}
+            fee={applicableFee}
+            onSelect={(option) => {
+              setField("applying_class_slug", option.slug);
+              setField("applying_class", option.name);
+            }}
+          />
+        )}
+        {step === 1 && (
+          <StudentInfoStep
+            form={form}
+            errors={fieldErrors}
+            classLabel={classLabel || form.applying_class || ""}
+            filesReady={{ photo: Boolean(files.photo), birth: Boolean(files.birth) }}
+            onChange={setField}
+            onPhoto={(file) => setFiles((prev) => ({ ...prev, photo: file }))}
+            onBirth={(file) => setFiles((prev) => ({ ...prev, birth: file }))}
+          />
+        )}
+        {step === 2 && (
+          <PhoneVerifyStep
+            phone={form.mobile ?? ""}
+            otp={otp}
+            verified={phoneVerified}
+            sending={sendingOtp}
+            verifying={verifyingOtp}
+            countdown={countdown}
+            debugOtp={debugOtp}
+            error={otpError}
+            onPhoneChange={(value) => setField("mobile", value)}
+            onOtpChange={setOtp}
+            onSend={sendOtp}
+            onVerify={verifyOtp}
+            onReset={resetPhone}
+          />
+        )}
+        {step === 3 && (
+          <PaymentSummaryStep
+            form={form}
+            fee={applicableFee}
+            methods={info?.methods ?? []}
+            errors={fieldErrors}
+            onChange={setField}
+            onScreenshot={(file) => setFiles((prev) => ({ ...prev, screenshot: file }))}
+          />
+        )}
+        {step === 4 && (
+          <PaymentStatusStep data={application} processing={processing} onRetry={retry} />
+        )}
+        {formError && <p className="mt-4 text-sm text-red-700 dark:text-red-300">{formError}</p>}
+      </div>
+      {step < 4 && (
+        <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-igqs-gold/20 bg-white/95 px-4 py-4 backdrop-blur dark:bg-[#0d1f18]/95 sm:flex-row sm:justify-between sm:px-7">
+          {step > 0 ? (
+            <button
+              type="button"
+              onClick={goBack}
+              className="min-h-12 rounded-full border border-igqs-gold/40 px-5 text-sm"
+            >
+              {tc("back")}
+            </button>
+          ) : (
+            <Link href="/" className="min-h-12 rounded-full border border-igqs-gold/40 px-5 py-3 text-center text-sm">
+              {t("cancelFlow")}
+            </Link>
+          )}
+          {step < 3 ? (
+            <button
+              type="button"
+              disabled={!canContinue}
+              onClick={goNext}
+              className="min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+            >
+              {tc("next")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={sending || !form.transaction_id || !phoneVerified}
+              onClick={submitPayment}
+              className="min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+            >
+              {sending ? t("processingPayment") : t("payWithBkash")}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

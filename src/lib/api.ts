@@ -21,18 +21,83 @@ export async function apiGet<T>(path: string, locale: string): Promise<T | null>
   }
 }
 
-export async function apiPost(path: string, body: FormData | object) {
+export async function apiPost(path: string, body: FormData | object, token?: string) {
   const isForm = body instanceof FormData;
+  const headers = new Headers();
+  if (!isForm) headers.set("Content-Type", "application/json");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
   const res = await fetch(apiUrl(path), {
     method: "POST",
     body: isForm ? body : JSON.stringify(body),
-    headers: isForm ? undefined : { "Content-Type": "application/json" },
+    headers,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(JSON.stringify(data));
   }
   return data;
+}
+
+export async function apiGetAuth<T>(path: string, token: string, locale?: string): Promise<T> {
+  const res = await fetch(apiUrl(path, locale), {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(JSON.stringify(data));
+  }
+  return data as T;
+}
+
+export type ApplicationDetail = {
+  application_id: string;
+  receipt_id: string;
+  student_name: string;
+  student_name_bn: string;
+  guardian_name: string;
+  applying_class: string;
+  mobile: string;
+  email: string;
+  status: string;
+  status_label: string;
+  rejection_reason?: string;
+  created_at: string;
+  receipt_pdf_url: string;
+  receipt_view_url?: string;
+  receipt_email_sent: boolean;
+  transaction: {
+    payment_method: string;
+    transaction_id: string;
+    payment_amount: string;
+    payment_date: string;
+    payer_mobile: string;
+    payment_screenshot: string;
+  };
+};
+
+export function parseApiError(error: unknown): {
+  form?: string;
+  code?: string;
+  fields: Record<string, string>;
+} {
+  const fields: Record<string, string> = {};
+  const raw = error instanceof Error ? error.message : "";
+  try {
+    const data = JSON.parse(raw) as Record<string, unknown>;
+    let form: string | undefined;
+    let code: string | undefined;
+    for (const [key, value] of Object.entries(data)) {
+      const text = Array.isArray(value) ? String(value[0] ?? "") : String(value ?? "");
+      if (!text) continue;
+      if (key === "code") code = text;
+      else if (key === "detail") form = text;
+      else fields[key] = text;
+    }
+    return { form, code, fields };
+  } catch {
+    return { form: raw || undefined, fields };
+  }
 }
 
 export type SiteSettings = {

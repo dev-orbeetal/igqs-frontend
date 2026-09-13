@@ -1,0 +1,124 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import type { AdmissionFeeInfo, PaymentMethodInfo } from "@/lib/api";
+import { fieldClass, fieldErrorClass, type WizardForm } from "./fields";
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-2 text-sm">
+      <dt className="text-igqs-muted">{label}</dt>
+      <dd className="text-right font-medium">{value}</dd>
+    </div>
+  );
+}
+
+export function PaymentSummaryStep({
+  form,
+  fee,
+  methods,
+  errors,
+  onChange,
+  onScreenshot,
+}: {
+  form: WizardForm;
+  fee: AdmissionFeeInfo | null;
+  methods: PaymentMethodInfo[];
+  errors: Record<string, string>;
+  onChange: (name: string, value: string) => void;
+  onScreenshot: (file?: File) => void;
+}) {
+  const t = useTranslations("admission");
+  const amount = fee ? `৳${Number(fee.amount).toLocaleString("en-BD")}` : "—";
+  const sorted = [...methods].sort((a, b) => {
+    if (a.code === "bkash") return -1;
+    if (b.code === "bkash") return 1;
+    return 0;
+  });
+  const selected = sorted.find((method) => method.code === form.payment_method) ?? sorted[0];
+
+  return (
+    <div className="grid gap-6">
+      <h2 className="font-display text-2xl sm:text-3xl">{t("paymentSummary")}</h2>
+      <dl className="rounded-3xl border border-igqs-gold/25 bg-igqs-sand/40 px-4 py-3 dark:bg-white/5">
+        <Row label={t("studentName")} value={form.student_name || "—"} />
+        <Row label={t("applyingClass")} value={form.applying_class || "—"} />
+        <Row label={t("guardianName")} value={form.guardian_name || "—"} />
+        <Row label={t("verifiedPhone")} value={form.mobile || "—"} />
+      </dl>
+
+      <div className="rounded-3xl bg-igqs-green px-5 py-6 text-center text-igqs-cream dark:bg-[#0b241c]">
+        <p className="text-sm text-igqs-gold-soft">{t("admissionFee")}</p>
+        <p className="mt-2 font-display text-4xl">{amount}</p>
+        <p className="mt-4 text-sm text-igqs-gold-soft">{t("totalDue")}</p>
+        <p className="font-display text-5xl">{amount}</p>
+      </div>
+
+      <div>
+        <h3 className="font-display text-xl">{t("payWithBkash")}</h3>
+        <p className="mt-1 text-sm text-igqs-muted">{t("bkashHint")}</p>
+        <div className="mt-4 grid gap-3">
+          {sorted.map((method) => (
+            <label
+              key={method.code}
+              className={`cursor-pointer rounded-2xl border px-4 py-4 ${
+                (form.payment_method || selected?.code) === method.code
+                  ? "border-igqs-gold bg-igqs-gold/15"
+                  : "border-igqs-gold/30"
+              }`}
+            >
+              <input
+                type="radio"
+                name="payment_method"
+                className="mr-2"
+                checked={(form.payment_method || selected?.code) === method.code}
+                onChange={() => onChange("payment_method", method.code)}
+              />
+              <span className="font-medium">{method.name}</span>
+              <span className="mt-1 block break-all font-mono text-sm text-igqs-muted">
+                {method.account_number}
+              </span>
+              {method.instructions && (
+                <span className="mt-2 block text-sm text-igqs-muted">{method.instructions}</span>
+              )}
+            </label>
+          ))}
+        </div>
+        {errors.payment_method && <p className={fieldErrorClass}>{errors.payment_method}</p>}
+      </div>
+
+      <label className="text-sm">
+        {t("transactionId")}
+        <input
+          className={fieldClass}
+          value={form.transaction_id ?? ""}
+          onChange={(event) => onChange("transaction_id", event.target.value)}
+        />
+        {errors.transaction_id && <p className={fieldErrorClass}>{errors.transaction_id}</p>}
+      </label>
+      <label className="text-sm">
+        {t("paymentAmount")}
+        <input className={`${fieldClass} bg-igqs-sand/40 dark:bg-white/5`} value={amount} readOnly />
+      </label>
+      <label className="text-sm">
+        {t("paymentDate")}
+        <input
+          type="date"
+          className={fieldClass}
+          value={form.payment_date ?? ""}
+          onChange={(event) => onChange("payment_date", event.target.value)}
+        />
+        {errors.payment_date && <p className={fieldErrorClass}>{errors.payment_date}</p>}
+      </label>
+      <label className="text-sm">
+        {t("screenshot")} <span className="text-igqs-muted">({t("screenshotOptional")})</span>
+        <input
+          type="file"
+          accept="image/*"
+          className={fieldClass}
+          onChange={(event) => onScreenshot(event.target.files?.[0])}
+        />
+      </label>
+    </div>
+  );
+}

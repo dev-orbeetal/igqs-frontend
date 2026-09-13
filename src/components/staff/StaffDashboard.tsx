@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { staffRequest, type StaffStats } from "@/lib/staff";
+import { staffRequest, type StaffApplicationListItem, type StaffStats } from "@/lib/staff";
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
@@ -18,9 +18,13 @@ export function StaffDashboard() {
   const t = useTranslations("staff");
   const locale = useLocale();
   const [stats, setStats] = useState<StaffStats | null>(null);
+  const [recent, setRecent] = useState<StaffApplicationListItem[]>([]);
 
   useEffect(() => {
     staffRequest<StaffStats>("/api/admissions/staff/stats/").then(setStats);
+    staffRequest<{ results: StaffApplicationListItem[] }>("/api/admissions/staff/applications/?sort=-created_at")
+      .then((data) => setRecent(data.results.slice(0, 8)))
+      .catch(() => setRecent([]));
   }, []);
 
   if (!stats) return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
@@ -50,15 +54,61 @@ export function StaffDashboard() {
           </Link>
         </div>
       </div>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label={t("total")} value={stats.total} />
+        <StatCard label={t("successful")} value={stats.approved} />
         <StatCard label={t("pending")} value={stats.pending} />
-        <StatCard label={t("approved")} value={stats.approved} />
-        <StatCard label={t("rejected")} value={stats.rejected} />
-        <StatCard label={t("today")} value={stats.today} />
+        <StatCard label={t("failed")} value={stats.rejected} />
         <StatCard label={t("feeCollected")} value={money(stats.fee_collected)} />
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <StatCard label={t("today")} value={stats.today} />
         <StatCard label={t("feePending")} value={money(stats.fee_pending)} />
         <StatCard label={t("feeSubmitted")} value={money(stats.fee_submitted)} />
+      </div>
+      <div className="mt-10 overflow-hidden rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18]">
+        <div className="flex items-center justify-between px-6 pt-6">
+          <h2 className="font-display text-2xl">{t("applications")}</h2>
+          <Link href="/staff/applications" className="text-sm text-igqs-gold underline">
+            {t("manageApplications")}
+          </Link>
+        </div>
+        {recent.length === 0 ? (
+          <p className="px-6 py-6 text-sm text-igqs-muted">{t("noApplications")}</p>
+        ) : (
+          <table className="mt-4 min-w-full text-left text-sm">
+            <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
+              <tr>
+                <th className="px-6 py-3">{t("student")}</th>
+                <th className="px-3 py-3">{t("applyingClass")}</th>
+                <th className="px-3 py-3">{t("amount")}</th>
+                <th className="px-3 py-3">{t("status")}</th>
+                <th className="px-6 py-3">{t("date")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((row) => (
+                <tr key={row.application_id} className="border-t border-igqs-gold/10">
+                  <td className="px-6 py-3">
+                    <Link href={`/staff/applications/${row.application_id}`} className="hover:underline">
+                      {row.student_name}
+                    </Link>
+                  </td>
+                  <td className="px-3 py-3">{row.applying_class}</td>
+                  <td className="px-3 py-3">
+                    {stats.currency} {Number(row.payment_amount).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}
+                  </td>
+                  <td className="px-3 py-3">
+                    {row.status === "approved" ? t("successful") : row.status === "rejected" ? t("failed") : t("pending")}
+                  </td>
+                  <td className="px-6 py-3">
+                    {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
       <div className="mt-10 rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
         <h2 className="font-display text-2xl">{t("byClass")}</h2>

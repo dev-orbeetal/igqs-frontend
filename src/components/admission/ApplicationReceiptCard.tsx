@@ -1,32 +1,9 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import type { ApplicationDetail } from "@/lib/api";
 
-export type ApplicationDetail = {
-  application_id: string;
-  receipt_id: string;
-  student_name: string;
-  student_name_bn: string;
-  guardian_name: string;
-  applying_class: string;
-  mobile: string;
-  email: string;
-  status: string;
-  status_label: string;
-  rejection_reason?: string;
-  created_at: string;
-  receipt_pdf_url: string;
-  receipt_view_url?: string;
-  receipt_email_sent: boolean;
-  transaction: {
-    payment_method: string;
-    transaction_id: string;
-    payment_amount: string;
-    payment_date: string;
-    payer_mobile: string;
-    payment_screenshot: string;
-  };
-};
+export type { ApplicationDetail };
 
 function methodLabel(
   code: string,
