@@ -14,8 +14,8 @@
   --color-igqs-surface: #163d32;
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
-  --font-bengali: var(--font-hind-siliguri), var(--font-outfit), sans-serif;
-  --font-bengali-display: var(--font-noto-serif-bn), serif;
+  --font-bengali: var(--font-shadhinata), var(--font-outfit), sans-serif;
+  --font-bengali-display: var(--font-shadhinata), var(--font-cormorant), serif;
 }
 
 html {
@@ -31,7 +31,7 @@ body {
 }
 
 .font-bn {
-  font-family: var(--font-hind-siliguri), var(--font-outfit), sans-serif;
+  font-family: var(--font-shadhinata), var(--font-outfit), sans-serif;
   letter-spacing: 0;
   word-spacing: 0;
   text-rendering: optimizeLegibility;
@@ -41,9 +41,9 @@ body {
 .font-bn h1,
 .font-bn h2,
 .font-bn h3 {
-  font-family: var(--font-noto-serif-bn), serif;
+  font-family: var(--font-shadhinata), var(--font-cormorant), serif;
   letter-spacing: 0;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 .font-bn .eyebrow,

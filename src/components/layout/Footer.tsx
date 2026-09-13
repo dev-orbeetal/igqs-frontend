@@ -86,6 +86,14 @@ export async function Footer({ site }: { site?: SiteSettings | null }) {
       <div className="gold-rule" />
       <p className="py-5 text-center text-xs text-igqs-gold-soft/80">
         © {new Date().getFullYear()} {site?.school_name}. {tf("rights")}
+        {" · "}
+        {tf("webfont")}-{" "}
+        <a
+          href="https://lipighor.com"
+          className="underline decoration-igqs-gold/50 underline-offset-2 hover:text-igqs-gold"
+        >
+          lipighor.com
+        </a>
       </p>
     </footer>
   );

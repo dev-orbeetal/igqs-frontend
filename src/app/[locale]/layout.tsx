@@ -1,4 +1,5 @@
-import { Cormorant_Garamond, Hind_Siliguri, Noto_Serif_Bengali, Outfit } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -23,15 +24,36 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-const hindSiliguri = Hind_Siliguri({
-  subsets: ["bengali", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-hind-siliguri",
-});
-
-const notoSerifBn = Noto_Serif_Bengali({
-  subsets: ["bengali"],
-  variable: "--font-noto-serif-bn",
+const shadhinata = localFont({
+  src: [
+    {
+      path: "../../fonts/LiShadhinata-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LiShadhinata-Regular.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LiShadhinata-Regular.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LiShadhinata-Regular.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LiShadhinata-Italic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+  ],
+  variable: "--font-shadhinata",
+  display: "swap",
 });
 
 export const dynamic = "force-dynamic";
@@ -72,7 +94,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${outfit.variable} ${cormorant.variable} ${hindSiliguri.variable} ${notoSerifBn.variable} ${
+        className={`${outfit.variable} ${cormorant.variable} ${shadhinata.variable} ${
           locale === "bn" ? "font-bn" : "font-sans"
         }`}
       >
