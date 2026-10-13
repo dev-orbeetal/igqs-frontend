@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { fieldClass, fieldErrorClass } from "./fields";
+import { controlClass, fieldErrorClass } from "./fields";
 
 export function PhoneVerifyStep({
   phone,
@@ -53,11 +53,13 @@ export function PhoneVerifyStep({
       <label className="mt-6 block text-sm">
         {t("mobile")}
         <input
+          data-field="mobile"
+          aria-invalid={Boolean(error && !phone.trim())}
           type="tel"
           inputMode="numeric"
           autoComplete="tel"
           placeholder={t("otpPlaceholder")}
-          className={fieldClass}
+          className={controlClass(Boolean(error && !phone.trim()))}
           value={phone}
           onChange={(event) => onPhoneChange(event.target.value)}
         />
@@ -74,11 +76,13 @@ export function PhoneVerifyStep({
       <label className="mt-8 block text-sm">
         {t("otpLabel")}
         <input
+          data-field="otp"
+          aria-invalid={Boolean(error && phone.trim())}
           type="text"
           inputMode="numeric"
           autoComplete="one-time-code"
           maxLength={6}
-          className={`${fieldClass} text-center font-mono text-2xl tracking-[0.4em]`}
+          className={`${controlClass(Boolean(error && phone.trim()))} text-center font-mono text-2xl tracking-[0.4em]`}
           value={otp}
           onChange={(event) => onOtpChange(event.target.value.replace(/\D/g, "").slice(0, 6))}
         />

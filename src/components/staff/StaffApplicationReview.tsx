@@ -68,8 +68,8 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
 
   return (
     <div>
-      <Link href="/staff/applications" className="text-sm text-igqs-gold">
-        ← {t("applications")}
+      <Link href="/staff/payments/applications" className="text-sm text-igqs-gold">
+        ← {t("applicationsPage")}
       </Link>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
         <div>

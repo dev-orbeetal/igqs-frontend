@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { ImageFileInput } from "@/components/ui/ImageFileInput";
 import { fieldClass, toDateTimeLocal, type CmsField } from "@/lib/cms";
 
 function setValue(
@@ -24,6 +26,7 @@ export function CmsFields({
   englishLabel: string;
   bengaliLabel: string;
 }) {
+  const t = useTranslations("cms");
   return (
     <div className="grid gap-4">
       {fields.map((field) => {
@@ -93,6 +96,65 @@ export function CmsFields({
                 ))}
               </select>
             </label>
+          );
+        }
+
+        if (field.type === "image") {
+          const urlValue = String(values[field.name] ?? "");
+          const fileValue = values[field.fileName];
+          const clearing = Boolean(values[`clear_${field.fileName}`]);
+          const preview =
+            fileValue instanceof File
+              ? URL.createObjectURL(fileValue)
+              : !clearing && typeof fileValue === "string" && fileValue
+                ? fileValue
+                : urlValue;
+          const hasUpload =
+            fileValue instanceof File || (!clearing && typeof fileValue === "string" && fileValue.length > 0);
+          return (
+            <div key={field.name} className="grid gap-3">
+              <p className="text-sm font-medium">{field.label}</p>
+              {preview && (
+                <img src={preview} alt="" className="h-28 w-40 rounded-xl object-cover" />
+              )}
+              <label className="text-sm">
+                {t("imageUrl")}
+                <input
+                  type="url"
+                  className={fieldClass}
+                  value={urlValue}
+                  placeholder="https://"
+                  onChange={(event) => setValue(values, field.name, event.currentTarget.value, onChange)}
+                />
+              </label>
+              <div className="text-sm">
+                {t("uploadImage")}
+                <ImageFileInput
+                  onChange={(file) =>
+                    onChange({
+                      ...values,
+                      [field.fileName]: file ?? "",
+                      [`clear_${field.fileName}`]: false,
+                    })
+                  }
+                />
+              </div>
+              {hasUpload && (
+                <button
+                  type="button"
+                  className="w-fit text-sm text-red-700 underline"
+                  onClick={() =>
+                    onChange({
+                      ...values,
+                      [field.fileName]: "",
+                      [`clear_${field.fileName}`]: true,
+                    })
+                  }
+                >
+                  {t("removeUpload")}
+                </button>
+              )}
+            </div>
           );
         }
 

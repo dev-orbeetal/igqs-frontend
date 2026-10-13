@@ -1,18 +1,10 @@
-import { setRequestLocale } from "next-intl/server";
-import { StaffApplicationReview } from "@/components/staff/StaffApplicationReview";
-import { StaffShell } from "@/components/staff/StaffShell";
+import { redirect } from "@/i18n/navigation";
 
-export default async function StaffApplicationDetailPage({
+export default async function StaffApplicationRedirect({
   params,
 }: {
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
-  setRequestLocale(locale);
-
-  return (
-    <StaffShell>
-      <StaffApplicationReview applicationId={id} />
-    </StaffShell>
-  );
+  redirect({ href: `/staff/payments/applications/${id}`, locale });
 }

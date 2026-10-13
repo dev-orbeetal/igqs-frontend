@@ -87,8 +87,10 @@ async function parseError(res: Response) {
   throw new Error(data.detail || JSON.stringify(data) || res.statusText);
 }
 
+const adminLoginDisabled = process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true";
+
 export async function staffRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = getStaffToken();
+  const token = adminLoginDisabled ? "" : getStaffToken();
   const headers = new Headers(init.headers);
   if (token) headers.set("Authorization", `Token ${token}`);
   if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {

@@ -15,18 +15,18 @@ import {
   feeFields,
   gradeFields,
   homeFields,
-  imageFields,
   leaderFields,
-  methodFields,
   newsFields,
-  preparePayload,
+  requestBody,
   subjectFields,
   whyFields,
   type CmsField,
   type CmsMeta,
 } from "@/lib/cms";
 import { staffRequest } from "@/lib/staff";
+import { AlbumImages } from "@/components/staff/cms/album-images";
 import { CmsFields, FormActions } from "@/components/staff/cms/fields";
+import { PaymentMethodsEditor } from "@/components/staff/cms/payment-methods";
 
 function useCmsCopy() {
   const t = useTranslations("cms");
@@ -110,7 +110,7 @@ function useSingleton(path: string) {
     try {
       const updated = await staffRequest<Record<string, unknown>>(path, {
         method: "PATCH",
-        body: JSON.stringify(preparePayload(fields, values)),
+        body: requestBody(fields, values),
       });
       setValues(updated);
       setSaved(true);
@@ -143,6 +143,14 @@ function SingletonBlock({ path, fields }: { path: string; fields: CmsField[] }) 
 function Loading() {
   const t = useTranslations("staff");
   return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
+}
+
+function rowLabel(row: Record<string, unknown>, titleField: string) {
+  const title = String(row[titleField] ?? "").trim();
+  if (title) return title;
+  const src = typeof row.image_src === "string" ? row.image_src : "";
+  const name = src.split("/").pop()?.split("?")[0];
+  return name || String(row.id);
 }
 
 function CollectionBlock({
@@ -186,13 +194,12 @@ function CollectionBlock({
     setSaved(false);
     setError("");
     try {
-      const payload = { ...defaults, ...preparePayload(fields, selected) };
       const id = selected.id;
       const updated = await staffRequest<Record<string, unknown>>(
         id ? `${path}${id}/` : path,
         {
           method: id ? "PATCH" : "POST",
-          body: JSON.stringify(payload),
+          body: requestBody(fields, { ...defaults, ...selected }),
         }
       );
       setSelected(updated);
@@ -230,7 +237,7 @@ function CollectionBlock({
             <li key={String(row.id)}>
               <button
                 type="button"
-                className={`block w-full rounded-xl px-3 py-2 text-left ${
+                className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left ${
                   selected?.id === row.id ? "bg-igqs-gold/15 text-igqs-gold" : "hover:bg-igqs-gold/10"
                 }`}
                 onClick={() => {
@@ -239,7 +246,10 @@ function CollectionBlock({
                   setError("");
                 }}
               >
-                {String(row[titleField] || row.id)}
+                {typeof row.image_src === "string" && row.image_src ? (
+                  <img src={row.image_src} alt="" className="h-8 w-8 shrink-0 rounded object-cover" />
+                ) : null}
+                <span className="min-w-0 truncate">{rowLabel(row, titleField)}</span>
               </button>
             </li>
           ))}
@@ -408,12 +418,7 @@ export function AdmissionEditor() {
           />
         </Card>
         <Card title={t("payments")}>
-          <CollectionBlock
-            path="/api/staff/methods/"
-            fields={methodFields(meta?.payment_codes ?? [])}
-            titleField="name_en"
-            defaults={{ is_active: true, order: 0, code: "bkash" }}
-          />
+          <PaymentMethodsEditor />
         </Card>
       </div>
     </div>
@@ -496,10 +501,9 @@ function ItemEditor({
     setSaved(false);
     setError("");
     try {
-      const payload = preparePayload(fields, { ...defaults, ...values });
       const updated = await staffRequest<Record<string, unknown>>(isNew ? resource : path, {
         method: isNew ? "POST" : "PATCH",
-        body: JSON.stringify(payload),
+        body: requestBody(fields, { ...defaults, ...values }),
       });
       setValues(updated);
       setSaved(true);
@@ -677,13 +681,7 @@ export function GalleryManager({ id }: { id?: string }) {
         />
         {id !== "new" && (
           <Card title={t("images")}>
-            <CollectionBlock
-              path="/api/staff/images/"
-              query={`?album=${id}`}
-              fields={imageFields}
-              titleField="caption_en"
-              defaults={{ album: Number(id), order: 0 }}
-            />
+            <AlbumImages albumId={id} />
           </Card>
         )}
       </div>

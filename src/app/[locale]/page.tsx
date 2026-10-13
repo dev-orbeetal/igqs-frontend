@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
-import { apiGet, type AdmissionInfo, type HomePayload, type SiteSettings } from "@/lib/api";
+import { apiGet, type HomePayload, type SiteSettings } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 
 const ICONS: Record<string, typeof BookOpen> = {
@@ -22,10 +22,9 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations();
-  const [home, site, admission] = await Promise.all([
+  const [home, site] = await Promise.all([
     apiGet<HomePayload>("/api/home/", locale),
     apiGet<SiteSettings>("/api/site/", locale),
-    apiGet<AdmissionInfo>("/api/admissions/info/", locale),
   ]);
 
   if (!home || !site) {
@@ -196,11 +195,6 @@ export default async function HomePage({
               <p className="mt-3 max-w-2xl text-base leading-relaxed sm:text-lg">
                 {site.admission_announcement}
               </p>
-              {admission?.default_fee && (
-                <p className="mt-3 font-display text-2xl text-igqs-gold">
-                  {admission.default_fee.label}: {admission.default_fee.display}
-                </p>
-              )}
             </div>
             <Link href="/admission" className="btn-gold inline-flex">
               {t("common.applyNow")}

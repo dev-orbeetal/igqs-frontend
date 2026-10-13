@@ -8,6 +8,8 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { clearStaffToken, getStaffToken, staffLogout, staffRequest, type StaffUser } from "@/lib/staff";
 
+const adminLoginDisabled = process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true";
+
 export function StaffShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("staff");
   const pathname = usePathname();
@@ -16,7 +18,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!getStaffToken()) {
+    if (!adminLoginDisabled && !getStaffToken()) {
       router.replace("/staff/login");
       return;
     }
@@ -41,7 +43,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 
   const links = [
     { href: "/staff", label: t("dashboard"), match: pathname === "/staff" },
-    { href: "/staff/applications", label: t("applications"), match: pathname.startsWith("/staff/applications") },
+    { href: "/staff/payments/applications", label: t("applications"), match: pathname.startsWith("/staff/payments") },
     { href: "/staff/content", label: t("website"), match: pathname.startsWith("/staff/content") },
   ];
 
@@ -55,16 +57,18 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
               <span className="hidden text-sm text-igqs-muted md:inline">{user?.name}</span>
               <LanguageSwitcher />
               <ThemeToggle />
-              <button
-                type="button"
-                className="min-h-10 rounded-full border border-igqs-gold/40 px-3 py-1.5 text-sm"
-                onClick={async () => {
-                  await staffLogout();
-                  router.replace("/staff/login");
-                }}
-              >
-                {t("logout")}
-              </button>
+              {!adminLoginDisabled && (
+                <button
+                  type="button"
+                  className="min-h-10 rounded-full border border-igqs-gold/40 px-3 py-1.5 text-sm"
+                  onClick={async () => {
+                    await staffLogout();
+                    router.replace("/staff/login");
+                  }}
+                >
+                  {t("logout")}
+                </button>
+              )}
             </div>
           </div>
           <nav className="-mx-4 mt-3 flex gap-4 overflow-x-auto px-4 pb-1 text-sm whitespace-nowrap sm:mx-0 sm:px-0">

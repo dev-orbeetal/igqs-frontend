@@ -1,6 +1,6 @@
 const API =
   process.env.NEXT_PUBLIC_API_URL ??
-  (process.env.VERCEL ? "https://igqs.orbeetal.com" : "http://127.0.0.1:8000");
+  (process.env.VERCEL ? "https://igqs.orbeetal.com" : "http://127.0.0.1:8855");
 
 export function apiUrl(path: string, locale?: string) {
   const url = new URL(path, API);
@@ -130,11 +130,7 @@ export type AdmissionFeeInfo = {
 export type PaymentMethodInfo = {
   code: string;
   name: string;
-  account_number: string;
-  account_name: string;
-  bank_name: string;
-  payment_type: string;
-  instructions: string;
+  details: { label: string; value: string }[];
 };
 
 export type AdmissionInfo = {

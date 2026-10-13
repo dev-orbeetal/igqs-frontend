@@ -2,7 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import type { AdmissionFeeInfo, PaymentMethodInfo } from "@/lib/api";
-import { fieldClass, fieldErrorClass, type WizardForm } from "./fields";
+import { ImageFileInput } from "@/components/ui/ImageFileInput";
+import { controlClass, fieldClass, fieldErrorClass, type WizardForm } from "./fields";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -30,12 +31,7 @@ export function PaymentSummaryStep({
 }) {
   const t = useTranslations("admission");
   const amount = fee ? `৳${Number(fee.amount).toLocaleString("en-BD")}` : "—";
-  const sorted = [...methods].sort((a, b) => {
-    if (a.code === "bkash") return -1;
-    if (b.code === "bkash") return 1;
-    return 0;
-  });
-  const selected = sorted.find((method) => method.code === form.payment_method) ?? sorted[0];
+  const selected = methods.find((method) => method.code === form.payment_method) ?? methods[0];
 
   return (
     <div className="grid gap-6">
@@ -55,10 +51,10 @@ export function PaymentSummaryStep({
       </div>
 
       <div>
-        <h3 className="font-display text-xl">{t("payWithBkash")}</h3>
-        <p className="mt-1 text-sm text-igqs-muted">{t("bkashHint")}</p>
+        <h3 className="font-display text-xl">{t("payExternally")}</h3>
+        <p className="mt-1 text-sm text-igqs-muted">{t("payExternalHint")}</p>
         <div className="mt-4 grid gap-3">
-          {sorted.map((method) => (
+          {methods.map((method) => (
             <label
               key={method.code}
               className={`cursor-pointer rounded-2xl border px-4 py-4 ${
@@ -75,12 +71,14 @@ export function PaymentSummaryStep({
                 onChange={() => onChange("payment_method", method.code)}
               />
               <span className="font-medium">{method.name}</span>
-              <span className="mt-1 block break-all font-mono text-sm text-igqs-muted">
-                {method.account_number}
-              </span>
-              {method.instructions && (
-                <span className="mt-2 block text-sm text-igqs-muted">{method.instructions}</span>
-              )}
+              <div className="mt-2 grid gap-1">
+                {method.details.map((detail, index) => (
+                  <p key={`${detail.label}-${index}`} className="text-sm text-igqs-muted">
+                    {detail.label ? <span className="text-igqs-gold">{detail.label}: </span> : null}
+                    <span className="whitespace-pre-wrap">{detail.value}</span>
+                  </p>
+                ))}
+              </div>
             </label>
           ))}
         </div>
@@ -90,7 +88,9 @@ export function PaymentSummaryStep({
       <label className="text-sm">
         {t("transactionId")}
         <input
-          className={fieldClass}
+          data-field="transaction_id"
+          aria-invalid={Boolean(errors.transaction_id)}
+          className={controlClass(Boolean(errors.transaction_id))}
           value={form.transaction_id ?? ""}
           onChange={(event) => onChange("transaction_id", event.target.value)}
         />
@@ -103,22 +103,24 @@ export function PaymentSummaryStep({
       <label className="text-sm">
         {t("paymentDate")}
         <input
+          data-field="payment_date"
+          aria-invalid={Boolean(errors.payment_date)}
           type="date"
-          className={fieldClass}
+          className={controlClass(Boolean(errors.payment_date))}
           value={form.payment_date ?? ""}
           onChange={(event) => onChange("payment_date", event.target.value)}
         />
         {errors.payment_date && <p className={fieldErrorClass}>{errors.payment_date}</p>}
       </label>
-      <label className="text-sm">
-        {t("screenshot")} <span className="text-igqs-muted">({t("screenshotOptional")})</span>
-        <input
-          type="file"
-          accept="image/*"
-          className={fieldClass}
-          onChange={(event) => onScreenshot(event.target.files?.[0])}
+      <div className="text-sm">
+        {t("screenshot")}
+        <ImageFileInput
+          dataField="payment_screenshot"
+          invalid={Boolean(errors.payment_screenshot)}
+          onChange={onScreenshot}
         />
-      </label>
+        {errors.payment_screenshot && <p className={fieldErrorClass}>{errors.payment_screenshot}</p>}
+      </div>
     </div>
   );
 }

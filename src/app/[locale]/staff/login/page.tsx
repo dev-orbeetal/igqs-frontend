@@ -1,8 +1,11 @@
+import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
 import { StaffLoginForm } from "@/components/staff/StaffLoginForm";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { redirect } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
 
 export default async function StaffLoginPage({
   params,
@@ -10,6 +13,12 @@ export default async function StaffLoginPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  if (process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true") {
+    redirect({
+      href: "/staff",
+      locale: hasLocale(routing.locales, locale) ? locale : routing.defaultLocale,
+    });
+  }
   setRequestLocale(locale);
   await getTranslations("staff");
 

@@ -14,7 +14,8 @@ export type CmsField =
   | { type: "pair"; name: string; label: string; textarea?: boolean }
   | { type: "checkbox"; name: string; label: string }
   | { type: "select"; name: string; label: string; options: Option[] }
-  | { type: "datetime"; name: string; label: string };
+  | { type: "datetime"; name: string; label: string }
+  | { type: "image"; name: string; fileName: string; label: string };
 
 export const fieldClass =
   "mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
@@ -61,6 +62,41 @@ export function preparePayload(fields: CmsField[], values: Record<string, unknow
   return payload;
 }
 
+export function requestBody(fields: CmsField[], values: Record<string, unknown>) {
+  const payload = preparePayload(fields, values);
+  const files: { name: string; file: File }[] = [];
+  const datetimes = new Set(fields.filter((field) => field.type === "datetime").map((field) => field.name));
+
+  for (const field of fields) {
+    if (field.type !== "image") continue;
+    const flag = `clear_${field.fileName}`;
+    const file = values[field.fileName];
+    delete payload[field.fileName];
+    if (file instanceof File) {
+      files.push({ name: field.fileName, file });
+      delete payload[flag];
+    } else if (payload[flag] !== true) {
+      delete payload[flag];
+    }
+  }
+
+  if (files.length === 0) return JSON.stringify(payload);
+
+  const form = new FormData();
+  for (const [key, value] of Object.entries(payload)) {
+    if ((value === null || value === undefined) && datetimes.has(key)) continue;
+    if (typeof value === "boolean") {
+      form.append(key, value ? "true" : "false");
+    } else if (value === null || value === undefined) {
+      form.append(key, "");
+    } else {
+      form.append(key, String(value));
+    }
+  }
+  for (const item of files) form.append(item.name, item.file);
+  return form;
+}
+
 export function emptyRecord(fields: CmsField[], extras: Record<string, unknown> = {}) {
   const values: Record<string, unknown> = { ...extras };
   for (const field of fields) {
@@ -81,13 +117,13 @@ export function emptyRecord(fields: CmsField[], extras: Record<string, unknown> 
 export const homeFields: CmsField[] = [
   { type: "pair", name: "hero_title", label: "Hero title" },
   { type: "pair", name: "hero_subtitle", label: "Hero subtitle", textarea: true },
-  { type: "url", name: "hero_image_url", label: "Hero image URL" },
+  { type: "image", name: "hero_image_url", fileName: "hero_image", label: "Hero image" },
   { type: "pair", name: "welcome", label: "Welcome", textarea: true },
   { type: "pair", name: "about_preview", label: "About preview", textarea: true },
   { type: "pair", name: "principal_name", label: "Principal name" },
   { type: "pair", name: "principal_title", label: "Principal title" },
   { type: "pair", name: "principal_message", label: "Principal message", textarea: true },
-  { type: "url", name: "principal_photo_url", label: "Principal photo URL" },
+  { type: "image", name: "principal_photo_url", fileName: "principal_photo", label: "Principal photo" },
 ];
 
 export const whyFields = (icons: Option[]): CmsField[] => [
@@ -110,21 +146,21 @@ export const leaderFields: CmsField[] = [
   { type: "pair", name: "name", label: "Name" },
   { type: "pair", name: "role", label: "Role" },
   { type: "pair", name: "bio", label: "Biography", textarea: true },
-  { type: "url", name: "photo_url", label: "Photo URL" },
+  { type: "image", name: "photo_url", fileName: "photo", label: "Photo" },
   { type: "number", name: "order", label: "Order" },
 ];
 
 export const facilityFields: CmsField[] = [
   { type: "pair", name: "title", label: "Title" },
   { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "url", name: "image_url", label: "Image URL" },
+  { type: "image", name: "image_url", fileName: "image", label: "Image" },
   { type: "number", name: "order", label: "Order" },
 ];
 
 export const contactFields: CmsField[] = [
   { type: "pair", name: "school_name", label: "School name" },
   { type: "pair", name: "tagline", label: "Tagline" },
-  { type: "url", name: "logo_url", label: "Logo URL" },
+  { type: "image", name: "logo_url", fileName: "logo", label: "Logo" },
   { type: "pair", name: "address", label: "Address" },
   { type: "text", name: "phone_primary", label: "Primary phone" },
   { type: "text", name: "phone_secondary", label: "Secondary phone" },
@@ -149,7 +185,7 @@ export const eventFields: CmsField[] = [
   { type: "datetime", name: "end_at", label: "Ends" },
   { type: "pair", name: "location", label: "Location" },
   { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "url", name: "image_url", label: "Image URL" },
+  { type: "image", name: "image_url", fileName: "image", label: "Image" },
   { type: "checkbox", name: "is_published", label: "Published" },
 ];
 
@@ -158,7 +194,7 @@ export const newsFields = (categories: Option[]): CmsField[] => [
   { type: "pair", name: "title", label: "Title" },
   { type: "select", name: "category", label: "Category", options: categories },
   { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "url", name: "featured_image_url", label: "Image URL" },
+  { type: "image", name: "featured_image_url", fileName: "featured_image", label: "Image" },
   { type: "datetime", name: "published_at", label: "Published at" },
   { type: "checkbox", name: "is_published", label: "Published" },
   { type: "checkbox", name: "is_important", label: "Show as important notice" },
@@ -189,13 +225,7 @@ export const albumFields = (categories: Option[]): CmsField[] => [
   { type: "pair", name: "title", label: "Title" },
   { type: "select", name: "category", label: "Category", options: categories },
   { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "url", name: "cover_image_url", label: "Cover image URL" },
-  { type: "number", name: "order", label: "Order" },
-];
-
-export const imageFields: CmsField[] = [
-  { type: "url", name: "image_url", label: "Image URL" },
-  { type: "pair", name: "caption", label: "Caption" },
+  { type: "image", name: "cover_image_url", fileName: "cover_image", label: "Cover image" },
   { type: "number", name: "order", label: "Order" },
 ];
 
@@ -207,14 +237,3 @@ export const feeFields = (grades: Option[]): CmsField[] => [
   { type: "checkbox", name: "is_active", label: "Active" },
 ];
 
-export const methodFields = (codes: Option[]): CmsField[] => [
-  { type: "select", name: "code", label: "Method", options: codes },
-  { type: "pair", name: "name", label: "Name" },
-  { type: "text", name: "account_number", label: "Account number" },
-  { type: "text", name: "account_name", label: "Account name" },
-  { type: "text", name: "bank_name", label: "Bank name" },
-  { type: "pair", name: "payment_type", label: "Payment type" },
-  { type: "pair", name: "instructions", label: "Payment instructions", textarea: true },
-  { type: "checkbox", name: "is_active", label: "Active" },
-  { type: "number", name: "order", label: "Order" },
-];

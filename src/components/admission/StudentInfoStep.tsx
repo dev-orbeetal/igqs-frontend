@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { fieldClass, fieldErrorClass, type WizardForm } from "./fields";
+import { ImageFileInput } from "@/components/ui/ImageFileInput";
+import { controlClass, fieldClass, fieldErrorClass, type WizardForm } from "./fields";
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
@@ -40,7 +41,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("studentName")}
           <input
-            className={fieldClass}
+            data-field="student_name"
+            aria-invalid={Boolean(errors.student_name)}
+            className={controlClass(Boolean(errors.student_name))}
             value={form.student_name ?? ""}
             onChange={(event) => onChange("student_name", event.target.value)}
             autoComplete="name"
@@ -50,7 +53,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("studentNameBn")}
           <input
-            className={fieldClass}
+            data-field="student_name_bn"
+            aria-invalid={Boolean(errors.student_name_bn)}
+            className={controlClass(Boolean(errors.student_name_bn))}
             value={form.student_name_bn ?? ""}
             onChange={(event) => onChange("student_name_bn", event.target.value)}
           />
@@ -59,8 +64,10 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("dob")}
           <input
+            data-field="date_of_birth"
+            aria-invalid={Boolean(errors.date_of_birth)}
             type="date"
-            className={fieldClass}
+            className={controlClass(Boolean(errors.date_of_birth))}
             value={form.date_of_birth ?? ""}
             onChange={(event) => onChange("date_of_birth", event.target.value)}
           />
@@ -69,7 +76,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("gender")}
           <select
-            className={fieldClass}
+            data-field="gender"
+            aria-invalid={Boolean(errors.gender)}
+            className={controlClass(Boolean(errors.gender))}
             value={form.gender ?? ""}
             onChange={(event) => onChange("gender", event.target.value)}
           >
@@ -94,7 +103,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("address")}
           <textarea
-            className={fieldClass}
+            data-field="student_address"
+            aria-invalid={Boolean(errors.student_address)}
+            className={controlClass(Boolean(errors.student_address))}
             rows={3}
             value={form.student_address ?? ""}
             onChange={(event) => onChange("student_address", event.target.value)}
@@ -103,11 +114,10 @@ export function StudentInfoStep({
         </label>
         <label className="text-sm">
           {t("photo")}
-          <input
-            type="file"
-            accept="image/*"
-            className={`${fieldClass} min-h-12`}
-            onChange={(event) => onPhoto(event.target.files?.[0])}
+          <ImageFileInput
+            dataField="student_photo"
+            invalid={Boolean(errors.student_photo)}
+            onChange={onPhoto}
           />
           <span className="mt-1 block text-xs text-igqs-muted">
             {filesReady.photo ? t("fileHint") : t("reattachFiles")}
@@ -117,8 +127,10 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("birthCertificate")}
           <input
+            data-field="birth_certificate"
+            aria-invalid={Boolean(errors.birth_certificate)}
             type="file"
-            className={`${fieldClass} min-h-12`}
+            className={`${controlClass(Boolean(errors.birth_certificate))} min-h-12`}
             onChange={(event) => onBirth(event.target.files?.[0])}
           />
           <span className="mt-1 block text-xs text-igqs-muted">{t("fileHint")}</span>
@@ -131,7 +143,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("fatherName")}
           <input
-            className={fieldClass}
+            data-field="father_name"
+            aria-invalid={Boolean(errors.father_name)}
+            className={controlClass(Boolean(errors.father_name))}
             value={form.father_name ?? ""}
             onChange={(event) => onChange("father_name", event.target.value)}
           />
@@ -140,7 +154,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("motherName")}
           <input
-            className={fieldClass}
+            data-field="mother_name"
+            aria-invalid={Boolean(errors.mother_name)}
+            className={controlClass(Boolean(errors.mother_name))}
             value={form.mother_name ?? ""}
             onChange={(event) => onChange("mother_name", event.target.value)}
           />
@@ -149,7 +165,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("guardianName")}
           <input
-            className={fieldClass}
+            data-field="guardian_name"
+            aria-invalid={Boolean(errors.guardian_name)}
+            className={controlClass(Boolean(errors.guardian_name))}
             value={form.guardian_name ?? ""}
             onChange={(event) => onChange("guardian_name", event.target.value)}
           />
@@ -158,7 +176,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("fatherOccupation")}
           <input
-            className={fieldClass}
+            data-field="father_occupation"
+            aria-invalid={Boolean(errors.father_occupation)}
+            className={controlClass(Boolean(errors.father_occupation))}
             value={form.father_occupation ?? ""}
             onChange={(event) => onChange("father_occupation", event.target.value)}
           />
@@ -175,10 +195,12 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("mobile")}
           <input
+            data-field="mobile"
+            aria-invalid={Boolean(errors.mobile)}
             type="tel"
             inputMode="numeric"
             autoComplete="tel"
-            className={fieldClass}
+            className={controlClass(Boolean(errors.mobile))}
             value={form.mobile ?? ""}
             onChange={(event) => onChange("mobile", event.target.value)}
           />
@@ -187,9 +209,11 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("email")}
           <input
+            data-field="email"
+            aria-invalid={Boolean(errors.email)}
             type="email"
             autoComplete="email"
-            className={fieldClass}
+            className={controlClass(Boolean(errors.email))}
             value={form.email ?? ""}
             onChange={(event) => onChange("email", event.target.value)}
           />
@@ -198,7 +222,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("guardianAddress")}
           <textarea
-            className={fieldClass}
+            data-field="guardian_address"
+            aria-invalid={Boolean(errors.guardian_address)}
+            className={controlClass(Boolean(errors.guardian_address))}
             rows={3}
             value={form.guardian_address ?? ""}
             onChange={(event) => onChange("guardian_address", event.target.value)}
@@ -208,7 +234,9 @@ export function StudentInfoStep({
         <label className="text-sm">
           {t("emergency")}
           <input
-            className={fieldClass}
+            data-field="emergency_contact"
+            aria-invalid={Boolean(errors.emergency_contact)}
+            className={controlClass(Boolean(errors.emergency_contact))}
             value={form.emergency_contact ?? ""}
             onChange={(event) => onChange("emergency_contact", event.target.value)}
           />

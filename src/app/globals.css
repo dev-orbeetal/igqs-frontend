@@ -30,6 +30,12 @@ body {
   @apply bg-[#07140f] text-igqs-sand;
 }
 
+select option,
+select optgroup {
+  color: #000;
+  background-color: #fff;
+}
+
 .font-bn {
   font-family: var(--font-shadhinata), var(--font-outfit), sans-serif;
   letter-spacing: 0;

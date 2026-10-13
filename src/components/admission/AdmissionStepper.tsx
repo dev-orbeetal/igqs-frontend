@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-const STEP_KEYS = ["stepClass", "stepInformation", "stepVerify", "stepPayment", "stepReceipt"] as const;
+const STEP_KEYS = ["stepClass", "stepInformation", "stepPayment", "stepReceipt"] as const;
 
 export function AdmissionStepper({
   step,
@@ -17,7 +17,7 @@ export function AdmissionStepper({
     <ol className="flex items-center gap-1 overflow-x-auto pb-1 text-xs sm:gap-2 sm:text-sm">
       {STEP_KEYS.map((key, index) => {
         const current = index === step;
-        const done = index < step || (index === 4 && receiptReady);
+        const done = index < step || (index === 3 && receiptReady);
         return (
           <li key={key} className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
             <div

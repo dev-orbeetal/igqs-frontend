@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
+import { PaymentsNav } from "@/components/staff/PaymentsNav";
 import { staffDownload, staffRequest, type StaffApplicationListItem } from "@/lib/staff";
 
 const fieldClass =
@@ -66,8 +67,9 @@ export function StaffApplicationList() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.28em] text-igqs-gold">{t("kicker")}</p>
-          <h1 className="mt-2 font-display text-4xl">{t("applications")}</h1>
-          <p className="mt-2 text-sm text-igqs-muted">{t("searchHint")}</p>
+          <h1 className="mt-2 font-display text-4xl">{t("applicationsPage")}</h1>
+          <PaymentsNav />
+          <p className="mt-4 text-sm text-igqs-muted">{t("searchHint")}</p>
         </div>
         <button
           type="button"
@@ -158,7 +160,7 @@ export function StaffApplicationList() {
             <p className="mt-1 text-xs text-igqs-muted">
               {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
             </p>
-            <Link href={`/staff/applications/${row.application_id}`} className="mt-3 inline-block text-sm text-igqs-gold underline">
+            <Link href={`/staff/payments/applications/${row.application_id}`} className="mt-3 inline-block text-sm text-igqs-gold underline">
               {t("review")}
             </Link>
           </article>
@@ -182,7 +184,7 @@ export function StaffApplicationList() {
               <tr
                 key={row.application_id}
                 className="cursor-pointer border-t border-igqs-gold/10 hover:bg-igqs-sand/30 dark:hover:bg-white/5"
-                onClick={() => router.push(`/staff/applications/${row.application_id}`)}
+                onClick={() => router.push(`/staff/payments/applications/${row.application_id}`)}
               >
                 <td className="px-4 py-3">
                   {row.student_name}
@@ -201,7 +203,7 @@ export function StaffApplicationList() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <Link
-                    href={`/staff/applications/${row.application_id}`}
+                    href={`/staff/payments/applications/${row.application_id}`}
                     className="text-igqs-gold underline"
                     onClick={(event) => event.stopPropagation()}
                   >

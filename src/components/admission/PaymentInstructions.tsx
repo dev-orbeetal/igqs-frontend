@@ -8,8 +8,6 @@ export function PaymentInstructions({
   howTitle,
   steps,
   methodsTitle,
-  accountLabel,
-  typeLabel,
   notice,
 }: {
   fee?: AdmissionFeeInfo | null;
@@ -19,8 +17,6 @@ export function PaymentInstructions({
   howTitle: string;
   steps: string[];
   methodsTitle: string;
-  accountLabel: string;
-  typeLabel: string;
   notice: string;
 }) {
   return (
@@ -58,20 +54,14 @@ export function PaymentInstructions({
               className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18]"
             >
               <h3 className="font-display text-2xl">{method.name}</h3>
-              <p className="mt-2 font-mono text-lg text-igqs-green dark:text-igqs-gold-soft">
-                {method.account_number}
-              </p>
-              {method.account_name && (
-                <p className="text-sm text-igqs-muted">
-                  {accountLabel}: {method.account_name}
-                </p>
-              )}
-              {method.bank_name && <p className="text-sm text-igqs-muted">{method.bank_name}</p>}
-              <p className="mt-2 text-sm">
-                <span className="text-igqs-gold">{typeLabel}: </span>
-                {method.payment_type}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-igqs-muted">{method.instructions}</p>
+              <div className="mt-3 grid gap-2">
+                {method.details.map((detail, index) => (
+                  <p key={`${detail.label}-${index}`} className="text-sm leading-relaxed text-igqs-muted">
+                    {detail.label ? <span className="text-igqs-gold">{detail.label}: </span> : null}
+                    <span className="whitespace-pre-wrap">{detail.value}</span>
+                  </p>
+                ))}
+              </div>
             </article>
           ))}
         </div>
