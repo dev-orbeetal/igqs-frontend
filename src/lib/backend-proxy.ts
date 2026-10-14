@@ -1,3 +1,4 @@
+import type { IncomingHttpHeaders } from "node:http";
 import https from "node:https";
 import { NextResponse } from "next/server";
 
@@ -14,7 +15,7 @@ const DROPPED_HEADERS = new Set([
 
 type BackendResult = {
   status: number;
-  headers: https.IncomingHttpHeaders;
+  headers: IncomingHttpHeaders;
   body: Buffer;
 };
 
@@ -58,6 +59,12 @@ function headerValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value.join(", ") : value;
 }
 
+function headerEntries(headers: IncomingHttpHeaders) {
+  return Object.entries(headers).filter(
+    (entry): entry is [string, string | string[]] => entry[1] != null,
+  );
+}
+
 export async function proxyBackend(request: Request) {
   const incoming = new URL(request.url);
   const headers: Record<string, string> = {};
@@ -84,8 +91,8 @@ export async function proxyBackend(request: Request) {
   const origin = incoming.origin;
   const backendOrigin = `https://${BACKEND_HOST}`;
   const outHeaders = new Headers();
-  for (const [key, value] of Object.entries(result.headers)) {
-    if (!value || DROPPED_HEADERS.has(key.toLowerCase())) continue;
+  for (const [key, value] of headerEntries(result.headers)) {
+    if (DROPPED_HEADERS.has(key.toLowerCase())) continue;
     outHeaders.set(key, headerValue(value).replaceAll(backendOrigin, origin));
   }
 
