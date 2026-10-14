@@ -23,7 +23,13 @@ function EventGrid({
           >
             <div className="relative h-48">
               {event.image && (
-                <Image src={event.image} alt="" fill className="object-cover transition group-hover:scale-105" />
+                <Image
+                  src={event.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 33vw, 100vw"
+                  className="object-cover transition group-hover:scale-105"
+                />
               )}
             </div>
             <div className="p-5">

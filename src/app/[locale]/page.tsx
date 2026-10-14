@@ -50,19 +50,21 @@ export default async function HomePage({
 
   return (
     <div>
-      <section className="relative min-h-[86vh] overflow-hidden">
-        {content.hero_image_url && (
-          <Image
-            src={content.hero_image_url}
-            alt=""
-            fill
-            priority
-            className="object-cover"
-          />
-        )}
-        <div className="hero-overlay absolute inset-0" />
-        <div className="hero-pattern absolute inset-0" />
-        <div className="hero-bottom-fade absolute inset-x-0 bottom-0 h-24" />
+      <section className="relative min-h-[86vh] overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
+        <div className="hero-media pointer-events-none absolute inset-0">
+          {content.hero_image_url && (
+            <Image
+              src={content.hero_image_url}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          )}
+          <div className="hero-overlay absolute inset-0" />
+          <div className="hero-pattern absolute inset-0" />
+        </div>
         <div className="relative mx-auto flex min-h-[86vh] max-w-7xl flex-col justify-center px-4 py-20 sm:px-6">
           <FadeIn>
             <p className="eyebrow">{site.school_name}</p>
@@ -113,6 +115,7 @@ export default async function HomePage({
               src={home.gallery[0]?.cover_image_url || content.hero_image_url}
               alt=""
               fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="img-zoom object-cover"
             />
             <div className="img-overlay absolute inset-0" />
@@ -132,6 +135,7 @@ export default async function HomePage({
                   src={content.principal_photo_url}
                   alt={content.principal_name}
                   fill
+                  sizes="(min-width: 768px) 200px, 100vw"
                   className="img-zoom object-cover"
                 />
               </div>
@@ -235,6 +239,7 @@ export default async function HomePage({
                         src={event.image}
                         alt=""
                         fill
+                        sizes="(min-width: 768px) 33vw, 100vw"
                         className="img-zoom object-cover"
                       />
                     )}
@@ -266,7 +271,13 @@ export default async function HomePage({
                 <Link href={`/news/${item.slug}`} className="surface-card surface-card-hover group block overflow-hidden bg-white/90 dark:bg-[#12352b]">
                   <div className="relative h-40">
                     {item.image && (
-                      <Image src={item.image} alt="" fill className="img-zoom object-cover" />
+                      <Image
+                        src={item.image}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                        className="img-zoom object-cover"
+                      />
                     )}
                     <div className="img-overlay absolute inset-0" />
                   </div>
@@ -298,6 +309,11 @@ export default async function HomePage({
                       src={album.cover_image_url}
                       alt={album.title}
                       fill
+                      sizes={
+                        i === 0
+                          ? "(min-width: 768px) 50vw, 100vw"
+                          : "(min-width: 768px) 25vw, 50vw"
+                      }
                       className="img-zoom object-cover"
                     />
                   )}

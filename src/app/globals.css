@@ -234,9 +234,18 @@ select optgroup {
 }
 
 .hero-overlay {
+  background: linear-gradient(
+    105deg,
+    rgb(8 28 22 / 0.92) 0%,
+    rgb(15 61 48 / 0.78) 46%,
+    rgb(16 35 28 / 0.38) 100%
+  );
+}
+
+.dark .hero-overlay {
   background:
     linear-gradient(105deg, rgb(8 28 22 / 0.92) 0%, rgb(15 61 48 / 0.78) 46%, rgb(16 35 28 / 0.38) 100%),
-    linear-gradient(180deg, rgb(8 24 18 / 0.18) 0%, transparent 28%, rgb(8 24 18 / 0.45) 100%);
+    linear-gradient(180deg, rgb(8 24 18 / 0.18) 0%, transparent 28%, rgb(8 24 18 / 0.55) 100%);
 }
 
 .hero-pattern {
@@ -245,12 +254,14 @@ select optgroup {
   animation: pattern-drift 90s linear infinite;
 }
 
-.hero-bottom-fade {
-  background: linear-gradient(180deg, transparent, #f6f1e7);
+.hero-media {
+  -webkit-mask-image: linear-gradient(#000 0, #000 calc(100% - 1.5rem), transparent 100%);
+  mask-image: linear-gradient(#000 0, #000 calc(100% - 1.5rem), transparent 100%);
 }
 
-.dark .hero-bottom-fade {
-  background: linear-gradient(180deg, transparent, #0a1a14);
+.dark .hero-media {
+  -webkit-mask-image: linear-gradient(#000 0, #000 calc(100% - 7rem), transparent 100%);
+  mask-image: linear-gradient(#000 0, #000 calc(100% - 7rem), transparent 100%);
 }
 
 .gold-rule {

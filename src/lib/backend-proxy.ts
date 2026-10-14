@@ -78,12 +78,7 @@ export async function proxyBackend(request: Request) {
   let path = `${incoming.pathname}${incoming.search}`;
   let result = await requestBackend(request.method, path, headers, body);
   const location = headerValue(result.headers.location);
-  if (
-    !hasBody &&
-    result.status >= 300 &&
-    result.status < 400 &&
-    location.startsWith("/")
-  ) {
+  if (result.status >= 300 && result.status < 400 && location.startsWith("/")) {
     path = location;
     result = await requestBackend(request.method, path, headers, body);
   }

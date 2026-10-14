@@ -70,7 +70,13 @@ export default async function AboutPage({
               <FadeIn key={person.id} className="overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
                 <div className="relative h-64">
                   {person.photo_url && (
-                    <Image src={person.photo_url} alt={person.name} fill className="object-cover" />
+                    <Image
+                      src={person.photo_url}
+                      alt={person.name}
+                      fill
+                      sizes="(min-width: 768px) 33vw, 100vw"
+                      className="object-cover"
+                    />
                   )}
                 </div>
                 <div className="p-5">
@@ -97,7 +103,13 @@ export default async function AboutPage({
               <FadeIn key={item.id} className="grid overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white md:grid-cols-2 dark:bg-[#0d1f18]">
                 <div className="relative min-h-44">
                   {item.image_url && (
-                    <Image src={item.image_url} alt="" fill className="object-cover" />
+                    <Image
+                      src={item.image_url}
+                      alt=""
+                      fill
+                      sizes="(min-width: 768px) 25vw, 100vw"
+                      className="object-cover"
+                    />
                   )}
                 </div>
                 <div className="p-6">

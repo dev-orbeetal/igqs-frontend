@@ -59,7 +59,13 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
             >
               <div className="relative h-52">
                 {album.cover_image_url && (
-                  <Image src={album.cover_image_url} alt="" fill className="object-cover" />
+                  <Image
+                    src={album.cover_image_url}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
                 )}
               </div>
               <div className="p-5">
@@ -74,7 +80,13 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {openAlbum.images.map((image) => (
             <div key={image.id} className="relative h-56 overflow-hidden rounded-2xl">
-              <Image src={image.image} alt={image.caption} fill className="object-cover" />
+              <Image
+                src={image.image}
+                alt={image.caption}
+                fill
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="object-cover"
+              />
             </div>
           ))}
         </div>

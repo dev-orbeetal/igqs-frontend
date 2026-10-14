@@ -24,7 +24,7 @@ export default async function EventDetailPage({
         <FadeIn>
           {event.image && (
             <div className="relative mb-8 h-80 overflow-hidden rounded-3xl">
-              <Image src={event.image} alt="" fill className="object-cover" />
+              <Image src={event.image} alt="" fill sizes="(min-width: 768px) 48rem, 100vw" className="object-cover" />
             </div>
           )}
           <p className="text-sm text-igqs-gold">

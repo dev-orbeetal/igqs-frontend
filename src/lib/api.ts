@@ -24,11 +24,30 @@ export function apiUrl(path: string, locale?: string) {
   return url.toString();
 }
 
+function isProductionSite(base: string) {
+  try {
+    return SITE_HOSTS.has(new URL(base).hostname);
+  } catch {
+    return false;
+  }
+}
+
 export async function apiGet<T>(path: string, locale: string): Promise<T | null> {
   try {
+    if (typeof window === "undefined" && isProductionSite(configuredApi())) {
+      const { cachedPublicGet } = await import("@/lib/public-api-cache");
+      const url = new URL(path, "https://igqsbd.com");
+      if (locale) url.searchParams.set("lang", locale);
+      const body = await cachedPublicGet(`${url.pathname}${url.search}`);
+      if (!body) return null;
+      return JSON.parse(body) as T;
+    }
+
     const res = await fetch(apiUrl(path, locale), {
-      cache: "no-store",
       signal: AbortSignal.timeout(15000),
+      ...(typeof window === "undefined"
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store" as const }),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
