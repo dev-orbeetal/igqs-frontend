@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -10,6 +11,7 @@ import { HideOnStaff } from "@/components/layout/HideOnStaff";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
+import { isAdminHost } from "@/lib/admin-paths";
 import { apiGet, type SiteSettings } from "@/lib/api";
 import "../globals.css";
 
@@ -89,6 +91,7 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
   const messages = await getMessages();
+  const adminSite = isAdminHost(await headers());
   const site = await apiGet<SiteSettings>("/api/site/", locale);
 
   return (
@@ -100,9 +103,9 @@ export default async function LocaleLayout({
       >
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
-            <Header site={site} />
+            <Header site={site} adminSite={adminSite} />
             <main>{children}</main>
-            <HideOnStaff>
+            <HideOnStaff adminSite={adminSite}>
               <Footer site={site} />
             </HideOnStaff>
           </NextIntlClientProvider>

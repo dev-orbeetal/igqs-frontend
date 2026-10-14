@@ -293,14 +293,14 @@ function useMeta() {
 export function ContentHub() {
   const t = useTranslations("cms");
   const sections = [
-    { href: "/staff/content/home", title: t("home"), hint: t("homeHint") },
-    { href: "/staff/content/about", title: t("about"), hint: t("aboutHint") },
-    { href: "/staff/content/curriculum", title: t("curriculum"), hint: t("curriculumHint") },
-    { href: "/staff/content/events", title: t("events"), hint: t("eventsHint") },
-    { href: "/staff/content/news", title: t("news"), hint: t("newsHint") },
-    { href: "/staff/content/gallery", title: t("gallery"), hint: t("galleryHint") },
-    { href: "/staff/content/contact", title: t("contact"), hint: t("contactHint") },
-    { href: "/staff/content/admission", title: t("admission"), hint: t("admissionHint") },
+    { href: "/content/home", title: t("home"), hint: t("homeHint") },
+    { href: "/content/about", title: t("about"), hint: t("aboutHint") },
+    { href: "/content/curriculum", title: t("curriculum"), hint: t("curriculumHint") },
+    { href: "/content/events", title: t("events"), hint: t("eventsHint") },
+    { href: "/content/news", title: t("news"), hint: t("newsHint") },
+    { href: "/content/gallery", title: t("gallery"), hint: t("galleryHint") },
+    { href: "/content/contact", title: t("contact"), hint: t("contactHint") },
+    { href: "/content/admission", title: t("admission"), hint: t("admissionHint") },
   ];
   return (
     <div>
@@ -327,7 +327,7 @@ function PageHeader({ title }: { title: string }) {
   const t = useTranslations("cms");
   return (
     <div className="mb-6">
-      <Link href="/staff/content" className="text-sm text-igqs-gold">
+      <Link href="/content" className="text-sm text-igqs-gold">
         ← {t("website")}
       </Link>
       <h1 className="mt-3 font-display text-4xl">{title}</h1>
@@ -554,7 +554,7 @@ export function EventsManager({ id }: { id?: string }) {
         <PageHeader title={t("events")} />
         <ItemTable
           path="/api/staff/events/"
-          hrefBase="/staff/content/events"
+          hrefBase="/content/events"
           titleField="title_en"
           extra={(row) => (row.is_published ? t("published") : t("draft"))}
         />
@@ -568,7 +568,7 @@ export function EventsManager({ id }: { id?: string }) {
         path={id === "new" ? "/api/staff/events/new" : `/api/staff/events/${id}/`}
         fields={eventFields}
         defaults={{ is_published: true }}
-        listHref="/staff/content/events"
+        listHref="/content/events"
       />
     </div>
   );
@@ -584,7 +584,7 @@ export function NewsManager({ id }: { id?: string }) {
         <PageHeader title={t("news")} />
         <ItemTable
           path="/api/staff/news/"
-          hrefBase="/staff/content/news"
+          hrefBase="/content/news"
           titleField="title_en"
           extra={(row) => `${row.category}${row.is_important ? ` · ${t("notice")}` : ""}`}
         />
@@ -598,7 +598,7 @@ export function NewsManager({ id }: { id?: string }) {
         path={id === "new" ? "/api/staff/news/new" : `/api/staff/news/${id}/`}
         fields={fields}
         defaults={{ category: "news", is_published: true, is_important: false, published_at: new Date().toISOString() }}
-        listHref="/staff/content/news"
+        listHref="/content/news"
       />
     </div>
   );
@@ -611,7 +611,7 @@ export function CurriculumManager({ id }: { id?: string }) {
     return (
       <div>
         <PageHeader title={t("curriculum")} />
-        <ItemTable path="/api/staff/grades/" hrefBase="/staff/content/curriculum" titleField="name_en" extra={(row) => String(row.slug)} />
+        <ItemTable path="/api/staff/grades/" hrefBase="/content/curriculum" titleField="name_en" extra={(row) => String(row.slug)} />
       </div>
     );
   }
@@ -623,7 +623,7 @@ export function CurriculumManager({ id }: { id?: string }) {
           path={id === "new" ? "/api/staff/grades/new" : `/api/staff/grades/${id}/`}
           fields={gradeFields}
           defaults={{ order: 0 }}
-          listHref="/staff/content/curriculum"
+          listHref="/content/curriculum"
         />
         {id !== "new" && meta && (
           <>
@@ -662,7 +662,7 @@ export function GalleryManager({ id }: { id?: string }) {
         <PageHeader title={t("gallery")} />
         <ItemTable
           path="/api/staff/albums/"
-          hrefBase="/staff/content/gallery"
+          hrefBase="/content/gallery"
           titleField="title_en"
           extra={(row) => String(row.category)}
         />
@@ -677,7 +677,7 @@ export function GalleryManager({ id }: { id?: string }) {
           path={id === "new" ? "/api/staff/albums/new" : `/api/staff/albums/${id}/`}
           fields={fields}
           defaults={{ category: "campus", order: 0 }}
-          listHref="/staff/content/gallery"
+          listHref="/content/gallery"
         />
         {id !== "new" && (
           <Card title={t("images")}>

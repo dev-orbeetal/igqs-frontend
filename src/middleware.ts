@@ -1,5 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
+import { canonicalAdminPath, isAdminPath } from "./lib/admin-paths";
 import { routing } from "./i18n/routing";
 
 const handleI18nRouting = createMiddleware(routing);
@@ -15,21 +16,23 @@ function requestHost(request: NextRequest) {
   return raw.trim().split(":")[0].toLowerCase();
 }
 
-function isStaffPath(pathname: string) {
-  return pathname === "/staff" || pathname.startsWith("/staff/");
-}
-
 export default function middleware(request: NextRequest) {
   const host = requestHost(request);
   const { pathname, search } = request.nextUrl;
+  const onAdmin = ADMIN_HOSTS.has(host);
+  const onPublic = PUBLIC_HOSTS.has(host);
+  const canonical = canonicalAdminPath(pathname, onAdmin);
 
-  if (ADMIN_HOSTS.has(host)) {
-    if (!isStaffPath(pathname)) {
-      const destination = pathname === "/" ? "/staff" : `${pathname}${search}`;
-      const origin = pathname === "/" ? request.url : PUBLIC_ORIGIN;
-      return NextResponse.redirect(new URL(destination, origin));
-    }
-  } else if (PUBLIC_HOSTS.has(host) && isStaffPath(pathname)) {
+  if (canonical !== pathname) {
+    const origin = onPublic ? ADMIN_ORIGIN : request.url;
+    return NextResponse.redirect(new URL(`${canonical}${search}`, origin));
+  }
+
+  if (onAdmin && pathname !== "/" && !isAdminPath(pathname)) {
+    return NextResponse.redirect(new URL(`${pathname}${search}`, PUBLIC_ORIGIN));
+  }
+
+  if (onPublic && isAdminPath(pathname)) {
     return NextResponse.redirect(new URL(`${pathname}${search}`, ADMIN_ORIGIN));
   }
 

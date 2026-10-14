@@ -15,7 +15,7 @@ export default async function StaffLoginPage({
   const { locale } = await params;
   if (process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true") {
     redirect({
-      href: "/staff",
+      href: "/dashboard",
       locale: hasLocale(routing.locales, locale) ? locale : routing.defaultLocale,
     });
   }

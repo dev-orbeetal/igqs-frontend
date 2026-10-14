@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { SiteSettings } from "@/lib/api";
+import { isAdminPath } from "@/lib/admin-paths";
 
 const LINKS = [
   { href: "/", key: "home" },
@@ -19,7 +20,7 @@ const LINKS = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-export function Header({ site }: { site?: SiteSettings | null }) {
+export function Header({ site, adminSite = false }: { site?: SiteSettings | null; adminSite?: boolean }) {
   const t = useTranslations("nav");
   const ta = useTranslations("a11y");
   const pathname = usePathname();
@@ -33,7 +34,7 @@ export function Header({ site }: { site?: SiteSettings | null }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  if (pathname.startsWith("/staff")) return null;
+  if (adminSite || isAdminPath(pathname)) return null;
 
   return (
     <header

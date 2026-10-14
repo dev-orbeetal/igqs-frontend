@@ -19,7 +19,7 @@ export function StaffLoginForm() {
     setError("");
     try {
       await staffLogin(username, password);
-      router.replace("/staff");
+      router.replace("/dashboard");
     } catch {
       setError(t("loginError"));
       setSending(false);

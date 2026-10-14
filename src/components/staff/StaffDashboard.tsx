@@ -41,13 +41,13 @@ export function StaffDashboard() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
-            href="/staff/content"
+            href="/content"
             className="rounded-full border border-igqs-gold/40 px-5 py-2 text-sm"
           >
             {t("website")}
           </Link>
           <Link
-            href="/staff/payments/applications"
+            href="/payments/applications"
             className="rounded-full bg-igqs-green px-5 py-2 text-sm text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
           >
             {t("manageApplications")}
@@ -69,7 +69,7 @@ export function StaffDashboard() {
       <div className="mt-10 overflow-hidden rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18]">
         <div className="flex items-center justify-between px-6 pt-6">
           <h2 className="font-display text-2xl">{t("applications")}</h2>
-          <Link href="/staff/payments/applications" className="text-sm text-igqs-gold underline">
+          <Link href="/payments/applications" className="text-sm text-igqs-gold underline">
             {t("manageApplications")}
           </Link>
         </div>
@@ -90,7 +90,7 @@ export function StaffDashboard() {
               {recent.map((row) => (
                 <tr key={row.application_id} className="border-t border-igqs-gold/10">
                   <td className="px-6 py-3">
-                    <Link href={`/staff/payments/applications/${row.application_id}`} className="hover:underline">
+                    <Link href={`/payments/applications/${row.application_id}`} className="hover:underline">
                       {row.student_name}
                     </Link>
                   </td>

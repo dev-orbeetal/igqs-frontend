@@ -1,9 +1,13 @@
 import { BookOpen, Heart, Layers, Shield } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { headers } from "next/headers";
 import Image from "next/image";
+import { StaffDashboard } from "@/components/staff/StaffDashboard";
+import { StaffShell } from "@/components/staff/StaffShell";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
+import { isAdminHost } from "@/lib/admin-paths";
 import { apiGet, type HomePayload, type SiteSettings } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 
@@ -21,6 +25,13 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  if (isAdminHost(await headers())) {
+    return (
+      <StaffShell>
+        <StaffDashboard />
+      </StaffShell>
+    );
+  }
   const t = await getTranslations();
   const [home, site] = await Promise.all([
     apiGet<HomePayload>("/api/home/", locale),

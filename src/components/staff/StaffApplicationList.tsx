@@ -160,7 +160,7 @@ export function StaffApplicationList() {
             <p className="mt-1 text-xs text-igqs-muted">
               {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
             </p>
-            <Link href={`/staff/payments/applications/${row.application_id}`} className="mt-3 inline-block text-sm text-igqs-gold underline">
+            <Link href={`/payments/applications/${row.application_id}`} className="mt-3 inline-block text-sm text-igqs-gold underline">
               {t("review")}
             </Link>
           </article>
@@ -184,7 +184,7 @@ export function StaffApplicationList() {
               <tr
                 key={row.application_id}
                 className="cursor-pointer border-t border-igqs-gold/10 hover:bg-igqs-sand/30 dark:hover:bg-white/5"
-                onClick={() => router.push(`/staff/payments/applications/${row.application_id}`)}
+                onClick={() => router.push(`/payments/applications/${row.application_id}`)}
               >
                 <td className="px-4 py-3">
                   {row.student_name}
@@ -203,7 +203,7 @@ export function StaffApplicationList() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <Link
-                    href={`/staff/payments/applications/${row.application_id}`}
+                    href={`/payments/applications/${row.application_id}`}
                     className="text-igqs-gold underline"
                     onClick={(event) => event.stopPropagation()}
                   >

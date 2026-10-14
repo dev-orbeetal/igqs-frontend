@@ -19,7 +19,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!adminLoginDisabled && !getStaffToken()) {
-      router.replace("/staff/login");
+      router.replace("/login");
       return;
     }
     staffRequest<StaffUser>("/api/admissions/staff/me/")
@@ -29,7 +29,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
       })
       .catch(() => {
         clearStaffToken();
-        router.replace("/staff/login");
+        router.replace("/login");
       });
   }, [router]);
 
@@ -42,9 +42,9 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
   }
 
   const links = [
-    { href: "/staff", label: t("dashboard"), match: pathname === "/staff" },
-    { href: "/staff/payments/applications", label: t("applications"), match: pathname.startsWith("/staff/payments") },
-    { href: "/staff/content", label: t("website"), match: pathname.startsWith("/staff/content") },
+    { href: "/dashboard", label: t("dashboard"), match: pathname === "/" || pathname === "/dashboard" },
+    { href: "/payments/applications", label: t("applications"), match: pathname.startsWith("/payments") },
+    { href: "/content", label: t("website"), match: pathname.startsWith("/content") },
   ];
 
   return (
@@ -63,7 +63,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
                   className="min-h-10 rounded-full border border-igqs-gold/40 px-3 py-1.5 text-sm"
                   onClick={async () => {
                     await staffLogout();
-                    router.replace("/staff/login");
+                    router.replace("/login");
                   }}
                 >
                   {t("logout")}

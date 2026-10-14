@@ -7,8 +7,8 @@ export function PaymentsNav() {
   const t = useTranslations("staff");
   const pathname = usePathname();
   const links = [
-    { href: "/staff/payments/fees", label: t("fees") },
-    { href: "/staff/payments/applications", label: t("applicationsPage") },
+    { href: "/payments/fees", label: t("fees") },
+    { href: "/payments/applications", label: t("applicationsPage") },
   ];
 
   return (

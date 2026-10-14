@@ -6,5 +6,5 @@ export default async function StaffApplicationsRedirect({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  redirect({ href: "/staff/payments/applications", locale });
+  redirect({ href: "/payments/applications", locale });
 }
