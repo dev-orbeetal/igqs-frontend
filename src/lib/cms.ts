@@ -74,7 +74,7 @@ export function requestBody(fields: CmsField[], values: Record<string, unknown>)
     delete payload[field.fileName];
     if (file instanceof File) {
       files.push({ name: field.fileName, file });
-      payload[field.name] = "";
+      delete payload[field.name];
       delete payload[flag];
     } else if (payload[flag] === true) {
       payload[field.name] = "";

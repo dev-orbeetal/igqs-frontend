@@ -45,7 +45,7 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">
-        <Logo light />
+        <Logo light src={site?.logo} />
         <nav className="hidden items-center gap-6 lg:flex">
           {LINKS.map((item) => {
             const active =

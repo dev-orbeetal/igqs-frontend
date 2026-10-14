@@ -13,7 +13,7 @@ export async function Footer({ site }: { site?: SiteSettings | null }) {
     <footer className="pattern-geo-dark border-t border-igqs-gold/25 bg-igqs-green text-igqs-cream print:hidden dark:bg-[#04110c]">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
         <div>
-          <Logo light />
+          <Logo light src={site?.logo} />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-igqs-gold-soft/90">
             {site?.tagline}
           </p>

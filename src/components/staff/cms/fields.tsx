@@ -121,9 +121,8 @@ export function CmsFields({
                   onChange={(file) =>
                     onChange({
                       ...values,
-                      [field.name]: "",
                       [field.fileName]: file ?? "",
-                      [`clear_${field.fileName}`]: !file,
+                      [`clear_${field.fileName}`]: false,
                     })
                   }
                 />

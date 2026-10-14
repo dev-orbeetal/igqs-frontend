@@ -49,7 +49,10 @@ function requestBackend(
     );
     req.on("error", reject);
     req.on("timeout", () => req.destroy(new Error("Backend timeout")));
-    if (body && body.length > 0) req.write(body);
+    if (body && body.length > 0) {
+      req.setHeader("Content-Length", body.length);
+      req.write(body);
+    }
     req.end();
   });
 }
@@ -57,6 +60,12 @@ function requestBackend(
 function headerValue(value: string | string[] | undefined) {
   if (!value) return "";
   return Array.isArray(value) ? value.join(", ") : value;
+}
+
+function rewriteBackendUrl(value: string, origin: string) {
+  return value
+    .replaceAll(`https://${BACKEND_HOST}`, origin)
+    .replaceAll(`http://${BACKEND_HOST}`, origin);
 }
 
 function headerEntries(headers: IncomingHttpHeaders) {
@@ -84,17 +93,16 @@ export async function proxyBackend(request: Request) {
   }
 
   const origin = incoming.origin;
-  const backendOrigin = `https://${BACKEND_HOST}`;
   const outHeaders = new Headers();
   for (const [key, value] of headerEntries(result.headers)) {
     if (DROPPED_HEADERS.has(key.toLowerCase())) continue;
-    outHeaders.set(key, headerValue(value).replaceAll(backendOrigin, origin));
+    outHeaders.set(key, rewriteBackendUrl(headerValue(value), origin));
   }
 
   const type = outHeaders.get("content-type") ?? "";
   const payload =
     type.includes("json") || type.startsWith("text/")
-      ? result.body.toString("utf8").replaceAll(backendOrigin, origin)
+      ? rewriteBackendUrl(result.body.toString("utf8"), origin)
       : new Uint8Array(result.body);
 
   return new NextResponse(payload, { status: result.status, headers: outHeaders });
