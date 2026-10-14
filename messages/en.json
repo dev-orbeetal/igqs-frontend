@@ -437,7 +437,7 @@
     "notice": "Notice",
     "defaultFee": "Default fee",
     "imageUrl": "Image URL",
-    "uploadImage": "Or upload an image",
+    "uploadImage": "Upload an image",
     "removeUpload": "Remove uploaded image"
   }
 }
