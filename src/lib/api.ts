@@ -1,9 +1,25 @@
-const API =
-  process.env.NEXT_PUBLIC_API_URL ??
-  (process.env.VERCEL ? "https://admin.igqsbd.com" : "http://127.0.0.1:8855");
+const SITE_HOSTS = new Set(["igqsbd.com", "www.igqsbd.com", "admin.igqsbd.com"]);
+
+function configuredApi() {
+  return (
+    process.env.NEXT_PUBLIC_API_URL ??
+    (process.env.VERCEL ? "https://igqsbd.com" : "http://127.0.0.1:8855")
+  );
+}
+
+function apiBase() {
+  const configured = configuredApi();
+  if (typeof window === "undefined") return configured;
+  try {
+    if (SITE_HOSTS.has(new URL(configured).hostname)) return window.location.origin;
+  } catch {
+    return configured;
+  }
+  return configured;
+}
 
 export function apiUrl(path: string, locale?: string) {
-  const url = new URL(path, API);
+  const url = new URL(path, apiBase());
   if (locale) url.searchParams.set("lang", locale);
   return url.toString();
 }
@@ -12,7 +28,7 @@ export async function apiGet<T>(path: string, locale: string): Promise<T | null>
   try {
     const res = await fetch(apiUrl(path, locale), {
       cache: "no-store",
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
