@@ -24,7 +24,9 @@ import {
   type CmsMeta,
 } from "@/lib/cms";
 import { staffRequest } from "@/lib/staff";
+import { btn } from "@/components/staff/buttons";
 import { AlbumImages } from "@/components/staff/cms/album-images";
+import { HeroSlideEditor } from "@/components/staff/cms/hero-slides";
 import { CmsFields, FormActions } from "@/components/staff/cms/fields";
 import { PaymentMethodsEditor } from "@/components/staff/cms/payment-methods";
 
@@ -172,10 +174,13 @@ function CollectionBlock({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [listQuery, setListQuery] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   async function reload() {
     const data = await staffRequest<Record<string, unknown>[]>(`${path}${query}`);
     setRows(data);
+    setLoaded(true);
   }
 
   useEffect(() => {
@@ -226,14 +231,29 @@ function CollectionBlock({
     }
   }
 
+  const visible = rows.filter((row) =>
+    rowLabel(row, titleField).toLowerCase().includes(listQuery.trim().toLowerCase())
+  );
+
   return (
     <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
       <div>
-        <button type="button" onClick={startNew} className="text-sm text-igqs-gold underline">
+        <button type="button" onClick={startNew} className={btn.primary}>
           {copy.add}
         </button>
+        <label className="mt-3 block text-sm">
+          {copy.t("searchList")}
+          <input
+            className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm"
+            value={listQuery}
+            onChange={(event) => setListQuery(event.currentTarget.value)}
+          />
+        </label>
+        {loaded && visible.length === 0 ? (
+          <p className="mt-3 text-sm text-igqs-muted">{copy.t("emptyList")}</p>
+        ) : (
         <ul className="mt-3 space-y-1 text-sm">
-          {rows.map((row) => (
+          {visible.map((row) => (
             <li key={String(row.id)}>
               <button
                 type="button"
@@ -254,6 +274,7 @@ function CollectionBlock({
             </li>
           ))}
         </ul>
+        )}
       </div>
       {selected ? (
         <RecordForm
@@ -305,14 +326,13 @@ export function ContentHub() {
   return (
     <div>
       <p className="text-xs uppercase tracking-[0.28em] text-igqs-gold">{t("kicker")}</p>
-      <h1 className="mt-2 font-display text-4xl">{t("title")}</h1>
       <p className="mt-2 max-w-2xl text-sm text-igqs-muted">{t("subtitle")}</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map((section) => (
           <Link
             key={section.href}
             href={section.href}
-            className="rounded-3xl border border-igqs-gold/25 bg-white p-5 transition hover:border-igqs-gold dark:bg-[#0d1f18]"
+            className="rounded-xl border border-igqs-gold/40 bg-white p-5 shadow-sm transition hover:border-igqs-gold hover:bg-igqs-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold active:bg-igqs-gold/20 dark:bg-[#0d1f18]"
           >
             <h2 className="font-display text-2xl">{section.title}</h2>
             <p className="mt-2 text-sm text-igqs-muted">{section.hint}</p>
@@ -323,14 +343,13 @@ export function ContentHub() {
   );
 }
 
-function PageHeader({ title }: { title: string }) {
+function PageHeader({ title: _title }: { title: string }) {
   const t = useTranslations("cms");
   return (
     <div className="mb-6">
-      <Link href="/content" className="text-sm text-igqs-gold">
+      <Link href="/content" className={btn.secondary}>
         ← {t("website")}
       </Link>
-      <h1 className="mt-3 font-display text-4xl">{title}</h1>
     </div>
   );
 }
@@ -344,6 +363,9 @@ export function HomeEditor() {
       <div className="space-y-6">
         <Card title={t("home")}>
           <SingletonBlock path="/api/staff/home/" fields={homeFields} />
+          <div className="mt-6">
+            <HeroSlideEditor />
+          </div>
         </Card>
         <Card title={t("whyChoose")}>
           <CollectionBlock
@@ -438,23 +460,49 @@ function ItemTable({
 }) {
   const copy = useCmsCopy();
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
+  const [listQuery, setListQuery] = useState("");
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    staffRequest<Record<string, unknown>[]>(path).then(setRows);
+    staffRequest<Record<string, unknown>[]>(path)
+      .then(setRows)
+      .finally(() => setLoaded(true));
   }, [path]);
+  const visible = rows.filter((row) => {
+    const details = extra?.(row) ?? "";
+    const haystack = `${String(row[titleField] || row.id)} ${details}`.toLowerCase();
+    return haystack.includes(listQuery.trim().toLowerCase());
+  });
   return (
     <div>
-      <Link href={`${hrefBase}/new`} className="text-sm text-igqs-gold underline">
-        {copy.add}
-      </Link>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <label className="text-sm">
+          {copy.t("searchList")}
+          <input
+            className="mt-1 w-full min-w-56 rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm"
+            value={listQuery}
+            onChange={(event) => setListQuery(event.currentTarget.value)}
+          />
+        </label>
+        <Link href={`${hrefBase}/new`} className={btn.primary}>
+          {copy.add}
+        </Link>
+      </div>
       <div className="mt-4 overflow-x-auto rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18]">
         <table className="min-w-full text-left text-sm">
+          <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
+            <tr>
+              <th className="px-4 py-3">{copy.t("columnItem")}</th>
+              <th className="px-4 py-3">{copy.t("columnDetails")}</th>
+              <th className="px-4 py-3 text-right">{copy.t("edit")}</th>
+            </tr>
+          </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={String(row.id)} className="border-t border-igqs-gold/10 first:border-t-0">
+            {visible.map((row) => (
+              <tr key={String(row.id)} className="border-t border-igqs-gold/10">
                 <td className="px-4 py-3">{String(row[titleField] || row.id)}</td>
                 <td className="px-4 py-3 text-igqs-muted">{extra?.(row)}</td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`${hrefBase}/${row.id}`} className="text-igqs-gold underline">
+                  <Link href={`${hrefBase}/${row.id}`} className={btn.secondary}>
                     {copy.t("edit")}
                   </Link>
                 </td>
@@ -462,6 +510,7 @@ function ItemTable({
             ))}
           </tbody>
         </table>
+        {loaded && visible.length === 0 && <p className="px-4 py-8 text-center text-sm text-igqs-muted">{copy.t("emptyList")}</p>}
       </div>
     </div>
   );

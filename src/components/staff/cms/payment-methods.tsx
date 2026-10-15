@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
+import { btn } from "@/components/staff/buttons";
 import { staffRequest } from "@/lib/staff";
 
 const fieldClass =
@@ -34,6 +36,7 @@ export function PaymentMethodsEditor() {
   const [nameBn, setNameBn] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [confirming, setConfirming] = useState(false);
 
   async function reload() {
     const data = await staffRequest<Method[]>("/api/staff/methods/");
@@ -141,7 +144,7 @@ export function PaymentMethodsEditor() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-igqs-green px-5 py-2 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+            className={btn.primary}
           >
             {t("addMethod")}
           </button>
@@ -203,7 +206,7 @@ export function PaymentMethodsEditor() {
                 <h3 className="font-display text-xl">{t("methodFields")}</h3>
                 <button
                   type="button"
-                  className="text-sm text-igqs-gold underline"
+                  className={btn.secondary}
                   onClick={() => setSelected({ ...selected, details: [...selected.details, emptyDetail()] })}
                 >
                   {t("addField")}
@@ -248,7 +251,7 @@ export function PaymentMethodsEditor() {
                   </label>
                   <button
                     type="button"
-                    className="w-fit text-sm text-red-700 underline"
+                    className={`w-fit ${btn.danger}`}
                     onClick={() =>
                       setSelected({
                         ...selected,
@@ -266,15 +269,15 @@ export function PaymentMethodsEditor() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-full bg-igqs-green px-5 py-2 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+                className={btn.primary}
               >
                 {saving ? t("saving") : t("save")}
               </button>
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => void remove()}
-                className="rounded-full border border-red-400 px-5 py-2 text-sm text-red-700"
+                onClick={() => setConfirming(true)}
+                className={btn.danger}
               >
                 {t("delete")}
               </button>
@@ -284,6 +287,18 @@ export function PaymentMethodsEditor() {
           <p className="text-sm text-igqs-muted">{error || t("chooseOrAdd")}</p>
         )}
       </div>
+      <ConfirmDialog
+        open={confirming}
+        title={t("confirmTitle")}
+        message={t("confirmDelete")}
+        confirmLabel={t("delete")}
+        cancelLabel={t("cancel")}
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => {
+          setConfirming(false);
+          void remove();
+        }}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "IGQS — Ideal Global Qur'anic School",
+    "title": "Ideal Global Quranic School",
     "description": "A bilingual Qur'anic school in Dhaka offering Islamic education, Hifz, and a complete academic programme."
   },
   "nav": {
@@ -17,7 +17,7 @@
     "apply": "Apply for Admission"
   },
   "brand": {
-    "name": "IGQS",
+    "name": "Ideal Global Quranic School",
     "tagline": "Qur'anic School"
   },
   "a11y": {
@@ -290,9 +290,12 @@
   },
   "footer": {
     "rights": "All rights reserved.",
+    "school": "Ideal Global Quranic School",
     "quick": "Quick links",
+    "info": "Information",
     "contact": "Contact",
-    "webfont": "Web font"
+    "webfont": "Web font",
+    "top": "Back to top"
   },
   "staff": {
     "kicker": "IGQS admin",
@@ -304,6 +307,18 @@
     "signingIn": "Signing in…",
     "loginError": "Those admin credentials were not accepted.",
     "logout": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navOverview": "Overview",
+    "navAdmissions": "Admissions",
+    "navWebsite": "Website",
+    "loadError": "Could not load the dashboard.",
+    "confirmTitle": "Please confirm",
+    "confirmApprove": "Approve this application?",
+    "confirmReject": "Reject this application?",
+    "confirmPending": "Mark this application as pending?",
+    "rejectionRequired": "Add a rejection reason before rejecting.",
+    "cancel": "Cancel",
     "loading": "Loading…",
     "dashboard": "Dashboard",
     "applications": "Payments",
@@ -417,6 +432,7 @@
     "subjects": "Subjects",
     "documents": "Documents",
     "images": "Album images",
+    "heroSlides": "Hero photos",
     "uploadImages": "Add photos",
     "uploadImagesHint": "Choose one or more photos. They are added to this album as soon as you select them.",
     "uploading": "Uploading…",
@@ -432,6 +448,13 @@
     "edit": "Edit",
     "error": "Could not save those changes.",
     "chooseOrAdd": "Choose an item or add a new one.",
+    "searchList": "Search this list",
+    "emptyList": "Nothing here yet.",
+    "columnItem": "Item",
+    "columnDetails": "Details",
+    "confirmTitle": "Please confirm",
+    "confirmDelete": "Delete this item? This cannot be undone.",
+    "cancel": "Cancel",
     "published": "Published",
     "draft": "Draft",
     "notice": "Notice",

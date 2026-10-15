@@ -1,9 +1,7 @@
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Logo } from "@/components/brand/Logo";
-import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
 import { StaffLoginForm } from "@/components/staff/StaffLoginForm";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -20,18 +18,17 @@ export default async function StaffLoginPage({
     });
   }
   setRequestLocale(locale);
-  await getTranslations("staff");
+  const t = await getTranslations("staff");
 
   return (
-    <div className="px-4 py-6 sm:px-6 sm:py-16">
-      <div className="mx-auto mb-8 flex max-w-md items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          <ThemeToggle />
+    <div className="flex min-h-screen items-center justify-center bg-[#0f3d30] px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 text-igqs-ink shadow-xl">
+        <div className="mb-6 flex justify-center">
+          <Logo iconOnly />
         </div>
+        <p className="mb-6 text-center text-xs tracking-wide text-igqs-muted">{t("kicker")}</p>
+        <StaffLoginForm />
       </div>
-      <StaffLoginForm />
     </div>
   );
 }

@@ -7,6 +7,14 @@ export type StaffUser = {
   name: string;
 };
 
+export function formatMoney(amount: string | number, locale: string, currency = "BDT") {
+  const value = Number(amount);
+  const formatted = Number.isFinite(value)
+    ? value.toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")
+    : String(amount);
+  return `${currency} ${formatted}`;
+}
+
 export type StaffStats = {
   total: number;
   pending: number;

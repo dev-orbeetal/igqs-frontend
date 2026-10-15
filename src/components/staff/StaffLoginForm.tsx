@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { btn } from "@/components/staff/buttons";
 import { useRouter } from "@/i18n/navigation";
 import { staffLogin } from "@/lib/staff";
 
@@ -27,13 +28,11 @@ export function StaffLoginForm() {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="mx-auto max-w-md rounded-3xl border border-igqs-gold/30 bg-white p-8 dark:bg-[#0d1f18]"
-    >
-      <p className="text-xs uppercase tracking-[0.28em] text-igqs-gold">{t("kicker")}</p>
-      <h1 className="mt-2 font-display text-4xl">{t("loginTitle")}</h1>
-      <p className="mt-2 text-sm text-igqs-muted">{t("loginSubtitle")}</p>
+    <form onSubmit={submit} className="grid gap-4">
+      <div>
+        <h1 className="font-display text-3xl">{t("loginTitle")}</h1>
+        <p className="mt-1 text-sm text-igqs-muted">{t("loginSubtitle")}</p>
+      </div>
       <label className="mt-6 block text-sm">
         {t("username")}
         <input
@@ -59,7 +58,7 @@ export function StaffLoginForm() {
       <button
         type="submit"
         disabled={sending}
-        className="mt-6 w-full rounded-full bg-igqs-green py-2.5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+        className={`mt-6 w-full ${btn.primary}`}
       >
         {sending ? t("signingIn") : t("signIn")}
       </button>

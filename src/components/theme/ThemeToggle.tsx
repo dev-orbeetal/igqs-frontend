@@ -19,7 +19,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => ready && setTheme(dark ? "light" : "dark")}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-cream transition-colors duration-500 hover:bg-igqs-gold/15 hover:text-igqs-gold-soft"
+      className="inline-flex size-8 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-ink transition-colors duration-200 hover:bg-igqs-gold/15 dark:text-igqs-cream"
       aria-label={ready ? (dark ? t("light") : t("dark")) : t("dark")}
     >
       {ready && dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

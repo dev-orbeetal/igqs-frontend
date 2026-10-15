@@ -2,17 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { StatusBadge } from "@/components/staff/StatusBadge";
+import { btn } from "@/components/staff/buttons";
 import { Link, useRouter } from "@/i18n/navigation";
-import { PaymentsNav } from "@/components/staff/PaymentsNav";
-import { staffDownload, staffRequest, type StaffApplicationListItem } from "@/lib/staff";
+import { formatMoney, staffDownload, staffRequest, type StaffApplicationListItem } from "@/lib/staff";
 
 const fieldClass =
   "mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
 
-function statusClass(status: string) {
-  if (status === "approved") return "text-emerald-700 dark:text-emerald-300";
-  if (status === "rejected") return "text-red-700 dark:text-red-300";
-  return "text-amber-700 dark:text-amber-300";
+function applicationStatus(status: string, t: (key: "approved" | "rejected" | "pending") => string) {
+  if (status === "approved") return t("approved");
+  if (status === "rejected") return t("rejected");
+  return t("pending");
 }
 
 export function StaffApplicationList() {
@@ -65,15 +66,10 @@ export function StaffApplicationList() {
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-igqs-gold">{t("kicker")}</p>
-          <h1 className="mt-2 font-display text-4xl">{t("applicationsPage")}</h1>
-          <PaymentsNav />
-          <p className="mt-4 text-sm text-igqs-muted">{t("searchHint")}</p>
-        </div>
+        <p className="max-w-2xl text-sm text-igqs-muted">{t("searchHint")}</p>
         <button
           type="button"
-          className="rounded-full border border-igqs-gold/40 px-4 py-2 text-sm"
+          className={btn.secondary}
           onClick={() => staffDownload(`/api/admissions/staff/applications/export/${query}`, "igqs-applications.csv")}
         >
           {t("downloadList")}
@@ -151,16 +147,14 @@ export function StaffApplicationList() {
             <p className="font-mono text-xs text-igqs-gold">{row.application_id}</p>
             <h2 className="mt-1 font-display text-2xl">{row.student_name}</h2>
             <p className="mt-1 text-sm text-igqs-muted">{row.guardian_name} · {row.applying_class}</p>
-            <p className="mt-2 text-sm">
-              BDT {Number(row.payment_amount).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}
-            </p>
-            <p className={`mt-2 text-sm ${statusClass(row.status)}`}>
-              {row.status === "approved" ? ta("approved") : row.status === "rejected" ? ta("rejected") : ta("pending")}
-            </p>
+            <p className="mt-2 text-sm">{formatMoney(row.payment_amount, locale)}</p>
+            <div className="mt-2">
+              <StatusBadge status={row.status} label={applicationStatus(row.status, ta)} />
+            </div>
             <p className="mt-1 text-xs text-igqs-muted">
               {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
             </p>
-            <Link href={`/payments/applications/${row.application_id}`} className="mt-3 inline-block text-sm text-igqs-gold underline">
+            <Link href={`/payments/applications/${row.application_id}`} className={`mt-3 ${btn.secondary}`}>
               {t("review")}
             </Link>
           </article>
@@ -192,11 +186,9 @@ export function StaffApplicationList() {
                   <div className="font-mono text-xs text-igqs-gold">{row.application_id}</div>
                 </td>
                 <td className="px-4 py-3">{row.applying_class}</td>
+                <td className="px-4 py-3">{formatMoney(row.payment_amount, locale)}</td>
                 <td className="px-4 py-3">
-                  BDT {Number(row.payment_amount).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}
-                </td>
-                <td className={`px-4 py-3 ${statusClass(row.status)}`}>
-                  {row.status === "approved" ? ta("approved") : row.status === "rejected" ? ta("rejected") : ta("pending")}
+                  <StatusBadge status={row.status} label={applicationStatus(row.status, ta)} />
                 </td>
                 <td className="px-4 py-3 text-sm">
                   {new Date(row.created_at).toLocaleDateString(locale === "bn" ? "bn-BD" : "en-GB")}
@@ -204,7 +196,7 @@ export function StaffApplicationList() {
                 <td className="px-4 py-3 text-right">
                   <Link
                     href={`/payments/applications/${row.application_id}`}
-                    className="text-igqs-gold underline"
+                    className={btn.secondary}
                     onClick={(event) => event.stopPropagation()}
                   >
                     {t("review")}

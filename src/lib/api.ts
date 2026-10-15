@@ -226,6 +226,7 @@ export type HomePayload = {
     principal_message: string;
     principal_photo_url: string;
   };
+  hero_images: string[];
   why_choose: { id: number; title: string; description: string; icon: string }[];
   upcoming_events: EventItem[];
   latest_news: NewsItem[];

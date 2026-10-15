@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { btn } from "@/components/staff/buttons";
 import { staffRequest } from "@/lib/staff";
 
 const fieldClass =
@@ -134,7 +135,7 @@ export function ClassFeeEditor() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-igqs-green px-5 py-2 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+            className={btn.primary}
           >
             {t("addClassAction")}
           </button>
@@ -161,7 +162,7 @@ export function ClassFeeEditor() {
                     {fee.grade_id != null && (
                       <button
                         type="button"
-                        className="text-xs text-red-700 underline"
+                        className={btn.danger}
                         disabled={saving}
                         onClick={() => void removeClass(fee.grade_id as number)}
                       >
@@ -187,7 +188,7 @@ export function ClassFeeEditor() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-full bg-igqs-green px-5 py-2 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+              className={btn.primary}
             >
               {saving ? t("savingFees") : t("saveFees")}
             </button>

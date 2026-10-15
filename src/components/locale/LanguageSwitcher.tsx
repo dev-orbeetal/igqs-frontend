@@ -18,10 +18,10 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setLocale("bn")}
-        className={`rounded-full px-2.5 py-1 transition-colors duration-500 ${
+        className={`rounded-full px-2.5 py-1 transition-colors duration-200 ${
           locale === "bn"
-            ? "bg-igqs-gold text-igqs-ink"
-            : "text-igqs-cream/70 hover:text-igqs-gold-soft"
+            ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
+            : "text-igqs-ink/70 hover:text-igqs-green dark:text-igqs-cream/70"
         }`}
       >
         বাংলা
@@ -30,10 +30,10 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setLocale("en")}
-        className={`rounded-full px-2.5 py-1 transition-colors duration-500 ${
+        className={`rounded-full px-2.5 py-1 transition-colors duration-200 ${
           locale === "en"
-            ? "bg-igqs-gold text-igqs-ink"
-            : "text-igqs-cream/70 hover:text-igqs-gold-soft"
+            ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
+            : "text-igqs-ink/70 hover:text-igqs-green dark:text-igqs-cream/70"
         }`}
       >
         English

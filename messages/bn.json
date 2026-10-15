@@ -17,7 +17,7 @@
     "apply": "ভর্তির আবেদন"
   },
   "brand": {
-    "name": "আইজিকিউএস",
+    "name": "Ideal Global Quranic School",
     "tagline": "কুরআনিক স্কুল"
   },
   "a11y": {
@@ -290,9 +290,12 @@
   },
   "footer": {
     "rights": "সর্বস্বত্ব সংরক্ষিত।",
+    "school": "Ideal Global Quranic School",
     "quick": "দ্রুত লিংক",
+    "info": "তথ্য",
     "contact": "যোগাযোগ",
-    "webfont": "ওয়েবফন্ট"
+    "webfont": "ওয়েবফন্ট",
+    "top": "উপরে যান"
   },
   "staff": {
     "kicker": "আইজিকিউএস কর্মকর্তা",
@@ -304,6 +307,18 @@
     "signingIn": "সাইন ইন হচ্ছে…",
     "loginError": "কর্মকর্তার তথ্য গ্রহণ করা যায়নি।",
     "logout": "সাইন আউট",
+    "openMenu": "মেনু খুলুন",
+    "closeMenu": "মেনু বন্ধ করুন",
+    "navOverview": "সংক্ষিপ্ত বিবরণ",
+    "navAdmissions": "ভর্তি",
+    "navWebsite": "ওয়েবসাইট",
+    "loadError": "ড্যাশবোর্ড লোড করা যায়নি।",
+    "confirmTitle": "নিশ্চিত করুন",
+    "confirmApprove": "এই আবেদন অনুমোদন করবেন?",
+    "confirmReject": "এই আবেদন প্রত্যাখ্যান করবেন?",
+    "confirmPending": "এই আবেদন অপেক্ষমাণ রাখবেন?",
+    "rejectionRequired": "প্রত্যাখ্যানের আগে কারণ লিখুন।",
+    "cancel": "বাতিল",
     "loading": "লোড হচ্ছে…",
     "dashboard": "ড্যাশবোর্ড",
     "applications": "পেমেন্ট",
@@ -417,6 +432,7 @@
     "subjects": "বিষয়সমূহ",
     "documents": "নথি",
     "images": "অ্যালবামের ছবি",
+    "heroSlides": "হিরো ছবি",
     "uploadImages": "ছবি যোগ করুন",
     "uploadImagesHint": "এক বা একাধিক ছবি বেছে নিন। বেছে নেওয়ার সাথে সাথে অ্যালবামে যোগ হবে।",
     "uploading": "আপলোড হচ্ছে…",
@@ -432,6 +448,13 @@
     "edit": "সম্পাদনা",
     "error": "পরিবর্তনগুলো সংরক্ষণ হয়নি।",
     "chooseOrAdd": "একটি আইটেম বেছে নিন অথবা নতুন যোগ করুন।",
+    "searchList": "এই তালিকায় খুঁজুন",
+    "emptyList": "এখানে এখনো কিছু নেই।",
+    "columnItem": "আইটেম",
+    "columnDetails": "বিবরণ",
+    "confirmTitle": "নিশ্চিত করুন",
+    "confirmDelete": "এই আইটেম মুছে ফেলবেন? এটি আর ফেরানো যাবে না।",
+    "cancel": "বাতিল",
     "published": "প্রকাশিত",
     "draft": "খসড়া",
     "notice": "নোটিশ",

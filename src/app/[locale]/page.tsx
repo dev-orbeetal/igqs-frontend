@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import Image from "next/image";
 import { StaffDashboard } from "@/components/staff/StaffDashboard";
 import { StaffShell } from "@/components/staff/StaffShell";
+import { HeroSlides } from "@/components/home/HeroSlides";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
@@ -33,48 +34,49 @@ export default async function HomePage({
     );
   }
   const t = await getTranslations();
+  const brand = await getTranslations("brand");
   const [home, site] = await Promise.all([
     apiGet<HomePayload>("/api/home/", locale),
     apiGet<SiteSettings>("/api/site/", locale),
   ]);
 
-  if (!home || !site) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-24 text-center">
-        <p>{t("common.loadError")}</p>
-      </div>
-    );
-  }
-
-  const { home: content } = home;
+  const content = home?.home;
+  const whyChoose = home?.why_choose ?? [];
+  const grades = home?.curriculum_highlights ?? [];
+  const events = home?.upcoming_events ?? [];
+  const news = home?.latest_news ?? [];
+  const albums = home?.gallery ?? [];
+  const aboutImage = albums[0]?.cover_image_url || "";
+  const notices = home?.notices ?? [];
+  const heroImages = [
+    ...(content?.hero_image_url ? [content.hero_image_url] : []),
+    ...(home?.hero_images ?? []).filter((url) => url && url !== content?.hero_image_url),
+  ];
 
   return (
     <div>
       <section className="relative min-h-[86vh] overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
-        <div className="hero-media pointer-events-none absolute inset-0">
-          {content.hero_image_url && (
-            <Image
-              src={content.hero_image_url}
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          )}
+        <div className="pointer-events-none absolute inset-0">
+          <HeroSlides images={heroImages} />
           <div className="hero-overlay absolute inset-0" />
           <div className="hero-pattern absolute inset-0" />
         </div>
         <div className="relative mx-auto flex min-h-[86vh] max-w-7xl flex-col justify-center px-4 py-20 sm:px-6">
           <FadeIn>
-            <p className="eyebrow">{site.school_name}</p>
-            <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-white sm:text-5xl md:text-6xl lg:text-7xl">
-              {content.hero_title}
-            </h1>
-            <div className="heading-rule mt-5" />
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-igqs-cream/90 sm:text-lg">
-              {content.hero_subtitle}
-            </p>
+            <p className="eyebrow">{brand("name")}</p>
+            {content?.hero_title && (
+              <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-white sm:text-5xl md:text-6xl lg:text-7xl">
+                {content.hero_title}
+              </h1>
+            )}
+            {content?.hero_subtitle && (
+              <>
+                <div className="heading-rule mt-5" />
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-igqs-cream/90 sm:text-lg">
+                  {content.hero_subtitle}
+                </p>
+              </>
+            )}
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/admission" className="btn-gold inline-flex">
                 {t("common.applyNow")}
@@ -90,74 +92,91 @@ export default async function HomePage({
         </div>
       </section>
 
-      <section className="section-cream section-pad">
-        <FadeIn className="section-shell">
-          <SectionHeading kicker={t("brand.name")} title={t("home.welcome")} />
-          <p className="max-w-3xl text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
-            {content.welcome}
-          </p>
-        </FadeIn>
-      </section>
-
-      <section className="section-cream pb-14 sm:pb-16 lg:pb-20">
-        <div className="section-shell grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
-          <FadeIn>
-            <SectionHeading title={t("home.about")} />
-            <p className="text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
-              {content.about_preview}
+      {content?.welcome && (
+        <section className="section-cream section-pad">
+          <FadeIn className="section-shell">
+            <SectionHeading kicker={t("brand.name")} title={t("home.welcome")} />
+            <p className="max-w-3xl text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
+              {content.welcome}
             </p>
-            <Link href="/about" className="link-gold mt-6 inline-block font-medium">
-              {t("common.learnMore")} →
-            </Link>
           </FadeIn>
-          <FadeIn delay={0.1} className="img-frame group min-h-72">
-            <Image
-              src={home.gallery[0]?.cover_image_url || content.hero_image_url}
-              alt=""
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="img-zoom object-cover"
-            />
-            <div className="img-overlay absolute inset-0" />
-          </FadeIn>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="section-cream-alt section-pad">
-        <div className="section-shell">
-          <FadeIn>
-            <SectionHeading title={t("home.principal")} />
-          </FadeIn>
-          <FadeIn className="surface-card grid gap-8 bg-white/90 p-6 md:grid-cols-[200px_1fr] md:p-9 dark:bg-[#12352b]">
-            {content.principal_photo_url && (
-              <div className="img-frame relative h-56 md:h-auto md:min-h-56">
+      {(content?.about_preview || aboutImage) && (
+        <section className="section-cream pb-14 sm:pb-16 lg:pb-20">
+          <div className="section-shell grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            {content?.about_preview && (
+              <FadeIn>
+                <SectionHeading title={t("home.about")} />
+                <p className="text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
+                  {content.about_preview}
+                </p>
+                <Link href="/about" className="link-gold mt-6 inline-block font-medium">
+                  {t("common.learnMore")} →
+                </Link>
+              </FadeIn>
+            )}
+            {aboutImage && (
+              <FadeIn delay={0.1} className="img-frame group min-h-72">
                 <Image
-                  src={content.principal_photo_url}
-                  alt={content.principal_name}
+                  src={aboutImage}
+                  alt=""
                   fill
-                  sizes="(min-width: 768px) 200px, 100vw"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   className="img-zoom object-cover"
                 />
-              </div>
+                <div className="img-overlay absolute inset-0" />
+              </FadeIn>
             )}
-            <blockquote>
-              <p className="font-display text-xl leading-relaxed text-igqs-green sm:text-2xl dark:text-igqs-gold-soft">
-                “{content.principal_message}”
-              </p>
-              <footer className="mt-6 text-sm">
-                <strong>{content.principal_name}</strong>
-                <span className="block text-igqs-muted">{content.principal_title}</span>
-              </footer>
-            </blockquote>
-          </FadeIn>
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
+      {(content?.principal_message || content?.principal_name || content?.principal_photo_url) && (
+        <section className="section-cream-alt section-pad">
+          <div className="section-shell">
+            <FadeIn>
+              <SectionHeading title={t("home.principal")} />
+            </FadeIn>
+            <FadeIn className="surface-card grid gap-8 bg-white/90 p-6 md:grid-cols-[200px_1fr] md:p-9 dark:bg-[#12352b]">
+              {content.principal_photo_url && (
+                <div className="img-frame relative h-56 md:h-auto md:min-h-56">
+                  <Image
+                    src={content.principal_photo_url}
+                    alt={content.principal_name}
+                    fill
+                    sizes="(min-width: 768px) 200px, 100vw"
+                    className="img-zoom object-cover"
+                  />
+                </div>
+              )}
+              {(content.principal_message || content.principal_name) && (
+                <blockquote>
+                  {content.principal_message && (
+                    <p className="font-display text-xl leading-relaxed text-igqs-green sm:text-2xl dark:text-igqs-gold-soft">
+                      “{content.principal_message}”
+                    </p>
+                  )}
+                  {content.principal_name && (
+                    <footer className="mt-6 text-sm">
+                      <strong>{content.principal_name}</strong>
+                      <span className="block text-igqs-muted">{content.principal_title}</span>
+                    </footer>
+                  )}
+                </blockquote>
+              )}
+            </FadeIn>
+          </div>
+        </section>
+      )}
+
+      {whyChoose.length > 0 && (
       <section className="section-forest pattern-geo-dark section-pad">
         <div className="section-shell">
           <SectionHeading title={t("home.why")} tone="onDark" />
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {home.why_choose.map((item, i) => {
+            {whyChoose.map((item, i) => {
               const Icon = ICONS[item.icon] ?? BookOpen;
               return (
                 <FadeIn key={item.id} delay={i * 0.08}>
@@ -176,7 +195,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+      )}
 
+      {grades.length > 0 && (
       <section className="section-cream section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
@@ -186,7 +207,7 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {home.curriculum_highlights.map((grade) => (
+            {grades.map((grade) => (
               <FadeIn key={grade.slug}>
                 <Link href="/curriculum" className="surface-card surface-card-hover block bg-white/90 p-5 dark:bg-[#12352b]">
                   <h3 className="font-display text-2xl text-igqs-green dark:text-igqs-gold-soft">
@@ -201,8 +222,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+      )}
 
-      {site.admission_open && (
+      {site?.admission_open && site.admission_announcement && (
         <section className="section-forest pattern-geo-dark py-14 sm:py-16">
           <FadeIn className="section-shell flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
@@ -218,6 +240,7 @@ export default async function HomePage({
         </section>
       )}
 
+      {events.length > 0 && (
       <section className="section-cream section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
@@ -227,7 +250,7 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
-            {home.upcoming_events.map((event) => (
+            {events.map((event) => (
               <FadeIn key={event.slug}>
                 <Link
                   href={`/events/${event.slug}`}
@@ -256,7 +279,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+      )}
 
+      {news.length > 0 && (
       <section className="section-cream-alt section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
@@ -266,7 +291,7 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {home.latest_news.map((item) => (
+            {news.map((item) => (
               <FadeIn key={item.slug}>
                 <Link href={`/news/${item.slug}`} className="surface-card surface-card-hover group block overflow-hidden bg-white/90 dark:bg-[#12352b]">
                   <div className="relative h-40">
@@ -291,7 +316,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+      )}
 
+      {albums.length > 0 && (
       <section className="section-cream section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
@@ -301,7 +328,7 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {home.gallery.map((album, i) => (
+            {albums.map((album, i) => (
               <FadeIn key={album.slug} delay={i * 0.05} className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
                 <Link href="/gallery" className="img-frame group relative block min-h-40 md:min-h-44">
                   {album.cover_image_url && (
@@ -327,12 +354,14 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+      )}
 
+      {notices.length > 0 && (
       <section className="section-cream-alt section-pad">
         <div className="section-shell">
           <SectionHeading title={t("home.notices")} />
           <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
-            {home.notices.map((notice) => (
+            {notices.map((notice) => (
               <li key={notice.slug}>
                 <Link
                   href={`/news/${notice.slug}`}
@@ -346,6 +375,7 @@ export default async function HomePage({
           </ul>
         </div>
       </section>
+      )}
     </div>
   );
 }

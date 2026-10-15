@@ -26,35 +26,14 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-const shadhinata = localFont({
+const kalpurush = localFont({
   src: [
-    {
-      path: "../../fonts/LiShadhinata-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../fonts/LiShadhinata-Regular.ttf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../fonts/LiShadhinata-Regular.ttf",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../../fonts/LiShadhinata-Regular.ttf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../../fonts/LiShadhinata-Italic.ttf",
-      weight: "400",
-      style: "italic",
-    },
+    { path: "../../fonts/Kalpurush.ttf", weight: "400", style: "normal" },
+    { path: "../../fonts/Kalpurush.ttf", weight: "500", style: "normal" },
+    { path: "../../fonts/Kalpurush.ttf", weight: "600", style: "normal" },
+    { path: "../../fonts/Kalpurush.ttf", weight: "700", style: "normal" },
   ],
-  variable: "--font-shadhinata",
+  variable: "--font-kalpurush",
   display: "swap",
 });
 
@@ -94,7 +73,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${outfit.variable} ${cormorant.variable} ${shadhinata.variable} ${
+        className={`${outfit.variable} ${cormorant.variable} ${kalpurush.variable} ${
           locale === "bn" ? "font-bn" : "font-sans"
         }`}
       >

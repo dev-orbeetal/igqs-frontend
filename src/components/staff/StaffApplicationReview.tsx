@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
+import { btn } from "@/components/staff/buttons";
 import { Link } from "@/i18n/navigation";
-import {
-  staffDownload,
-  staffRequest,
-  type StaffApplicationDetail,
-} from "@/lib/staff";
+import { formatMoney, staffDownload, staffRequest, type StaffApplicationDetail } from "@/lib/staff";
 
 function Row({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
@@ -27,6 +25,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<"approved" | "rejected" | "pending" | null>(null);
 
   useEffect(() => {
     staffRequest<StaffApplicationDetail>(
@@ -36,6 +35,22 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
       setReason(detail.rejection_reason || "");
     });
   }, [applicationId]);
+
+  function askStatus(status: "approved" | "rejected" | "pending") {
+    if (status === "rejected" && !reason.trim()) {
+      setError(t("rejectionRequired"));
+      return;
+    }
+    setError("");
+    setPendingStatus(status);
+  }
+
+  const confirmMessage =
+    pendingStatus === "approved"
+      ? t("confirmApprove")
+      : pendingStatus === "rejected"
+        ? t("confirmReject")
+        : t("confirmPending");
 
   async function changeStatus(status: "approved" | "rejected" | "pending") {
     setSaving(true);
@@ -61,14 +76,11 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
 
   if (!data) return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
 
-  const fee = Number(data.payment_amount || data.transaction.payment_amount);
-  const amount = Number.isFinite(fee)
-    ? `BDT ${fee.toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}`
-    : "";
+  const amount = formatMoney(data.payment_amount || data.transaction.payment_amount, locale);
 
   return (
     <div>
-      <Link href="/payments/applications" className="text-sm text-igqs-gold">
+      <Link href="/payments/applications" className={btn.secondary}>
         ← {t("applicationsPage")}
       </Link>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
@@ -82,7 +94,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            className="rounded-full border border-igqs-gold/40 px-4 py-2 text-sm"
+            className={btn.secondary}
             onClick={() =>
               staffDownload(
                 `/api/admissions/staff/applications/${data.application_id}/export/`,
@@ -94,7 +106,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           </button>
           <button
             type="button"
-            className="rounded-full border border-igqs-gold/40 px-4 py-2 text-sm"
+            className={btn.secondary}
             onClick={() =>
               staffDownload(
                 `/api/admissions/staff/applications/${data.application_id}/receipt/`,
@@ -124,7 +136,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
               <img src={data.student_photo} alt={data.student_name} className="mt-4 h-40 rounded-2xl object-cover" />
             )}
             {data.birth_certificate && (
-              <a href={data.birth_certificate} className="mt-3 inline-block text-sm text-igqs-gold underline" target="_blank" rel="noreferrer">
+              <a href={data.birth_certificate} className={`mt-3 ${btn.secondary}`} target="_blank" rel="noreferrer">
                 {t("viewBirthCertificate")}
               </a>
             )}
@@ -198,24 +210,24 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => changeStatus("approved")}
-                className="rounded-full bg-igqs-green py-2 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+                onClick={() => askStatus("approved")}
+                className={`${btn.primary} w-full`}
               >
                 {t("approve")}
               </button>
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => changeStatus("rejected")}
-                className="rounded-full border border-red-400 py-2 text-sm text-red-700 disabled:opacity-40"
+                onClick={() => askStatus("rejected")}
+                className={`${btn.danger} w-full`}
               >
                 {t("reject")}
               </button>
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => changeStatus("pending")}
-                className="rounded-full border border-igqs-gold/40 py-2 text-sm disabled:opacity-40"
+                onClick={() => askStatus("pending")}
+                className={`${btn.secondary} w-full`}
               >
                 {t("markPending")}
               </button>
@@ -228,6 +240,22 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           </section>
         </div>
       </div>
+      <ConfirmDialog
+        open={pendingStatus !== null}
+        title={t("confirmTitle")}
+        message={confirmMessage}
+        confirmLabel={
+          pendingStatus === "approved" ? t("approve") : pendingStatus === "rejected" ? t("reject") : t("markPending")
+        }
+        cancelLabel={t("cancel")}
+        tone={pendingStatus === "rejected" ? "danger" : "primary"}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={() => {
+          const next = pendingStatus;
+          setPendingStatus(null);
+          if (next) void changeStatus(next);
+        }}
+      />
     </div>
   );
 }

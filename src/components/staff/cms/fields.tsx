@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
+import { btn } from "@/components/staff/buttons";
 import { ImageFileInput } from "@/components/ui/ImageFileInput";
 import { fieldClass, toDateTimeLocal, type CmsField } from "@/lib/cms";
 
@@ -130,7 +133,7 @@ export function CmsFields({
               {preview && (
                 <button
                   type="button"
-                  className="w-fit text-sm text-red-700 underline"
+                  className={`w-fit ${btn.danger}`}
                   onClick={() =>
                     onChange({
                       ...values,
@@ -202,12 +205,14 @@ export function FormActions({
   onDelete?: () => void;
   saved: boolean;
 }) {
+  const t = useTranslations("cms");
+  const [confirming, setConfirming] = useState(false);
   return (
     <div className="mt-5 flex flex-wrap items-center gap-3">
       <button
         type="submit"
         disabled={saving}
-        className="rounded-full bg-igqs-green px-5 py-2 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+        className={btn.primary}
       >
         {saving ? savingLabel : saveLabel}
       </button>
@@ -215,13 +220,25 @@ export function FormActions({
         <button
           type="button"
           disabled={saving}
-          onClick={onDelete}
-          className="rounded-full border border-red-400 px-5 py-2 text-sm text-red-700 disabled:opacity-40"
+          onClick={() => setConfirming(true)}
+          className={btn.danger}
         >
           {deleteLabel}
         </button>
       )}
       {saved && <span className="text-sm text-emerald-700">{savedLabel}</span>}
+      <ConfirmDialog
+        open={confirming}
+        title={t("confirmTitle")}
+        message={t("confirmDelete")}
+        confirmLabel={deleteLabel || t("delete")}
+        cancelLabel={t("cancel")}
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => {
+          setConfirming(false);
+          onDelete?.();
+        }}
+      />
     </div>
   );
 }
