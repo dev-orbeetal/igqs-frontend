@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { apiGetAuth, apiPost, parseApiError, type ApplicationDetail } from "@/lib/api";
-import {
-  getGuardianSession,
-  isBdPhone,
-  normalizeBdPhone,
-  setGuardianSession,
-} from "@/lib/guardian";
-import { PhoneVerifyStep } from "./PhoneVerifyStep";
+import { apiUrl, type ApplicationDetail } from "@/lib/api";
+import { isBdPhone, normalizeBdPhone } from "@/lib/guardian";
+import { fieldClass } from "./fields";
 
 function statusLabel(status: string, t: ReturnType<typeof useTranslations<"admission">>) {
   if (status === "approved") return t("paid");
@@ -22,127 +17,78 @@ export function MyPaymentsPanel() {
   const t = useTranslations("admission");
   const locale = useLocale();
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [debugOtp, setDebugOtp] = useState("");
   const [error, setError] = useState("");
-  const [sending, setSending] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [countdown, setCountdown] = useState(0);
-  const [sessionPhone, setSessionPhone] = useState("");
+  const [lookedUp, setLookedUp] = useState("");
   const [rows, setRows] = useState<ApplicationDetail[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const session = getGuardianSession();
-    if (session) {
-      setSessionPhone(session.phone);
-      setPhone(session.phone);
-      loadPayments(session.token);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (countdown <= 0) return;
-    const timer = window.setTimeout(() => setCountdown((value) => value - 1), 1000);
-    return () => window.clearTimeout(timer);
-  }, [countdown]);
-
-  async function loadPayments(token: string) {
-    setLoading(true);
-    try {
-      const data = await apiGetAuth<{ results: ApplicationDetail[] }>(
-        "/api/admissions/me/applications/",
-        token,
-        locale
-      );
-      setRows(data.results);
-    } catch {
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function sendOtp() {
-    setError("");
+  async function lookup(event: React.FormEvent) {
+    event.preventDefault();
     const normalized = normalizeBdPhone(phone);
     if (!isBdPhone(normalized)) {
       setError(t("otpInvalidPhone"));
       return;
     }
     setPhone(normalized);
-    setSending(true);
-    try {
-      const result = await apiPost("/api/admissions/otp/send/", { phone: normalized });
-      setDebugOtp(result.debug_otp || "");
-      setCountdown(result.resend_in || 60);
-    } catch (err) {
-      const parsed = parseApiError(err);
-      setError(parsed.form || t("otpIncorrect"));
-    } finally {
-      setSending(false);
-    }
-  }
-
-  async function verifyOtp() {
     setError("");
-    setVerifying(true);
+    setLoading(true);
     try {
-      const result = await apiPost("/api/admissions/otp/verify/", {
-        phone: normalizeBdPhone(phone),
-        otp,
-      });
-      setGuardianSession({ token: result.token, phone: result.phone });
-      setSessionPhone(result.phone);
-      setOtp("");
-      await loadPayments(result.token);
-    } catch (err) {
-      const parsed = parseApiError(err);
-      if (parsed.code === "otp_expired") setError(t("otpExpired"));
-      else if (parsed.code === "otp_incorrect") setError(t("otpIncorrect"));
-      else setError(parsed.form || t("otpIncorrect"));
+      const response = await fetch(
+        apiUrl(`/api/admissions/me/applications/?phone=${encodeURIComponent(normalized)}`, locale)
+      );
+      const data = (await response.json().catch(() => ({}))) as {
+        detail?: string;
+        results?: ApplicationDetail[];
+      };
+      if (!response.ok) {
+        setRows([]);
+        setLookedUp("");
+        setError(data.detail || t("receiptSearchError"));
+        return;
+      }
+      setLookedUp(normalized);
+      setRows(data.results ?? []);
+    } catch {
+      setRows([]);
+      setLookedUp("");
+      setError(t("receiptSearchError"));
     } finally {
-      setVerifying(false);
+      setLoading(false);
     }
-  }
-
-  if (!sessionPhone) {
-    return (
-      <div className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18] sm:p-7">
-        <PhoneVerifyStep
-          phone={phone}
-          otp={otp}
-          verified={false}
-          sending={sending}
-          verifying={verifying}
-          countdown={countdown}
-          debugOtp={debugOtp}
-          error={error}
-          onPhoneChange={setPhone}
-          onOtpChange={setOtp}
-          onSend={sendOtp}
-          onVerify={verifyOtp}
-          onReset={() => undefined}
-        />
-      </div>
-    );
   }
 
   return (
     <div>
-      <p className="mb-4 text-sm text-igqs-muted">
-        {t("verifiedPhone")}: <span className="font-mono">{sessionPhone}</span>
-      </p>
-      {loading ? (
-        <p className="text-sm text-igqs-muted">{t("searchingReceipt")}</p>
-      ) : rows.length === 0 ? (
-        <p className="rounded-3xl border border-igqs-gold/25 bg-white p-6 text-sm dark:bg-[#0d1f18]">
+      <form onSubmit={lookup} className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18] sm:p-7">
+        <label className="text-sm">
+          {t("mobile")}
+          <input
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            className={fieldClass}
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+          />
+        </label>
+        {error && <p className="mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-4 min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+        >
+          {loading ? t("searchingReceipt") : t("searchReceipt")}
+        </button>
+      </form>
+
+      {lookedUp && !loading && rows.length === 0 && (
+        <p className="mt-4 rounded-3xl border border-igqs-gold/25 bg-white p-6 text-sm dark:bg-[#0d1f18]">
           {t("emptyPayments")}
         </p>
-      ) : (
-        <div className="grid gap-4">
+      )}
+
+      {rows.length > 0 && (
+        <div className="mt-4 grid gap-4">
           {rows.map((row) => (
             <article
               key={row.application_id}

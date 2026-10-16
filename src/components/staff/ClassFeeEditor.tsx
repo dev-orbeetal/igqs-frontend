@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { btn } from "@/components/staff/buttons";
+import { fieldClass } from "@/lib/cms";
 import { staffRequest } from "@/lib/staff";
-
-const fieldClass =
-  "w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
 
 type ClassFee = {
   grade_id: number | null;

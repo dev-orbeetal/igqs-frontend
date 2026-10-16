@@ -237,9 +237,9 @@ select optgroup {
 .hero-overlay {
   background: linear-gradient(
     105deg,
-    rgb(8 28 22 / 0.92) 0%,
-    rgb(15 61 48 / 0.78) 46%,
-    rgb(16 35 28 / 0.38) 100%
+    rgb(8 28 22 / 0.78) 0%,
+    rgb(15 61 48 / 0.42) 42%,
+    rgb(16 35 28 / 0.18) 100%
   );
 }
 

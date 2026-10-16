@@ -16,6 +16,45 @@ function applicationStatus(status: string, t: (key: "approved" | "rejected" | "p
   return t("pending");
 }
 
+const FIRST_SORT: Record<string, string> = {
+  created_at: "-created_at",
+  student_name: "student_name",
+  applying_class: "applying_class",
+  payment_amount: "-payment_amount",
+  status: "status",
+};
+
+function SortHeader({
+  label,
+  field,
+  sort,
+  onSort,
+  align = "left",
+}: {
+  label: string;
+  field: string;
+  sort: string;
+  onSort: (field: string) => void;
+  align?: "left" | "right";
+}) {
+  const active = sort === field || sort === `-${field}`;
+  const descending = sort === `-${field}`;
+  return (
+    <th className={`px-4 py-3 ${align === "right" ? "text-right" : ""}`} aria-sort={active ? (descending ? "descending" : "ascending") : "none"}>
+      <button
+        type="button"
+        className={`inline-flex items-center gap-1 text-xs uppercase tracking-[0.12em] text-igqs-gold ${align === "right" ? "ml-auto" : ""}`}
+        onClick={() => onSort(field)}
+      >
+        {label}
+        <span className={active ? "text-igqs-green dark:text-igqs-gold-soft" : "text-igqs-gold/40"} aria-hidden>
+          {active ? (descending ? "↓" : "↑") : "↕"}
+        </span>
+      </button>
+    </th>
+  );
+}
+
 export function StaffApplicationList() {
   const t = useTranslations("staff");
   const ta = useTranslations("admission");
@@ -62,6 +101,14 @@ export function StaffApplicationList() {
       })
       .finally(() => setLoading(false));
   }, [query]);
+
+  function onSort(field: string) {
+    if (sort === field || sort === `-${field}`) {
+      setSort(sort.startsWith("-") ? field : `-${field}`);
+      return;
+    }
+    setSort(FIRST_SORT[field] ?? field);
+  }
 
   return (
     <div>
@@ -130,9 +177,13 @@ export function StaffApplicationList() {
             <option value="-created_at">{t("sortNewest")}</option>
             <option value="created_at">{t("sortOldest")}</option>
             <option value="student_name">{t("sortName")}</option>
+            <option value="-student_name">{t("sortNameDesc")}</option>
             <option value="applying_class">{t("sortClass")}</option>
+            <option value="-applying_class">{t("sortClassDesc")}</option>
             <option value="-payment_amount">{t("sortFee")}</option>
+            <option value="payment_amount">{t("sortFeeLow")}</option>
             <option value="status">{t("sortStatus")}</option>
+            <option value="-status">{t("sortStatusDone")}</option>
           </select>
         </label>
       </form>
@@ -165,12 +216,12 @@ export function StaffApplicationList() {
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
             <tr>
-              <th className="px-4 py-3">{t("student")}</th>
-              <th className="px-4 py-3">{t("applyingClass")}</th>
-              <th className="px-4 py-3">{t("amount")}</th>
-              <th className="px-4 py-3">{t("status")}</th>
-              <th className="px-4 py-3">{t("date")}</th>
-              <th className="px-4 py-3">{t("action")}</th>
+              <SortHeader label={t("student")} field="student_name" sort={sort} onSort={onSort} />
+              <SortHeader label={t("applyingClass")} field="applying_class" sort={sort} onSort={onSort} />
+              <SortHeader label={t("amount")} field="payment_amount" sort={sort} onSort={onSort} />
+              <SortHeader label={t("status")} field="status" sort={sort} onSort={onSort} />
+              <SortHeader label={t("date")} field="created_at" sort={sort} onSort={onSort} />
+              <th className="px-4 py-3 text-right">{t("action")}</th>
             </tr>
           </thead>
           <tbody>

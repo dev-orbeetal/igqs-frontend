@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { AdmissionFeeInfo, PaymentMethodInfo } from "@/lib/api";
+import { paymentMethodRows, type AdmissionFeeInfo, type PaymentMethodInfo } from "@/lib/api";
 import { ImageFileInput } from "@/components/ui/ImageFileInput";
 import { controlClass, fieldClass, fieldErrorClass, type WizardForm } from "./fields";
 
@@ -30,8 +30,14 @@ export function PaymentSummaryStep({
   onScreenshot: (file?: File) => void;
 }) {
   const t = useTranslations("admission");
-  const amount = fee ? `৳${Number(fee.amount).toLocaleString("en-BD")}` : "—";
+  const amount = fee ? `৳${Number(fee.amount).toLocaleString("bn-BD")}` : "—";
   const selected = methods.find((method) => method.code === form.payment_method) ?? methods[0];
+  const detailLabels = {
+    accountName: t("accountLabel"),
+    accountNumber: t("accountNumber"),
+    bank: t("bankName"),
+    type: t("typeLabel"),
+  };
 
   return (
     <div className="grid gap-6">
@@ -40,7 +46,7 @@ export function PaymentSummaryStep({
         <Row label={t("studentName")} value={form.student_name || "—"} />
         <Row label={t("applyingClass")} value={form.applying_class || "—"} />
         <Row label={t("guardianName")} value={form.guardian_name || "—"} />
-        <Row label={t("verifiedPhone")} value={form.mobile || "—"} />
+        <Row label={t("mobile")} value={form.mobile || "—"} />
       </dl>
 
       <div className="rounded-3xl bg-igqs-green px-5 py-6 text-center text-igqs-cream dark:bg-[#0b241c]">
@@ -72,7 +78,7 @@ export function PaymentSummaryStep({
               />
               <span className="font-medium">{method.name}</span>
               <div className="mt-2 grid gap-1">
-                {method.details.map((detail, index) => (
+                {paymentMethodRows(method, detailLabels).map((detail, index) => (
                   <p key={`${detail.label}-${index}`} className="text-sm text-igqs-muted">
                     {detail.label ? <span className="text-igqs-gold">{detail.label}: </span> : null}
                     <span className="whitespace-pre-wrap">{detail.value}</span>

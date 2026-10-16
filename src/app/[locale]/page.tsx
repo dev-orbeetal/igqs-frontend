@@ -48,6 +48,9 @@ export default async function HomePage({
   const albums = home?.gallery ?? [];
   const aboutImage = albums[0]?.cover_image_url || "";
   const notices = home?.notices ?? [];
+  const noticeSlugs = new Set(notices.map((notice) => notice.slug));
+  const newsItems = news.filter((item) => !noticeSlugs.has(item.slug));
+  const classNames = grades.map((grade) => grade.name).filter(Boolean);
   const heroImages = [
     ...(content?.hero_image_url ? [content.hero_image_url] : []),
     ...(home?.hero_images ?? []).filter((url) => url && url !== content?.hero_image_url),
@@ -55,17 +58,16 @@ export default async function HomePage({
 
   return (
     <div>
-      <section className="relative min-h-[86vh] overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
+      <section className="relative flex min-h-[calc(100svh-6.5rem)] flex-col overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
         <div className="pointer-events-none absolute inset-0">
           <HeroSlides images={heroImages} />
           <div className="hero-overlay absolute inset-0" />
           <div className="hero-pattern absolute inset-0" />
         </div>
-        <div className="relative mx-auto flex min-h-[86vh] max-w-7xl flex-col justify-center px-4 py-20 sm:px-6">
-          <FadeIn>
+        <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pb-24 pt-16 sm:px-6">
             <p className="eyebrow">{brand("name")}</p>
             {content?.hero_title && (
-              <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-white sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-white sm:text-5xl lg:text-6xl">
                 {content.hero_title}
               </h1>
             )}
@@ -84,13 +86,57 @@ export default async function HomePage({
               <Link href="/curriculum" className="btn-gold-outline">
                 {t("common.viewCurriculum")}
               </Link>
-              <Link href="/contact" className="btn-ghost">
-                {t("common.contactUs")}
-              </Link>
             </div>
-          </FadeIn>
         </div>
       </section>
+
+      <section className="border-b border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
+          {classNames.length > 0 && (
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.classes")}</p>
+              <p className="mt-2 text-sm leading-relaxed">{classNames.join(", ")}</p>
+            </div>
+          )}
+          {site?.office_hours && (
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.hours")}</p>
+              <p className="mt-2 text-sm leading-relaxed">{site.office_hours}</p>
+            </div>
+          )}
+          {site?.address && (
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.address")}</p>
+              <p className="mt-2 text-sm leading-relaxed">{site.address}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.howToApply")}</p>
+            <p className="mt-2 text-sm leading-relaxed">{t("home.howToApplyBody")}</p>
+          </div>
+        </div>
+      </section>
+
+      {notices.length > 0 && (
+        <section className="section-cream py-10 sm:py-12">
+          <div className="section-shell">
+            <SectionHeading title={t("home.notices")} />
+            <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
+              {notices.map((notice) => (
+                <li key={notice.slug}>
+                  <Link
+                    href={`/news/${notice.slug}`}
+                    className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 transition-colors duration-500 hover:bg-igqs-gold/10"
+                  >
+                    <span className="font-medium">{notice.title}</span>
+                    <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {content?.welcome && (
         <section className="section-cream section-pad">
@@ -209,7 +255,7 @@ export default async function HomePage({
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {grades.map((grade) => (
               <FadeIn key={grade.slug}>
-                <Link href="/curriculum" className="surface-card surface-card-hover block bg-white/90 p-5 dark:bg-[#12352b]">
+                <Link href={`/curriculum#grade-${grade.slug}`} className="surface-card surface-card-hover block bg-white/90 p-5 dark:bg-[#12352b]">
                   <h3 className="font-display text-2xl text-igqs-green dark:text-igqs-gold-soft">
                     {grade.name}
                   </h3>
@@ -269,7 +315,7 @@ export default async function HomePage({
                     <div className="img-overlay absolute inset-0" />
                   </div>
                   <div className="p-5">
-                    <p className="text-xs text-igqs-gold">{formatDate(event.start_at, locale, true)}</p>
+                    <p className="text-xs text-igqs-gold">{formatDate(event.start_at, locale)}</p>
                     <h3 className="mt-2 font-display text-2xl leading-tight">{event.title}</h3>
                     <p className="mt-1 text-sm text-igqs-muted">{event.location}</p>
                   </div>
@@ -281,7 +327,7 @@ export default async function HomePage({
       </section>
       )}
 
-      {news.length > 0 && (
+      {newsItems.length > 0 && (
       <section className="section-cream-alt section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
@@ -291,7 +337,7 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {news.map((item) => (
+            {newsItems.map((item) => (
               <FadeIn key={item.slug}>
                 <Link href={`/news/${item.slug}`} className="surface-card surface-card-hover group block overflow-hidden bg-white/90 dark:bg-[#12352b]">
                   <div className="relative h-40">
@@ -352,27 +398,6 @@ export default async function HomePage({
               </FadeIn>
             ))}
           </div>
-        </div>
-      </section>
-      )}
-
-      {notices.length > 0 && (
-      <section className="section-cream-alt section-pad">
-        <div className="section-shell">
-          <SectionHeading title={t("home.notices")} />
-          <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
-            {notices.map((notice) => (
-              <li key={notice.slug}>
-                <Link
-                  href={`/news/${notice.slug}`}
-                  className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 transition-colors duration-500 hover:bg-igqs-gold/10"
-                >
-                  <span className="font-medium">{notice.title}</span>
-                  <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
       )}

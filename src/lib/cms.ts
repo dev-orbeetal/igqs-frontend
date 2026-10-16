@@ -9,16 +9,17 @@ export type CmsMeta = {
   why_icons: Option[];
 };
 
-export type CmsField =
+export type CmsField = { section?: string; hint?: string } & (
   | { type: "text" | "textarea" | "url" | "number"; name: string; label: string }
   | { type: "pair"; name: string; label: string; textarea?: boolean }
   | { type: "checkbox"; name: string; label: string }
   | { type: "select"; name: string; label: string; options: Option[] }
   | { type: "datetime"; name: string; label: string }
-  | { type: "image"; name: string; fileName: string; label: string };
+  | { type: "image"; name: string; fileName: string; label: string }
+);
 
 export const fieldClass =
-  "mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
+  "mt-1.5 w-full min-h-11 rounded-xl border border-igqs-gold/40 bg-white px-3.5 py-2.5 text-sm text-igqs-ink shadow-sm outline-none transition placeholder:text-igqs-muted/80 focus:border-igqs-gold focus:ring-2 focus:ring-igqs-gold/30 dark:bg-[#10261e] dark:text-igqs-sand";
 
 export function toDateTimeLocal(value?: string | null) {
   if (!value) return "";
@@ -119,15 +120,14 @@ export function emptyRecord(fields: CmsField[], extras: Record<string, unknown> 
 }
 
 export const homeFields: CmsField[] = [
-  { type: "pair", name: "hero_title", label: "Hero title" },
-  { type: "pair", name: "hero_subtitle", label: "Hero subtitle", textarea: true },
-  { type: "image", name: "hero_image_url", fileName: "hero_image", label: "Hero image" },
-  { type: "pair", name: "welcome", label: "Welcome", textarea: true },
-  { type: "pair", name: "about_preview", label: "About preview", textarea: true },
-  { type: "pair", name: "principal_name", label: "Principal name" },
-  { type: "pair", name: "principal_title", label: "Principal title" },
-  { type: "pair", name: "principal_message", label: "Principal message", textarea: true },
-  { type: "image", name: "principal_photo_url", fileName: "principal_photo", label: "Principal photo" },
+  { type: "pair", name: "hero_title", label: "Hero title", section: "sectionHero" },
+  { type: "pair", name: "hero_subtitle", label: "Hero subtitle", textarea: true, section: "sectionHero" },
+  { type: "pair", name: "welcome", label: "Welcome", textarea: true, section: "sectionWelcome" },
+  { type: "pair", name: "about_preview", label: "About preview", textarea: true, section: "sectionWelcome" },
+  { type: "pair", name: "principal_name", label: "Principal name", section: "sectionPrincipal" },
+  { type: "pair", name: "principal_title", label: "Principal title", section: "sectionPrincipal" },
+  { type: "pair", name: "principal_message", label: "Principal message", textarea: true, section: "sectionPrincipal" },
+  { type: "image", name: "principal_photo_url", fileName: "principal_photo", label: "Principal photo", section: "sectionPrincipal" },
 ];
 
 export const whyFields = (icons: Option[]): CmsField[] => [
@@ -138,43 +138,43 @@ export const whyFields = (icons: Option[]): CmsField[] => [
 ];
 
 export const aboutFields: CmsField[] = [
-  { type: "pair", name: "introduction", label: "Introduction", textarea: true },
-  { type: "pair", name: "vision", label: "Vision", textarea: true },
-  { type: "pair", name: "mission", label: "Mission", textarea: true },
-  { type: "pair", name: "history", label: "History", textarea: true },
-  { type: "pair", name: "quranic_approach", label: "Qur'anic approach", textarea: true },
-  { type: "pair", name: "principal_message", label: "Principal message", textarea: true },
+  { type: "pair", name: "introduction", label: "Introduction", textarea: true, section: "sectionStory" },
+  { type: "pair", name: "history", label: "History", textarea: true, section: "sectionStory" },
+  { type: "pair", name: "vision", label: "Vision", textarea: true, section: "sectionPurpose" },
+  { type: "pair", name: "mission", label: "Mission", textarea: true, section: "sectionPurpose" },
+  { type: "pair", name: "quranic_approach", label: "Qur'anic approach", textarea: true, section: "sectionPurpose" },
+  { type: "pair", name: "principal_message", label: "Principal message", textarea: true, section: "sectionPrincipal" },
 ];
 
 export const leaderFields: CmsField[] = [
-  { type: "pair", name: "name", label: "Name" },
-  { type: "pair", name: "role", label: "Role" },
-  { type: "pair", name: "bio", label: "Biography", textarea: true },
-  { type: "image", name: "photo_url", fileName: "photo", label: "Photo" },
-  { type: "number", name: "order", label: "Order" },
+  { type: "pair", name: "name", label: "Name", section: "sectionDetails" },
+  { type: "pair", name: "role", label: "Role", section: "sectionDetails" },
+  { type: "pair", name: "bio", label: "Biography", textarea: true, section: "sectionDetails" },
+  { type: "image", name: "photo_url", fileName: "photo", label: "Photo", section: "sectionMedia" },
+  { type: "number", name: "order", label: "Order", section: "sectionPublishing" },
 ];
 
 export const facilityFields: CmsField[] = [
-  { type: "pair", name: "title", label: "Title" },
-  { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "image", name: "image_url", fileName: "image", label: "Image" },
-  { type: "number", name: "order", label: "Order" },
+  { type: "pair", name: "title", label: "Title", section: "sectionDetails" },
+  { type: "pair", name: "description", label: "Description", textarea: true, section: "sectionDetails" },
+  { type: "image", name: "image_url", fileName: "image", label: "Image", section: "sectionMedia" },
+  { type: "number", name: "order", label: "Order", section: "sectionPublishing" },
 ];
 
 export const contactFields: CmsField[] = [
-  { type: "pair", name: "school_name", label: "School name" },
-  { type: "pair", name: "tagline", label: "Tagline" },
-  { type: "image", name: "logo_url", fileName: "logo", label: "Logo" },
-  { type: "pair", name: "address", label: "Address" },
-  { type: "text", name: "phone_primary", label: "Primary phone" },
-  { type: "text", name: "phone_secondary", label: "Secondary phone" },
-  { type: "text", name: "email", label: "Email" },
-  { type: "pair", name: "office_hours", label: "Office hours" },
-  { type: "url", name: "map_embed_url", label: "Map embed URL" },
-  { type: "url", name: "facebook_url", label: "Facebook" },
-  { type: "url", name: "youtube_url", label: "YouTube" },
-  { type: "url", name: "instagram_url", label: "Instagram" },
-  { type: "url", name: "whatsapp_url", label: "WhatsApp" },
+  { type: "pair", name: "school_name", label: "School name", section: "sectionIdentity" },
+  { type: "pair", name: "tagline", label: "Tagline", section: "sectionIdentity" },
+  { type: "image", name: "logo_url", fileName: "logo", label: "Logo", section: "sectionIdentity" },
+  { type: "pair", name: "address", label: "Address", section: "sectionContact" },
+  { type: "text", name: "phone_primary", label: "Primary phone", section: "sectionContact" },
+  { type: "text", name: "phone_secondary", label: "Secondary phone", section: "sectionContact" },
+  { type: "text", name: "email", label: "Email", section: "sectionContact" },
+  { type: "pair", name: "office_hours", label: "Office hours", section: "sectionContact" },
+  { type: "url", name: "map_embed_url", label: "Map embed URL", section: "sectionMap" },
+  { type: "url", name: "facebook_url", label: "Facebook", section: "sectionSocial" },
+  { type: "url", name: "youtube_url", label: "YouTube", section: "sectionSocial" },
+  { type: "url", name: "instagram_url", label: "Instagram", section: "sectionSocial" },
+  { type: "url", name: "whatsapp_url", label: "WhatsApp", section: "sectionSocial" },
 ];
 
 export const admissionInfoFields: CmsField[] = [
@@ -183,32 +183,32 @@ export const admissionInfoFields: CmsField[] = [
 ];
 
 export const eventFields: CmsField[] = [
-  { type: "text", name: "slug", label: "Slug" },
-  { type: "pair", name: "title", label: "Title" },
-  { type: "datetime", name: "start_at", label: "Starts" },
-  { type: "datetime", name: "end_at", label: "Ends" },
-  { type: "pair", name: "location", label: "Location" },
-  { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "image", name: "image_url", fileName: "image", label: "Image" },
-  { type: "checkbox", name: "is_published", label: "Published" },
+  { type: "text", name: "slug", label: "Page link", hint: "slugHint", section: "sectionDetails" },
+  { type: "pair", name: "title", label: "Title", section: "sectionDetails" },
+  { type: "pair", name: "location", label: "Location", section: "sectionDetails" },
+  { type: "pair", name: "description", label: "Description", textarea: true, section: "sectionDetails" },
+  { type: "datetime", name: "start_at", label: "Starts", section: "sectionSchedule" },
+  { type: "datetime", name: "end_at", label: "Ends", section: "sectionSchedule" },
+  { type: "image", name: "image_url", fileName: "image", label: "Image", section: "sectionPublishing" },
+  { type: "checkbox", name: "is_published", label: "Published", section: "sectionPublishing" },
 ];
 
 export const newsFields = (categories: Option[]): CmsField[] => [
-  { type: "text", name: "slug", label: "Slug" },
-  { type: "pair", name: "title", label: "Title" },
-  { type: "select", name: "category", label: "Category", options: categories },
-  { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "image", name: "featured_image_url", fileName: "featured_image", label: "Image" },
-  { type: "datetime", name: "published_at", label: "Published at" },
-  { type: "checkbox", name: "is_published", label: "Published" },
-  { type: "checkbox", name: "is_important", label: "Show as important notice" },
+  { type: "text", name: "slug", label: "Page link", hint: "slugHint", section: "sectionDetails" },
+  { type: "pair", name: "title", label: "Title", section: "sectionDetails" },
+  { type: "select", name: "category", label: "Category", options: categories, section: "sectionDetails" },
+  { type: "pair", name: "description", label: "Description", textarea: true, section: "sectionDetails" },
+  { type: "image", name: "featured_image_url", fileName: "featured_image", label: "Image", section: "sectionMedia" },
+  { type: "datetime", name: "published_at", label: "Published at", section: "sectionPublishing" },
+  { type: "checkbox", name: "is_published", label: "Published", section: "sectionPublishing" },
+  { type: "checkbox", name: "is_important", label: "Show as important notice", section: "sectionPublishing" },
 ];
 
 export const gradeFields: CmsField[] = [
-  { type: "text", name: "slug", label: "Slug" },
-  { type: "pair", name: "name", label: "Name" },
-  { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "number", name: "order", label: "Order" },
+  { type: "text", name: "slug", label: "Page link", hint: "slugHint", section: "sectionDetails" },
+  { type: "pair", name: "name", label: "Name", section: "sectionDetails" },
+  { type: "pair", name: "description", label: "Description", textarea: true, section: "sectionDetails" },
+  { type: "number", name: "order", label: "Order", section: "sectionPublishing" },
 ];
 
 export const subjectFields = (categories: Option[]): CmsField[] => [
@@ -225,12 +225,12 @@ export const documentFields: CmsField[] = [
 ];
 
 export const albumFields = (categories: Option[]): CmsField[] => [
-  { type: "text", name: "slug", label: "Slug" },
-  { type: "pair", name: "title", label: "Title" },
-  { type: "select", name: "category", label: "Category", options: categories },
-  { type: "pair", name: "description", label: "Description", textarea: true },
-  { type: "image", name: "cover_image_url", fileName: "cover_image", label: "Cover image" },
-  { type: "number", name: "order", label: "Order" },
+  { type: "text", name: "slug", label: "Page link", hint: "slugHint", section: "sectionDetails" },
+  { type: "pair", name: "title", label: "Title", section: "sectionDetails" },
+  { type: "select", name: "category", label: "Category", options: categories, section: "sectionDetails" },
+  { type: "pair", name: "description", label: "Description", textarea: true, section: "sectionDetails" },
+  { type: "image", name: "cover_image_url", fileName: "cover_image", label: "Cover image", section: "sectionMedia" },
+  { type: "number", name: "order", label: "Order", section: "sectionPublishing" },
 ];
 
 export const feeFields = (grades: Option[]): CmsField[] => [

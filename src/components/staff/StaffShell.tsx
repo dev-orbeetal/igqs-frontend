@@ -91,7 +91,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
     },
   ];
   const links = groups.flatMap((group) => group.links);
-  const current = pathname === "/content" ? cms("title") : links.find((link) => link.match)?.label || t("dashboard");
+  const current = links.find((link) => link.match)?.label || t("dashboard");
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-igqs-ink lg:grid lg:grid-cols-[260px_1fr] dark:bg-[#07140f] dark:text-igqs-sand">

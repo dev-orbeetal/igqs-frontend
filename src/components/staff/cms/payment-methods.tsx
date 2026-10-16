@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
 import { btn } from "@/components/staff/buttons";
+import { LangMark } from "@/components/staff/cms/fields";
+import { fieldClass } from "@/lib/cms";
 import { staffRequest } from "@/lib/staff";
-
-const fieldClass =
-  "mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
 
 type Detail = {
   label_en: string;
@@ -133,11 +132,11 @@ export function PaymentMethodsEditor() {
         }}
       >
         <label className="text-sm">
-          {t("methodNameEn")}
+          <LangMark code="en" label={t("english")} />
           <input className={fieldClass} value={nameEn} onChange={(event) => setNameEn(event.currentTarget.value)} required />
         </label>
         <label className="text-sm">
-          {t("methodNameBn")}
+          <LangMark code="bn" label={t("bengali")} />
           <input className={fieldClass} value={nameBn} onChange={(event) => setNameBn(event.currentTarget.value)} required />
         </label>
         <div>
@@ -175,9 +174,9 @@ export function PaymentMethodsEditor() {
               void save();
             }}
           >
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-3 rounded-2xl border border-igqs-gold/20 bg-white p-4 dark:bg-[#10261e] md:grid-cols-2">
               <label className="text-sm">
-                {t("methodNameEn")}
+                <LangMark code="en" label={t("english")} />
                 <input
                   className={fieldClass}
                   value={selected.name_en}
@@ -185,7 +184,7 @@ export function PaymentMethodsEditor() {
                 />
               </label>
               <label className="text-sm">
-                {t("methodNameBn")}
+                <LangMark code="bn" label={t("bengali")} />
                 <input
                   className={fieldClass}
                   value={selected.name_bn}
@@ -214,9 +213,9 @@ export function PaymentMethodsEditor() {
               </div>
               <p className="text-sm text-igqs-muted">{t("methodFieldsHint")}</p>
               {selected.details.map((detail, index) => (
-                <div key={index} className="grid gap-3 rounded-2xl border border-igqs-gold/20 p-3 md:grid-cols-2">
+                <div key={index} className="grid gap-3 rounded-2xl border border-igqs-gold/20 bg-igqs-sand/40 p-4 dark:bg-white/[0.04] md:grid-cols-2">
                   <label className="text-sm">
-                    {t("fieldLabelEn")}
+                    <LangMark code="en" label={t("fieldLabelEn")} />
                     <input
                       className={fieldClass}
                       value={detail.label_en}
@@ -224,7 +223,7 @@ export function PaymentMethodsEditor() {
                     />
                   </label>
                   <label className="text-sm">
-                    {t("fieldLabelBn")}
+                    <LangMark code="bn" label={t("fieldLabelBn")} />
                     <input
                       className={fieldClass}
                       value={detail.label_bn}
@@ -232,18 +231,18 @@ export function PaymentMethodsEditor() {
                     />
                   </label>
                   <label className="text-sm">
-                    {t("fieldValueEn")}
+                    <LangMark code="en" label={t("fieldValueEn")} />
                     <textarea
-                      className={fieldClass}
+                      className={`${fieldClass} min-h-20`}
                       rows={2}
                       value={detail.value_en}
                       onChange={(event) => updateDetail(index, "value_en", event.currentTarget.value)}
                     />
                   </label>
                   <label className="text-sm">
-                    {t("fieldValueBn")}
+                    <LangMark code="bn" label={t("fieldValueBn")} />
                     <textarea
-                      className={fieldClass}
+                      className={`${fieldClass} min-h-20`}
                       rows={2}
                       value={detail.value_bn}
                       onChange={(event) => updateDetail(index, "value_bn", event.currentTarget.value)}

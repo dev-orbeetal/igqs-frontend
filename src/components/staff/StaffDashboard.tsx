@@ -24,7 +24,6 @@ function statusLabel(status: string, t: (key: "approved" | "rejected" | "pending
 
 export function StaffDashboard() {
   const t = useTranslations("staff");
-  const cms = useTranslations("cms");
   const ta = useTranslations("admission");
   const locale = useLocale();
   const [stats, setStats] = useState<StaffStats | null>(null);
@@ -47,21 +46,7 @@ export function StaffDashboard() {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2">
-        <Link href="/payments/applications" className={btn.primary}>
-          {t("manageApplications")}
-        </Link>
-        <Link href="/payments/fees" className={btn.secondary}>
-          {t("fees")}
-        </Link>
-        <Link href="/content/home" className={btn.secondary}>
-          {cms("home")}
-        </Link>
-        <Link href="/content/news" className={btn.secondary}>
-          {cms("news")}
-        </Link>
-      </div>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label={t("total")} value={stats.total} />
         <StatCard label={t("successful")} value={stats.approved} />
         <StatCard label={t("pending")} value={stats.pending} />

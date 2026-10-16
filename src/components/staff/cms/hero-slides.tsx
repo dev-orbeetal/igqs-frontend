@@ -18,8 +18,8 @@ export function HeroSlideEditor() {
   const [pendingId, setPendingId] = useState<number | null>(null);
 
   async function reload() {
-    const data = await staffRequest<Slide[]>("/api/staff/hero-slides/");
-    setSlides(data);
+    const data = await staffRequest<Slide[] | { results: Slide[] }>("/api/staff/hero-slides/");
+    setSlides(Array.isArray(data) ? data : (data.results ?? []));
   }
 
   useEffect(() => {
@@ -36,8 +36,8 @@ export function HeroSlideEditor() {
       await staffRequest("/api/staff/hero-slides/bulk/", { method: "POST", body: form });
       setInputKey((key) => key + 1);
       await reload();
-    } catch {
-      setError(t("error"));
+    } catch (error) {
+      setError(error instanceof Error && error.message ? error.message : t("error"));
     } finally {
       setUploading(false);
     }
@@ -54,21 +54,28 @@ export function HeroSlideEditor() {
   }
 
   return (
-    <div className="grid gap-3">
-      <p className="text-sm font-medium">{t("heroSlides")}</p>
-      <div className="flex flex-wrap gap-3">
-        {slides.map((slide) => (
-          <div key={slide.id} className="grid gap-1">
-            {slide.image_src && (
-              <img src={slide.image_src} alt="" className="h-24 w-36 rounded-xl object-cover" />
-            )}
-            <button type="button" className={btn.danger} onClick={() => setPendingId(slide.id)}>
-              {t("removeUpload")}
-            </button>
-          </div>
-        ))}
+    <div className="grid gap-4">
+      {slides.length === 0 ? (
+        <p className="text-sm text-igqs-muted">{t("noHeroSlides")}</p>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          {slides.map((slide) => (
+            <div key={slide.id} className="grid gap-1">
+              {slide.image_src && (
+                <img src={slide.image_src} alt="" className="h-24 w-36 rounded-xl object-cover" />
+              )}
+              <button type="button" className={btn.danger} onClick={() => setPendingId(slide.id)}>
+                {t("removeUpload")}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="rounded-2xl border border-dashed border-igqs-gold/50 bg-white p-4 text-sm dark:bg-[#10261e]">
+        <p className="font-medium">{t("addHeroSlides")}</p>
+        <span className="mt-1 block text-xs text-igqs-muted">{t("heroSlidesHint")}</span>
+        <ImageFileInput key={inputKey} multiple disabled={uploading} onFiles={(files) => void upload(files)} />
       </div>
-      <ImageFileInput key={inputKey} multiple disabled={uploading} onFiles={(files) => void upload(files)} />
       {uploading && <p className="text-sm text-igqs-muted">{t("uploading")}</p>}
       {error && <p className="text-sm text-red-700">{error}</p>}
       <ConfirmDialog

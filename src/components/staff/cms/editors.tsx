@@ -13,6 +13,7 @@ import {
   eventFields,
   facilityFields,
   feeFields,
+  fieldClass,
   gradeFields,
   homeFields,
   leaderFields,
@@ -79,7 +80,11 @@ function RecordForm({
         englishLabel={copy.english}
         bengaliLabel={copy.bengali}
       />
-      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
+      {error && (
+        <p className="mt-4 rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+          {error}
+        </p>
+      )}
       <FormActions
         saving={saving}
         saveLabel={copy.save}
@@ -236,29 +241,33 @@ function CollectionBlock({
   );
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
-      <div>
-        <button type="button" onClick={startNew} className={btn.primary}>
+    <div className="grid gap-6 lg:grid-cols-[minmax(220px,280px)_1fr]">
+      <div className="rounded-2xl border border-igqs-gold/20 bg-igqs-sand/40 p-3 dark:bg-white/[0.04]">
+        <button type="button" onClick={startNew} className={`${btn.primary} w-full min-h-11`}>
           {copy.add}
         </button>
-        <label className="mt-3 block text-sm">
+        <label className="mt-3 block text-sm font-medium">
           {copy.t("searchList")}
           <input
-            className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm"
+            className={fieldClass}
             value={listQuery}
             onChange={(event) => setListQuery(event.currentTarget.value)}
           />
         </label>
         {loaded && visible.length === 0 ? (
-          <p className="mt-3 text-sm text-igqs-muted">{copy.t("emptyList")}</p>
+          <p className="mt-4 rounded-xl bg-white px-3 py-6 text-center text-sm text-igqs-muted dark:bg-[#10261e]">
+            {copy.t("emptyList")}
+          </p>
         ) : (
-        <ul className="mt-3 space-y-1 text-sm">
+        <ul className="mt-3 max-h-[28rem] space-y-1 overflow-y-auto text-sm">
           {visible.map((row) => (
             <li key={String(row.id)}>
               <button
                 type="button"
                 className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left ${
-                  selected?.id === row.id ? "bg-igqs-gold/15 text-igqs-gold" : "hover:bg-igqs-gold/10"
+                  selected?.id === row.id
+                    ? "bg-white font-semibold text-igqs-green shadow-sm dark:bg-[#10261e] dark:text-igqs-gold-soft"
+                    : "hover:bg-white/80 dark:hover:bg-white/5"
                 }`}
                 onClick={() => {
                   setSelected(row);
@@ -288,7 +297,9 @@ function CollectionBlock({
           error={error}
         />
       ) : (
-        <p className="text-sm text-igqs-muted">{copy.t("chooseOrAdd")}</p>
+        <div className="flex min-h-40 items-center justify-center rounded-2xl border border-dashed border-igqs-gold/40 px-4 py-8 text-center text-sm text-igqs-muted">
+          {copy.t("chooseOrAdd")}
+        </div>
       )}
     </div>
   );
@@ -296,9 +307,9 @@ function CollectionBlock({
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
-      <h2 className="mb-5 font-display text-2xl">{title}</h2>
-      {children}
+    <section className="rounded-3xl border border-igqs-gold/25 bg-white p-5 shadow-sm dark:bg-[#0d1f18] sm:p-6">
+      <h2 className="border-b border-igqs-gold/20 pb-3 font-display text-2xl">{title}</h2>
+      <div className="mt-5">{children}</div>
     </section>
   );
 }
@@ -311,61 +322,17 @@ function useMeta() {
   return meta;
 }
 
-export function ContentHub() {
-  const t = useTranslations("cms");
-  const sections = [
-    { href: "/content/home", title: t("home"), hint: t("homeHint") },
-    { href: "/content/about", title: t("about"), hint: t("aboutHint") },
-    { href: "/content/curriculum", title: t("curriculum"), hint: t("curriculumHint") },
-    { href: "/content/events", title: t("events"), hint: t("eventsHint") },
-    { href: "/content/news", title: t("news"), hint: t("newsHint") },
-    { href: "/content/gallery", title: t("gallery"), hint: t("galleryHint") },
-    { href: "/content/contact", title: t("contact"), hint: t("contactHint") },
-    { href: "/content/admission", title: t("admission"), hint: t("admissionHint") },
-  ];
-  return (
-    <div>
-      <p className="text-xs uppercase tracking-[0.28em] text-igqs-gold">{t("kicker")}</p>
-      <p className="mt-2 max-w-2xl text-sm text-igqs-muted">{t("subtitle")}</p>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {sections.map((section) => (
-          <Link
-            key={section.href}
-            href={section.href}
-            className="rounded-xl border border-igqs-gold/40 bg-white p-5 shadow-sm transition hover:border-igqs-gold hover:bg-igqs-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold active:bg-igqs-gold/20 dark:bg-[#0d1f18]"
-          >
-            <h2 className="font-display text-2xl">{section.title}</h2>
-            <p className="mt-2 text-sm text-igqs-muted">{section.hint}</p>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PageHeader({ title: _title }: { title: string }) {
-  const t = useTranslations("cms");
-  return (
-    <div className="mb-6">
-      <Link href="/content" className={btn.secondary}>
-        ← {t("website")}
-      </Link>
-    </div>
-  );
-}
-
 export function HomeEditor() {
   const t = useTranslations("cms");
   const meta = useMeta();
   return (
     <div>
-      <PageHeader title={t("home")} />
       <div className="space-y-6">
+        <Card title={t("heroSlides")}>
+          <HeroSlideEditor />
+        </Card>
         <Card title={t("home")}>
           <SingletonBlock path="/api/staff/home/" fields={homeFields} />
-          <div className="mt-6">
-            <HeroSlideEditor />
-          </div>
         </Card>
         <Card title={t("whyChoose")}>
           <CollectionBlock
@@ -384,7 +351,6 @@ export function AboutEditor() {
   const t = useTranslations("cms");
   return (
     <div>
-      <PageHeader title={t("about")} />
       <div className="space-y-6">
         <Card title={t("about")}>
           <SingletonBlock path="/api/staff/about/" fields={aboutFields} />
@@ -409,7 +375,6 @@ export function ContactEditor() {
   const t = useTranslations("cms");
   return (
     <div>
-      <PageHeader title={t("contact")} />
       <Card title={t("contact")}>
         <SingletonBlock path="/api/staff/site/" fields={contactFields} />
       </Card>
@@ -426,7 +391,6 @@ export function AdmissionEditor() {
   ];
   return (
     <div>
-      <PageHeader title={t("admission")} />
       <div className="space-y-6">
         <Card title={t("admissionInfo")}>
           <SingletonBlock path="/api/staff/site/" fields={admissionInfoFields} />
@@ -474,20 +438,36 @@ function ItemTable({
   });
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <label className="text-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <label className="text-sm font-medium">
           {copy.t("searchList")}
           <input
-            className="mt-1 w-full min-w-56 rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm"
+            className={`${fieldClass} sm:min-w-64`}
             value={listQuery}
             onChange={(event) => setListQuery(event.currentTarget.value)}
           />
         </label>
-        <Link href={`${hrefBase}/new`} className={btn.primary}>
+        <Link href={`${hrefBase}/new`} className={`${btn.primary} min-h-11`}>
           {copy.add}
         </Link>
       </div>
-      <div className="mt-4 overflow-x-auto rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18]">
+      <div className="mt-4 space-y-3 md:hidden">
+        {loaded && visible.length === 0 && (
+          <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-4 py-8 text-center text-sm text-igqs-muted">
+            {copy.t("emptyList")}
+          </p>
+        )}
+        {visible.map((row) => (
+          <article key={String(row.id)} className="rounded-2xl border border-igqs-gold/25 bg-white p-4 dark:bg-[#0d1f18]">
+            <p className="font-medium">{String(row[titleField] || row.id)}</p>
+            {extra && <p className="mt-1 text-sm text-igqs-muted">{extra(row)}</p>}
+            <Link href={`${hrefBase}/${row.id}`} className={`${btn.secondary} mt-3 min-h-11`}>
+              {copy.t("edit")}
+            </Link>
+          </article>
+        ))}
+      </div>
+      <div className="mt-4 hidden overflow-x-auto rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18] md:block">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
             <tr>
@@ -499,7 +479,7 @@ function ItemTable({
           <tbody>
             {visible.map((row) => (
               <tr key={String(row.id)} className="border-t border-igqs-gold/10">
-                <td className="px-4 py-3">{String(row[titleField] || row.id)}</td>
+                <td className="px-4 py-3 font-medium">{String(row[titleField] || row.id)}</td>
                 <td className="px-4 py-3 text-igqs-muted">{extra?.(row)}</td>
                 <td className="px-4 py-3 text-right">
                   <Link href={`${hrefBase}/${row.id}`} className={btn.secondary}>
@@ -600,7 +580,6 @@ export function EventsManager({ id }: { id?: string }) {
   if (!id) {
     return (
       <div>
-        <PageHeader title={t("events")} />
         <ItemTable
           path="/api/staff/events/"
           hrefBase="/content/events"
@@ -612,7 +591,6 @@ export function EventsManager({ id }: { id?: string }) {
   }
   return (
     <div>
-      <PageHeader title={t("events")} />
       <ItemEditor
         path={id === "new" ? "/api/staff/events/new" : `/api/staff/events/${id}/`}
         fields={eventFields}
@@ -630,7 +608,6 @@ export function NewsManager({ id }: { id?: string }) {
   if (!id) {
     return (
       <div>
-        <PageHeader title={t("news")} />
         <ItemTable
           path="/api/staff/news/"
           hrefBase="/content/news"
@@ -642,7 +619,6 @@ export function NewsManager({ id }: { id?: string }) {
   }
   return (
     <div>
-      <PageHeader title={t("news")} />
       <ItemEditor
         path={id === "new" ? "/api/staff/news/new" : `/api/staff/news/${id}/`}
         fields={fields}
@@ -659,14 +635,12 @@ export function CurriculumManager({ id }: { id?: string }) {
   if (!id) {
     return (
       <div>
-        <PageHeader title={t("curriculum")} />
         <ItemTable path="/api/staff/grades/" hrefBase="/content/curriculum" titleField="name_en" extra={(row) => String(row.slug)} />
       </div>
     );
   }
   return (
     <div>
-      <PageHeader title={t("curriculum")} />
       <div className="space-y-6">
         <ItemEditor
           path={id === "new" ? "/api/staff/grades/new" : `/api/staff/grades/${id}/`}
@@ -708,7 +682,6 @@ export function GalleryManager({ id }: { id?: string }) {
   if (!id) {
     return (
       <div>
-        <PageHeader title={t("gallery")} />
         <ItemTable
           path="/api/staff/albums/"
           hrefBase="/content/gallery"
@@ -720,7 +693,6 @@ export function GalleryManager({ id }: { id?: string }) {
   }
   return (
     <div>
-      <PageHeader title={t("gallery")} />
       <div className="space-y-6">
         <ItemEditor
           path={id === "new" ? "/api/staff/albums/new" : `/api/staff/albums/${id}/`}

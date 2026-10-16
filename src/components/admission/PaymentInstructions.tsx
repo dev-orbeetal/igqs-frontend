@@ -55,7 +55,7 @@ export function PaymentInstructions({
             >
               <h3 className="font-display text-2xl">{method.name}</h3>
               <div className="mt-3 grid gap-2">
-                {method.details.map((detail, index) => (
+                {(method.details ?? []).map((detail, index) => (
                   <p key={`${detail.label}-${index}`} className="text-sm leading-relaxed text-igqs-muted">
                     {detail.label ? <span className="text-igqs-gold">{detail.label}: </span> : null}
                     <span className="whitespace-pre-wrap">{detail.value}</span>

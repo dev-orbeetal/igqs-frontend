@@ -104,9 +104,9 @@ export function AlbumImages({ albumId }: { albumId: string }) {
 
   return (
     <div className="grid gap-6">
-      <label className="text-sm">
+      <label className="rounded-2xl border border-dashed border-igqs-gold/50 bg-white p-4 text-sm dark:bg-[#10261e]">
         {t("uploadImages")}
-        <span className="mt-1 block text-igqs-muted">{t("uploadImagesHint")}</span>
+        <span className="mt-1 block text-xs leading-relaxed text-igqs-muted">{t("uploadImagesHint")}</span>
         <ImageFileInput
           key={inputKey}
           multiple
@@ -146,7 +146,13 @@ export function AlbumImages({ albumId }: { albumId: string }) {
               void save();
             }}
           >
-            {preview && <img src={preview} alt="" className="mb-4 h-28 w-40 rounded-xl object-cover" />}
+            {preview ? (
+              <img src={preview} alt="" className="mb-4 h-40 w-full max-w-xs rounded-xl object-cover" />
+            ) : (
+              <p className="mb-4 rounded-xl bg-igqs-sand/60 px-3 py-6 text-center text-sm text-igqs-muted dark:bg-white/5">
+                {t("imageEmpty")}
+              </p>
+            )}
             <CmsFields
               fields={captionFields}
               values={selected}
@@ -166,7 +172,9 @@ export function AlbumImages({ albumId }: { albumId: string }) {
             />
           </form>
         ) : (
-          <p className="text-sm text-igqs-muted">{rows.length === 0 ? t("noImages") : t("chooseImage")}</p>
+          <div className="flex min-h-32 items-center justify-center rounded-2xl border border-dashed border-igqs-gold/40 px-4 py-8 text-center text-sm text-igqs-muted">
+            {rows.length === 0 ? t("noImages") : t("chooseImage")}
+          </div>
         )}
       </div>
       {!selected && error && <p className="text-sm text-red-700">{error}</p>}

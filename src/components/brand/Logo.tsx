@@ -26,8 +26,8 @@ export function Logo({
       />
       {!iconOnly && (
         <span
-          className={`min-w-0 whitespace-nowrap font-display font-semibold leading-tight tracking-wide ${
-            compact ? "text-sm" : "text-base sm:text-lg"
+          className={`min-w-0 font-display font-semibold leading-tight tracking-wide ${
+            compact ? "hidden text-sm sm:inline" : "text-base sm:text-lg"
           } ${light ? "text-igqs-cream" : "text-igqs-green group-hover:text-igqs-forest dark:text-igqs-gold-soft"}`}
         >
           {name}

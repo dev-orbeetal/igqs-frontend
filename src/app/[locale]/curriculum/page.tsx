@@ -22,7 +22,8 @@ export default async function CurriculumPage({
         {grades?.map((grade) => (
           <FadeIn
             key={grade.slug}
-            className="rounded-3xl border border-igqs-gold/20 bg-white p-6 dark:bg-[#0d1f18] md:p-8"
+            id={`grade-${grade.slug}`}
+            className="scroll-mt-28 rounded-3xl border border-igqs-gold/20 bg-white p-6 dark:bg-[#0d1f18] md:p-8"
           >
             <h2 className="font-display text-3xl text-igqs-green dark:text-igqs-gold-soft">
               {grade.name}

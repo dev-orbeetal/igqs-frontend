@@ -48,7 +48,7 @@ export function ClassSelectStep({
       {selectedSlug && fee && (
         <div className="mt-6 rounded-3xl bg-igqs-green px-5 py-6 text-center text-igqs-cream dark:bg-[#0b241c]">
           <p className="text-sm text-igqs-gold-soft">{t("feeFixed")}</p>
-          <p className="mt-2 font-display text-4xl">৳{Number(fee.amount).toLocaleString("en-BD")}</p>
+          <p className="mt-2 font-display text-4xl">৳{Number(fee.amount).toLocaleString("bn-BD")}</p>
         </div>
       )}
     </div>

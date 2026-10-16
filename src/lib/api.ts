@@ -162,11 +162,38 @@ export type AdmissionFeeInfo = {
   display: string;
 };
 
+export type PaymentMethodDetail = { label: string; value: string };
+
 export type PaymentMethodInfo = {
   code: string;
   name: string;
-  details: { label: string; value: string }[];
+  details?: PaymentMethodDetail[];
+  account_number?: string;
+  account_name?: string;
+  bank_name?: string;
+  payment_type?: string;
+  instructions?: string;
 };
+
+export function paymentMethodRows(
+  method: PaymentMethodInfo,
+  labels: { accountName: string; accountNumber: string; bank: string; type: string }
+): PaymentMethodDetail[] {
+  if (Array.isArray(method.details) && method.details.length > 0) {
+    return method.details.filter((row) => row && (row.label || row.value));
+  }
+  const rows: PaymentMethodDetail[] = [];
+  const push = (label: string, value?: string) => {
+    const text = (value ?? "").trim();
+    if (text) rows.push({ label, value: text });
+  };
+  push(labels.accountName, method.account_name);
+  push(labels.accountNumber, method.account_number);
+  push(labels.bank, method.bank_name);
+  push(labels.type, method.payment_type);
+  push("", method.instructions);
+  return rows;
+}
 
 export type AdmissionInfo = {
   default_fee: AdmissionFeeInfo | null;
