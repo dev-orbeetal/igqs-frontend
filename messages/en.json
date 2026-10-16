@@ -119,6 +119,12 @@
     "exam": "Examination",
     "update": "Updates"
   },
+  "noticesPage": {
+    "title": "Notices",
+    "subtitle": "School notices by topic, newest first",
+    "all": "All topics",
+    "empty": "No notices in this topic."
+  },
   "gallery": {
     "title": "Gallery",
     "subtitle": "Life at IGQS — campus, class, and community",

@@ -85,6 +85,9 @@ export async function proxyBackend(request: Request) {
   const body = hasBody ? Buffer.from(await request.arrayBuffer()) : undefined;
 
   let path = `${incoming.pathname}${incoming.search}`;
+  if (incoming.pathname.startsWith("/api/") && !incoming.pathname.endsWith("/")) {
+    path = `${incoming.pathname}/${incoming.search}`;
+  }
   let result = await requestBackend(request.method, path, headers, body);
   const location = headerValue(result.headers.location);
   if (result.status >= 300 && result.status < 400 && location.startsWith("/")) {

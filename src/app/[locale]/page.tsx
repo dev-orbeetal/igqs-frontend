@@ -381,7 +381,12 @@ export default async function HomePage({
       {notices.length > 0 && (
         <section id="notices" className="section-cream scroll-mt-28 py-10 sm:py-12">
           <div className="section-shell">
-            <SectionHeading title={t("home.notices")} />
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading title={t("home.notices")} className="mb-0" />
+              <Link href="/notices" className="link-gold mb-1 shrink-0">
+                {t("common.viewAll")}
+              </Link>
+            </div>
             <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
               {notices.map((notice) => (
                 <li key={notice.slug}>

@@ -2,7 +2,7 @@
 
 import { CalendarDays, Home, Menu, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { startTransition, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import { startTransition, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/icons/Social";
 import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
@@ -47,15 +47,6 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
   const measureRef = useRef<HTMLDivElement>(null);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-
-  function scrollToNotices(event: MouseEvent<HTMLAnchorElement>) {
-    setDrawerOpen(false);
-    if (pathname !== "/") return;
-    const target = document.getElementById("notices");
-    if (!target) return;
-    event.preventDefault();
-    target.scrollIntoView({ behavior: "smooth" });
-  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -194,8 +185,8 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-2">
             <Link
-              href="/#notices"
-              onClick={scrollToNotices}
+              href="/notices"
+              onClick={() => setDrawerOpen(false)}
               className={`${compact ? "hidden" : "hidden md:inline-flex"} items-center rounded-md border border-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-igqs-green transition hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink`}
             >
               {t("notices")}
@@ -267,8 +258,8 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
               </Link>
             ))}
             <Link
-              href="/#notices"
-              onClick={scrollToNotices}
+              href="/notices"
+              onClick={() => setDrawerOpen(false)}
               className="mt-2 inline-flex justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green dark:border-igqs-gold dark:text-igqs-gold"
             >
               {t("notices")}

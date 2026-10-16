@@ -22,6 +22,11 @@ export default function middleware(request: NextRequest) {
   const onAdmin = ADMIN_HOSTS.has(host);
   const onPublic = PUBLIC_HOSTS.has(host);
   const canonical = canonicalAdminPath(pathname, onAdmin);
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/\/+$/, "") || "/";
+    return NextResponse.redirect(url);
+  }
 
   if (canonical !== pathname) {
     const origin = onPublic ? ADMIN_ORIGIN : request.url;

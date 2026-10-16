@@ -1,4 +1,5 @@
 import { apiUrl } from "@/lib/api";
+import { compressFormImages } from "@/lib/compress-image";
 
 const TOKEN_KEY = "igqs-staff-token";
 
@@ -101,10 +102,12 @@ export async function staffRequest<T>(path: string, init: RequestInit = {}): Pro
   const token = adminLoginDisabled ? "" : getStaffToken();
   const headers = new Headers(init.headers);
   if (token) headers.set("Authorization", `Token ${token}`);
-  if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
+  let body = init.body;
+  if (body instanceof FormData) body = await compressFormImages(body);
+  if (body && !(body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-  const res = await fetch(apiUrl(path), { ...init, headers, cache: "no-store" });
+  const res = await fetch(apiUrl(path), { ...init, body, headers, cache: "no-store" });
   if (res.status === 401) {
     clearStaffToken();
     throw new Error("unauthorized");

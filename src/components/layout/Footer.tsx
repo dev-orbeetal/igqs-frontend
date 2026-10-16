@@ -61,6 +61,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
   const infoLinks = [
     { label: t("about"), href: "/about" },
     { label: t("news"), href: "/news" },
+    { label: t("notices"), href: "/notices" },
     { label: t("gallery"), href: "/gallery" },
     { label: t("contact"), href: "/contact" },
     { label: t("receipt"), href: "/admission/receipt" },

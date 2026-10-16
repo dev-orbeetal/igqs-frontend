@@ -1,3 +1,5 @@
+import { compressFormImages } from "@/lib/compress-image";
+
 const SITE_HOSTS = new Set(["igqsbd.com", "www.igqsbd.com", "admin.igqsbd.com"]);
 
 function configuredApi() {
@@ -61,9 +63,10 @@ export async function apiPost(path: string, body: FormData | object, token?: str
   const headers = new Headers();
   if (!isForm) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
+  const payload = isForm ? await compressFormImages(body) : JSON.stringify(body);
   const res = await fetch(apiUrl(path), {
     method: "POST",
-    body: isForm ? body : JSON.stringify(body),
+    body: payload,
     headers,
   });
   const data = await res.json().catch(() => ({}));
