@@ -1,5 +1,6 @@
 "use client";
 
+import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function HeroSlides({ images }: { images: string[] }) {
@@ -71,11 +72,12 @@ export function HeroSlides({ images }: { images: string[] }) {
           </button>
           <button
             type="button"
-            className="ml-1 inline-flex h-8 items-center rounded-full bg-black/45 px-3 text-xs text-white"
+            className="ml-1 inline-flex size-8 items-center justify-center rounded-full bg-black/45 text-white"
             onClick={() => setPaused((value) => !value)}
             aria-pressed={paused}
+            aria-label={paused ? "Play" : "Pause"}
           >
-            {paused ? "Play" : "Pause"}
+            {paused ? <Play className="size-3.5 fill-current" /> : <Pause className="size-3.5 fill-current" />}
           </button>
         </div>
       )}

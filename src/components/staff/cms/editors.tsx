@@ -15,11 +15,13 @@ import {
   feeFields,
   fieldClass,
   gradeFields,
+  highlightFields,
   homeFields,
   leaderFields,
   newsFields,
   requestBody,
   subjectFields,
+  testimonialFields,
   whyFields,
   type CmsField,
   type CmsMeta,
@@ -331,6 +333,14 @@ export function HomeEditor() {
         <Card title={t("heroSlides")}>
           <HeroSlideEditor />
         </Card>
+        <Card title={t("highlights")}>
+          <CollectionBlock
+            path="/api/staff/highlights/"
+            fields={highlightFields(meta?.stat_icons ?? [])}
+            titleField="label_en"
+            defaults={{ icon: "users", order: 0, value: "" }}
+          />
+        </Card>
         <Card title={t("home")}>
           <SingletonBlock path="/api/staff/home/" fields={homeFields} />
         </Card>
@@ -340,6 +350,14 @@ export function HomeEditor() {
             fields={whyFields(meta?.why_icons ?? [])}
             titleField="title_en"
             defaults={{ icon: "book-open", order: 0 }}
+          />
+        </Card>
+        <Card title={t("testimonials")}>
+          <CollectionBlock
+            path="/api/staff/testimonials/"
+            fields={testimonialFields}
+            titleField="name_en"
+            defaults={{ role: "guardian", rating: 5, order: 0 }}
           />
         </Card>
       </div>

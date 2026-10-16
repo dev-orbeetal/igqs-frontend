@@ -4,6 +4,8 @@ import { headers } from "next/headers";
 import Image from "next/image";
 import { StaffDashboard } from "@/components/staff/StaffDashboard";
 import { StaffShell } from "@/components/staff/StaffShell";
+import { Highlights } from "@/components/home/Highlights";
+import { Testimonials } from "@/components/home/Testimonials";
 import { HeroSlides } from "@/components/home/HeroSlides";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { SectionHeading } from "@/components/ui/PageHero";
@@ -42,6 +44,8 @@ export default async function HomePage({
 
   const content = home?.home;
   const whyChoose = home?.why_choose ?? [];
+  const highlights = home?.highlights ?? [];
+  const testimonials = home?.testimonials ?? [];
   const grades = home?.curriculum_highlights ?? [];
   const events = home?.upcoming_events ?? [];
   const news = home?.latest_news ?? [];
@@ -50,7 +54,6 @@ export default async function HomePage({
   const notices = home?.notices ?? [];
   const noticeSlugs = new Set(notices.map((notice) => notice.slug));
   const newsItems = news.filter((item) => !noticeSlugs.has(item.slug));
-  const classNames = grades.map((grade) => grade.name).filter(Boolean);
   const heroImages = [
     ...(content?.hero_image_url ? [content.hero_image_url] : []),
     ...(home?.hero_images ?? []).filter((url) => url && url !== content?.hero_image_url),
@@ -90,53 +93,7 @@ export default async function HomePage({
         </div>
       </section>
 
-      <section className="border-b border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
-          {classNames.length > 0 && (
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.classes")}</p>
-              <p className="mt-2 text-sm leading-relaxed">{classNames.join(", ")}</p>
-            </div>
-          )}
-          {site?.office_hours && (
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.hours")}</p>
-              <p className="mt-2 text-sm leading-relaxed">{site.office_hours}</p>
-            </div>
-          )}
-          {site?.address && (
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.address")}</p>
-              <p className="mt-2 text-sm leading-relaxed">{site.address}</p>
-            </div>
-          )}
-          <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{t("home.howToApply")}</p>
-            <p className="mt-2 text-sm leading-relaxed">{t("home.howToApplyBody")}</p>
-          </div>
-        </div>
-      </section>
-
-      {notices.length > 0 && (
-        <section className="section-cream py-10 sm:py-12">
-          <div className="section-shell">
-            <SectionHeading title={t("home.notices")} />
-            <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
-              {notices.map((notice) => (
-                <li key={notice.slug}>
-                  <Link
-                    href={`/news/${notice.slug}`}
-                    className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 transition-colors duration-500 hover:bg-igqs-gold/10"
-                  >
-                    <span className="font-medium">{notice.title}</span>
-                    <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
+      <Highlights items={highlights} label={t("home.highlights")} />
 
       {content?.welcome && (
         <section className="section-cream section-pad">
@@ -226,14 +183,31 @@ export default async function HomePage({
               const Icon = ICONS[item.icon] ?? BookOpen;
               return (
                 <FadeIn key={item.id} delay={i * 0.08}>
-                  <article className="surface-card surface-card-hover h-full bg-[#1a4a3c]/85 p-6 dark:bg-[#12352b]">
-                    <span className="icon-well">
-                      <Icon className="h-5 w-5" strokeWidth={1.5} />
-                    </span>
-                    <h3 className="mt-5 font-display text-2xl text-igqs-cream">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-igqs-cream/75">
-                      {item.description}
-                    </p>
+                  <article className="surface-card surface-card-hover h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
+                    {item.image ? (
+                      <div className="relative h-44">
+                        <Image
+                          src={item.image}
+                          alt=""
+                          fill
+                          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : null}
+                    <div className="p-6">
+                      {item.image ? null : (
+                        <span className="icon-well">
+                          <Icon className="h-5 w-5" strokeWidth={1.5} />
+                        </span>
+                      )}
+                      <h3 className={`font-display text-2xl text-igqs-cream ${item.image ? "" : "mt-5"}`}>
+                        {item.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-igqs-cream/75">
+                        {item.description}
+                      </p>
+                    </div>
                   </article>
                 </FadeIn>
               );
@@ -242,6 +216,8 @@ export default async function HomePage({
         </div>
       </section>
       )}
+
+      <Testimonials items={testimonials} />
 
       {grades.length > 0 && (
       <section className="section-cream section-pad">
@@ -400,6 +376,27 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+      )}
+
+      {notices.length > 0 && (
+        <section id="notices" className="section-cream scroll-mt-28 py-10 sm:py-12">
+          <div className="section-shell">
+            <SectionHeading title={t("home.notices")} />
+            <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
+              {notices.map((notice) => (
+                <li key={notice.slug}>
+                  <Link
+                    href={`/news/${notice.slug}`}
+                    className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 transition-colors duration-500 hover:bg-igqs-gold/10"
+                  >
+                    <span className="font-medium">{notice.title}</span>
+                    <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
     </div>
   );

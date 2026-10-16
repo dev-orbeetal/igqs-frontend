@@ -2,7 +2,7 @@
 
 import { CalendarDays, Home, Menu, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/icons/Social";
 import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
@@ -39,8 +39,23 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  function scrollToNotices(event: MouseEvent<HTMLAnchorElement>) {
+    setDrawerOpen(false);
+    if (pathname !== "/") return;
+    const target = document.getElementById("notices");
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: "smooth" });
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -52,6 +67,39 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
   useEffect(() => {
     startTransition(() => setDrawerOpen(false));
   }, [pathname]);
+
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    const measure = measureRef.current;
+    if (!row || !measure) return;
+
+    const update = () => {
+      const row = rowRef.current;
+      const measure = measureRef.current;
+      const links = measure?.querySelector<HTMLElement>("[data-links]");
+      const actions = measure?.querySelector<HTMLElement>("[data-actions]");
+      if (!row || !links || !actions) return;
+      const logo = logoRef.current?.offsetWidth ?? 0;
+      const tools = toolsRef.current?.offsetWidth ?? 0;
+      const menu = menuRef.current?.offsetWidth ?? 0;
+      const persistent = menu > 0 ? Math.max(0, tools - menu - 8) : tools;
+      const style = getComputedStyle(row);
+      const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      const reserved = logo + actions.offsetWidth + persistent + padding + 12 + 12 + 8;
+      const available = row.clientWidth - reserved;
+      const overflow = links.offsetWidth > available + 1;
+      setCompact(overflow);
+      if (!overflow) setDrawerOpen(false);
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(row);
+    observer.observe(measure);
+    if (logoRef.current) observer.observe(logoRef.current);
+    if (toolsRef.current) observer.observe(toolsRef.current);
+    return () => observer.disconnect();
+  }, [locale]);
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -99,7 +147,7 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
         scrolled ? "shadow-[0_4px_20px_rgba(15,23,42,0.08)]" : ""
       }`}
     >
-      <div className="hidden bg-[#0f172a] text-white md:block">
+      <div className={`${compact ? "hidden" : "hidden md:block"} bg-[#0f172a] text-white`}>
         <div className="mx-auto flex h-6 max-w-7xl items-center justify-between px-4 text-[11px] sm:px-6 sm:text-xs">
           <p className="flex min-w-0 items-center gap-1.5 truncate text-white/90">
             <CalendarDays className="size-3 shrink-0 opacity-80" />
@@ -123,10 +171,12 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
       </div>
 
       <div className="border-b border-igqs-gold/20">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
-          <Logo compact href="/" />
-          <nav aria-label="Primary" className="hidden min-w-0 flex-1 md:block">
-            <ul className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={rowRef} className="relative mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
+          <div ref={logoRef} className="shrink-0">
+            <Logo compact href="/" />
+          </div>
+          <nav aria-label="Primary" className={`min-w-0 flex-1 ${compact ? "hidden" : "hidden md:block"}`}>
+            <ul className="flex items-center gap-1">
               <li>
                 <Link href="/" className={`${linkClass(isActive("/"))} gap-1 font-semibold`}>
                   <Home className="size-3 shrink-0" />
@@ -142,24 +192,60 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
               ))}
             </ul>
           </nav>
-          <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <Link
+              href="/#notices"
+              onClick={scrollToNotices}
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} items-center rounded-md border border-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-igqs-green transition hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink`}
+            >
+              {t("notices")}
+            </Link>
             <Link
               href="/admission"
-              className="hidden items-center rounded-md bg-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white transition hover:brightness-110 md:inline-flex dark:bg-igqs-gold dark:text-igqs-ink"
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} items-center rounded-md bg-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white transition hover:brightness-110 dark:bg-igqs-gold dark:text-igqs-ink`}
             >
               {t("apply")}
             </Link>
-            <LanguageSwitcher />
-            <ThemeToggle />
-            <button
-              type="button"
-              className="inline-flex size-8 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-ink md:hidden dark:text-igqs-cream"
-              onClick={() => setDrawerOpen((open) => !open)}
-              aria-label={ta("menu")}
-              aria-expanded={drawerOpen}
-            >
-              {drawerOpen ? <X className="size-4" /> : <Menu className="size-4" />}
-            </button>
+            <div ref={toolsRef} className="flex shrink-0 items-center gap-2">
+              <LanguageSwitcher />
+              <ThemeToggle />
+              <button
+                ref={menuRef}
+                type="button"
+                className={`${compact ? "inline-flex" : "inline-flex md:hidden"} size-8 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-ink dark:text-igqs-cream`}
+                onClick={() => setDrawerOpen((open) => !open)}
+                aria-label={ta("menu")}
+                aria-expanded={drawerOpen}
+              >
+                {drawerOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+              </button>
+            </div>
+          </div>
+          <div
+            ref={measureRef}
+            className="pointer-events-none absolute top-0 left-0 -z-10 w-max opacity-0"
+            aria-hidden
+            inert
+          >
+            <div data-links className="flex w-max items-center gap-1">
+              <span className={`${linkClass(false)} gap-1 font-semibold`}>
+                <Home className="size-3 shrink-0" />
+                {t("home")}
+              </span>
+              {LINKS.map((item) => (
+                <span key={item.href} className={linkClass(false)}>
+                  {t(item.key)}
+                </span>
+              ))}
+            </div>
+            <div data-actions className="flex w-max items-center gap-2">
+              <span className="inline-flex items-center rounded-md border border-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap">
+                {t("notices")}
+              </span>
+              <span className="inline-flex items-center rounded-md bg-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap">
+                {t("apply")}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -181,9 +267,16 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
               </Link>
             ))}
             <Link
+              href="/#notices"
+              onClick={scrollToNotices}
+              className="mt-2 inline-flex justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green dark:border-igqs-gold dark:text-igqs-gold"
+            >
+              {t("notices")}
+            </Link>
+            <Link
               href="/admission"
               onClick={() => setDrawerOpen(false)}
-              className="mt-2 inline-flex justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
+              className="inline-flex justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {t("apply")}
             </Link>

@@ -7,6 +7,7 @@ export type CmsMeta = {
   gallery_categories: Option[];
   payment_codes: Option[];
   why_icons: Option[];
+  stat_icons: Option[];
 };
 
 export type CmsField = { section?: string; hint?: string } & (
@@ -106,13 +107,13 @@ export function emptyRecord(fields: CmsField[], extras: Record<string, unknown> 
   const values: Record<string, unknown> = { ...extras };
   for (const field of fields) {
     if (field.type === "pair") {
-      values[`${field.name}_en`] = "";
-      values[`${field.name}_bn`] = "";
+      values[`${field.name}_en`] = extras[`${field.name}_en`] ?? "";
+      values[`${field.name}_bn`] = extras[`${field.name}_bn`] ?? "";
     } else if (field.type === "checkbox") {
-      values[field.name] = false;
+      values[field.name] = extras[field.name] ?? false;
     } else if (field.type === "number") {
-      values[field.name] = 0;
-    } else {
+      values[field.name] = extras[field.name] ?? 0;
+    } else if (extras[field.name] === undefined) {
       values[field.name] = "";
     }
   }
@@ -130,9 +131,36 @@ export const homeFields: CmsField[] = [
   { type: "image", name: "principal_photo_url", fileName: "principal_photo", label: "Principal photo", section: "sectionPrincipal" },
 ];
 
+export const highlightFields = (icons: Option[]): CmsField[] => [
+  { type: "text", name: "value", label: "Value", hint: "statValueHint" },
+  { type: "pair", name: "label", label: "Label" },
+  { type: "select", name: "icon", label: "Icon", options: icons },
+  { type: "number", name: "order", label: "Order" },
+];
+
+export const testimonialFields: CmsField[] = [
+  { type: "pair", name: "name", label: "Name" },
+  {
+    type: "select",
+    name: "role",
+    label: "Who is speaking",
+    options: [
+      { value: "guardian", label: "Guardian" },
+      { value: "student", label: "Student" },
+    ],
+  },
+  { type: "pair", name: "quote", label: "Quote", textarea: true },
+  { type: "datetime", name: "spoken_on", label: "Date" },
+  { type: "number", name: "rating", label: "Stars (0–5)" },
+  { type: "url", name: "facebook_url", label: "Facebook profile" },
+  { type: "image", name: "image_url", fileName: "image", label: "Photo" },
+  { type: "number", name: "order", label: "Order" },
+];
+
 export const whyFields = (icons: Option[]): CmsField[] => [
   { type: "pair", name: "title", label: "Title" },
   { type: "pair", name: "description", label: "Description", textarea: true },
+  { type: "image", name: "image_url", fileName: "image", label: "Photo" },
   { type: "select", name: "icon", label: "Icon", options: icons },
   { type: "number", name: "order", label: "Order" },
 ];

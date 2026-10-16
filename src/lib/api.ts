@@ -254,7 +254,18 @@ export type HomePayload = {
     principal_photo_url: string;
   };
   hero_images: string[];
-  why_choose: { id: number; title: string; description: string; icon: string }[];
+  highlights: { id: number; value: string; label: string; icon: string }[];
+  why_choose: { id: number; title: string; description: string; icon: string; image: string }[];
+  testimonials: {
+    id: number;
+    name: string;
+    role: string;
+    quote: string;
+    spoken_on: string | null;
+    rating: number;
+    facebook_url: string;
+    image: string;
+  }[];
   upcoming_events: EventItem[];
   latest_news: NewsItem[];
   notices: NewsItem[];
