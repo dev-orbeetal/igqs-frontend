@@ -54,5 +54,9 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
+  // staff-support is excluded alongside api/trpc/_next/_vercel: it's a
+  // plain top-level route.ts (no dot in its path, unlike /media/*.jpg),
+  // so without this it would otherwise get caught by the locale rewrite
+  // below and 404 (there's no [locale]/staff-support page).
+  matcher: "/((?!api|trpc|_next|_vercel|staff-support|.*\\..*).*)",
 };
