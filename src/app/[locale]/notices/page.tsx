@@ -58,7 +58,7 @@ export default async function NoticesPage({
           <div className="space-y-10">
             {groups.map((group) => (
               <section key={group.topic}>
-                <h2 className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{topics(group.topic)}</h2>
+                <h2 className="text-xs uppercase tracking-[0.18em] text-igqs-forest dark:text-igqs-gold">{topics(group.topic)}</h2>
                 <ul className="mt-3 divide-y divide-igqs-gold/15 overflow-hidden rounded-2xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
                   {group.items.map((notice) => (
                     <li key={notice.slug}>

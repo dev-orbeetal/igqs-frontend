@@ -8,19 +8,35 @@ import { ApplicationReceiptCard } from "./ApplicationReceiptCard";
 export function PaymentStatusStep({
   data,
   processing,
+  error,
   onRetry,
 }: {
   data: ApplicationDetail | null;
   processing?: boolean;
+  error?: boolean;
   onRetry?: () => void;
 }) {
   const t = useTranslations("admission");
 
-  if (processing || !data) {
+  if (processing) {
     return (
       <div className="rounded-3xl border border-igqs-gold/25 bg-white px-5 py-10 text-center dark:bg-[#0d1f18]">
         <p className="font-display text-2xl">{t("processingPayment")}</p>
         <p className="mt-3 text-sm text-igqs-muted">{t("processingStay")}</p>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="rounded-3xl border border-red-400/40 bg-red-50 px-5 py-10 text-center dark:bg-red-950/20">
+        <p className="font-display text-2xl">{t("receiptSearchError")}</p>
+        <Link
+          href="/admission/receipt"
+          className="mt-6 inline-flex min-h-12 items-center rounded-full bg-igqs-green px-5 text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
+        >
+          {t("downloadPageTitle")}
+        </Link>
       </div>
     );
   }

@@ -55,7 +55,7 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
             <button
               type="button"
               onClick={() => setActive(album.slug)}
-              className="w-full overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white text-left dark:bg-[#0d1f18]"
+              className="img-frame w-full rounded-3xl bg-white text-left dark:bg-[#0d1f18]"
             >
               <div className="relative h-52">
                 {album.cover_image_url && (
@@ -79,7 +79,7 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
       {openAlbum && (
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {openAlbum.images.map((image) => (
-            <div key={image.id} className="relative h-56 overflow-hidden rounded-2xl">
+            <div key={image.id} className="img-frame h-56">
               <Image
                 src={image.image}
                 alt={image.caption}

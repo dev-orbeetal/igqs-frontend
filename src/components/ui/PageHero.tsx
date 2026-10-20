@@ -10,7 +10,7 @@ export function PageHero({
 }) {
   const brand = useTranslations("brand");
   return (
-    <section className="pattern-geo-dark border-b border-igqs-gold/20 bg-igqs-green py-12 text-igqs-cream print:hidden dark:bg-[#0b241c] sm:py-16">
+    <section className="on-dark pattern-geo-dark border-y border-igqs-gold bg-igqs-forest py-12 text-igqs-cream print:hidden dark:bg-[#0b241c] sm:py-16">
       <FadeIn className="mx-auto max-w-7xl px-4 sm:px-6">
         <p className="eyebrow">{brand("name")}</p>
         <h1 className="mt-3 font-display text-4xl leading-tight md:text-5xl">{title}</h1>
@@ -38,8 +38,8 @@ export function SectionHeading({
     <div className={`mb-8 ${className}`}>
       {kicker && <p className="eyebrow">{kicker}</p>}
       <h2
-        className={`mt-2 font-display text-3xl leading-tight md:text-[2.45rem] ${
-          onDark ? "text-igqs-cream" : "text-igqs-green dark:text-igqs-gold-soft"
+        className={`mt-2 font-display text-3xl leading-tight md:text-[3.0625rem] ${
+          onDark ? "text-igqs-cream" : "text-igqs-forest dark:text-igqs-gold-soft"
         }`}
       >
         {title}

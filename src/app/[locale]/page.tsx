@@ -5,6 +5,7 @@ import Image from "next/image";
 import { StaffDashboard } from "@/components/staff/StaffDashboard";
 import { StaffShell } from "@/components/staff/StaffShell";
 import { Highlights } from "@/components/home/Highlights";
+import { HeroIntro } from "@/components/home/HeroIntro";
 import { Testimonials } from "@/components/home/Testimonials";
 import { HeroSlides } from "@/components/home/HeroSlides";
 import { FadeIn } from "@/components/motion/FadeIn";
@@ -61,36 +62,19 @@ export default async function HomePage({
 
   return (
     <div>
-      <section className="relative flex min-h-[calc(100svh-6.5rem)] flex-col overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
+      <section className="on-dark relative flex min-h-[calc(100svh-6.5rem)] flex-col overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
         <div className="pointer-events-none absolute inset-0">
           <HeroSlides images={heroImages} />
           <div className="hero-overlay absolute inset-0" />
           <div className="hero-pattern absolute inset-0" />
         </div>
-        <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pb-24 pt-16 sm:px-6">
-            <p className="eyebrow">{brand("name")}</p>
-            {content?.hero_title && (
-              <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-white sm:text-5xl lg:text-6xl">
-                {content.hero_title}
-              </h1>
-            )}
-            {content?.hero_subtitle && (
-              <>
-                <div className="heading-rule mt-5" />
-                <p className="mt-5 max-w-xl text-base leading-relaxed text-igqs-cream/90 sm:text-lg">
-                  {content.hero_subtitle}
-                </p>
-              </>
-            )}
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/admission" className="btn-gold inline-flex">
-                {t("common.applyNow")}
-              </Link>
-              <Link href="/curriculum" className="btn-gold-outline">
-                {t("common.viewCurriculum")}
-              </Link>
-            </div>
-        </div>
+        <HeroIntro
+          kicker={brand("name")}
+          title={content?.hero_title}
+          subtitle={content?.hero_subtitle}
+          applyLabel={t("common.applyNow")}
+          curriculumLabel={t("common.viewCurriculum")}
+        />
       </section>
 
       <Highlights items={highlights} label={t("home.highlights")} />
@@ -107,7 +91,7 @@ export default async function HomePage({
       )}
 
       {(content?.about_preview || aboutImage) && (
-        <section className="section-cream pb-14 sm:pb-16 lg:pb-20">
+        <section className="section-white pb-14 sm:pb-16 lg:pb-20">
           <div className="section-shell grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             {content?.about_preview && (
               <FadeIn>
@@ -137,7 +121,7 @@ export default async function HomePage({
       )}
 
       {(content?.principal_message || content?.principal_name || content?.principal_photo_url) && (
-        <section className="section-cream-alt section-pad">
+        <section className="section-cream section-pad">
           <div className="section-shell">
             <FadeIn>
               <SectionHeading title={t("home.principal")} />
@@ -157,7 +141,7 @@ export default async function HomePage({
               {(content.principal_message || content.principal_name) && (
                 <blockquote>
                   {content.principal_message && (
-                    <p className="font-display text-xl leading-relaxed text-igqs-green sm:text-2xl dark:text-igqs-gold-soft">
+                    <p className="font-display text-xl leading-relaxed text-igqs-forest sm:text-2xl dark:text-igqs-gold-soft">
                       “{content.principal_message}”
                     </p>
                   )}
@@ -185,7 +169,7 @@ export default async function HomePage({
                 <FadeIn key={item.id} delay={i * 0.08}>
                   <article className="surface-card surface-card-hover h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
                     {item.image ? (
-                      <div className="relative h-44">
+                      <div className="relative h-44 overflow-hidden border-b border-igqs-gold/45">
                         <Image
                           src={item.image}
                           alt=""
@@ -232,7 +216,7 @@ export default async function HomePage({
             {grades.map((grade) => (
               <FadeIn key={grade.slug}>
                 <Link href={`/curriculum#grade-${grade.slug}`} className="surface-card surface-card-hover block bg-white/90 p-5 dark:bg-[#12352b]">
-                  <h3 className="font-display text-2xl text-igqs-green dark:text-igqs-gold-soft">
+                  <h3 className="font-display text-2xl text-igqs-forest dark:text-igqs-gold-soft">
                     {grade.name}
                   </h3>
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-igqs-muted">
@@ -263,7 +247,7 @@ export default async function HomePage({
       )}
 
       {events.length > 0 && (
-      <section className="section-cream section-pad">
+      <section className="section-white section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.events")} className="mb-0" />
@@ -291,7 +275,7 @@ export default async function HomePage({
                     <div className="img-overlay absolute inset-0" />
                   </div>
                   <div className="p-5">
-                    <p className="text-xs text-igqs-gold">{formatDate(event.start_at, locale)}</p>
+                    <p className="text-xs text-igqs-forest dark:text-igqs-gold">{formatDate(event.start_at, locale)}</p>
                     <h3 className="mt-2 font-display text-2xl leading-tight">{event.title}</h3>
                     <p className="mt-1 text-sm text-igqs-muted">{event.location}</p>
                   </div>
@@ -304,7 +288,7 @@ export default async function HomePage({
       )}
 
       {newsItems.length > 0 && (
-      <section className="section-cream-alt section-pad">
+      <section className="section-cream section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.news")} className="mb-0" />
@@ -341,7 +325,7 @@ export default async function HomePage({
       )}
 
       {albums.length > 0 && (
-      <section className="section-cream section-pad">
+      <section className="section-white section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.gallery")} className="mb-0" />

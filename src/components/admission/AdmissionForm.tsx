@@ -15,7 +15,7 @@ import {
 import { isBdPhone, normalizeBdPhone } from "@/lib/guardian";
 import { AdmissionStepper } from "./AdmissionStepper";
 import { ClassSelectStep } from "./ClassSelectStep";
-import { loadDraft, saveDraft, type WizardForm } from "./fields";
+import { clearDraft, loadDraft, saveDraft, type WizardForm } from "./fields";
 import { PaymentStatusStep } from "./PaymentStatusStep";
 import { PaymentSummaryStep } from "./PaymentSummaryStep";
 import { StudentInfoStep } from "./StudentInfoStep";
@@ -66,10 +66,19 @@ export function AdmissionForm({
 
   async function submitPayment() {
     if (sending) return;
+    if (!applicableFee) {
+      setFormError(t("feeUnavailable"));
+      setStep(0);
+      return;
+    }
+    const methods = info?.methods ?? [];
     const missing: Record<string, string> = {};
     if (!String(form.transaction_id ?? "").trim()) missing.transaction_id = t("requiredField");
     if (!String(form.payment_date ?? "").trim()) missing.payment_date = t("requiredField");
     if (!files.screenshot) missing.payment_screenshot = t("screenshotRequired");
+    if (methods.length > 0 && !methods.some((method) => method.code === form.payment_method)) {
+      missing.payment_method = t("requiredField");
+    }
     if (Object.keys(missing).length) {
       showFieldErrors(missing);
       return;
@@ -79,11 +88,14 @@ export function AdmissionForm({
     setFieldErrors({});
     const data = new FormData();
     Object.entries(form).forEach(([key, value]) => data.append(key, value));
-    if (applicableFee) data.set("payment_amount", String(Number(applicableFee.amount)));
+    data.set("payment_amount", String(Number(applicableFee.amount)));
     const phone = normalizeBdPhone(form.mobile || "");
     data.set("mobile", phone);
     data.set("payer_mobile", phone);
-    if (!form.payment_method) data.set("payment_method", "bkash");
+    const effectiveMethod = methods.some((method) => method.code === form.payment_method)
+      ? form.payment_method
+      : methods[0]?.code;
+    data.set("payment_method", effectiveMethod || "bkash");
     if (files.photo) data.append("student_photo", files.photo);
     if (files.birth) data.append("birth_certificate", files.birth);
     if (files.screenshot) data.append("payment_screenshot", files.screenshot);
@@ -92,6 +104,7 @@ export function AdmissionForm({
       setStep(3);
       const result = (await apiPost("/api/admissions/apply/", data)) as ApplicationDetail;
       setApplication(result);
+      clearDraft();
       window.setTimeout(() => setProcessing(false), 900);
     } catch (error) {
       setProcessing(false);
@@ -148,6 +161,9 @@ export function AdmissionForm({
     if (!missing.mobile && !isBdPhone(normalizeBdPhone(form.mobile || ""))) {
       missing.mobile = t("otpInvalidPhone");
     }
+    if (!missing.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form.email ?? "").trim())) {
+      missing.email = t("invalidEmail");
+    }
     if (!files.photo) missing.student_photo = t("fileMissing");
     if (!files.birth) missing.birth_certificate = t("fileMissing");
     return missing;
@@ -158,6 +174,10 @@ export function AdmissionForm({
     if (step === 0 && !form.applying_class_slug) {
       showFieldErrors({ applying_class: t("continueWithoutClass") });
       setFormError(t("continueWithoutClass"));
+      return;
+    }
+    if (step === 0 && !applicableFee) {
+      setFormError(t("feeUnavailable"));
       return;
     }
     if (step === 1) {

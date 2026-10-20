@@ -1,15 +1,13 @@
 "use client";
 
-import { CalendarDays, Home, Menu, X } from "lucide-react";
+import { Home, Menu, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { startTransition, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/icons/Social";
 import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Link, usePathname } from "@/i18n/navigation";
 import { isAdminPath } from "@/lib/admin-paths";
-import type { SiteSettings } from "@/lib/api";
 
 const LINKS = [
   { href: "/about", key: "about" },
@@ -20,19 +18,7 @@ const LINKS = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-function digitsOnly(value: string) {
-  return value.replace(/\D/g, "");
-}
-
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M12.04 2C6.58 2 2.15 6.4 2.15 11.83c0 1.74.46 3.44 1.34 4.94L2 22l5.39-1.41a10 10 0 0 0 4.65 1.18h.01c5.46 0 9.89-4.4 9.89-9.83C21.94 6.4 17.5 2 12.04 2zm5.76 13.95c-.24.68-1.4 1.3-1.94 1.38-.5.07-1.12.1-1.81-.11-.41-.13-.95-.31-1.63-.61-2.86-1.24-4.72-4.12-4.86-4.31-.14-.19-1.15-1.53-1.15-2.92s.73-2.07 1-2.35c.24-.26.64-.38.85-.38.21 0 .42 0 .6.01.19.01.45-.07.7.54.26.63.87 2.16.95 2.32.08.16.13.35.03.56-.1.21-.16.34-.31.52-.16.18-.33.4-.47.54-.16.16-.32.33-.14.64.19.31.83 1.37 1.78 2.22 1.22 1.09 2.25 1.43 2.57 1.59.31.16.5.13.68-.08.18-.21.78-.91.99-1.22.21-.31.42-.26.7-.16.28.1 1.78.84 2.08.99.31.16.51.23.58.36.08.13.08.75-.16 1.43z" />
-    </svg>
-  );
-}
-
-export function Header({ site, adminSite = false }: { site?: SiteSettings | null; adminSite?: boolean }) {
+export function Header({ adminSite = false }: { adminSite?: boolean }) {
   const t = useTranslations("nav");
   const ta = useTranslations("a11y");
   const locale = useLocale();
@@ -103,28 +89,6 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
 
   if (adminSite || isAdminPath(pathname)) return null;
 
-  const today = new Intl.DateTimeFormat(locale === "bn" ? "bn-BD" : "en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date());
-
-  const social = [
-    site?.facebook_url ? { href: site.facebook_url, label: "Facebook", icon: FacebookIcon } : null,
-    site?.youtube_url ? { href: site.youtube_url, label: "YouTube", icon: YoutubeIcon } : null,
-    site?.instagram_url ? { href: site.instagram_url, label: "Instagram", icon: InstagramIcon } : null,
-    site?.whatsapp_url || site?.phone_primary
-      ? {
-          href:
-            site?.whatsapp_url ||
-            `https://wa.me/${digitsOnly(site?.phone_primary || "")}`,
-          label: "WhatsApp",
-          icon: WhatsAppIcon,
-        }
-      : null,
-  ].filter((item): item is { href: string; label: string; icon: typeof FacebookIcon } => Boolean(item?.href));
-
   const linkClass = (active: boolean) =>
     `inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
       active
@@ -138,29 +102,6 @@ export function Header({ site, adminSite = false }: { site?: SiteSettings | null
         scrolled ? "shadow-[0_4px_20px_rgba(15,23,42,0.08)]" : ""
       }`}
     >
-      <div className={`${compact ? "hidden" : "hidden md:block"} bg-[#0f172a] text-white`}>
-        <div className="mx-auto flex h-6 max-w-7xl items-center justify-between px-4 text-[11px] sm:px-6 sm:text-xs">
-          <p className="flex min-w-0 items-center gap-1.5 truncate text-white/90">
-            <CalendarDays className="size-3 shrink-0 opacity-80" />
-            <span className="truncate">{today}</span>
-          </p>
-          <div className="flex items-center gap-3">
-            {social.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={item.label}
-                className="opacity-90 hover:opacity-100"
-              >
-                <item.icon className="size-3" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <div className="border-b border-igqs-gold/20">
         <div ref={rowRef} className="relative mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
           <div ref={logoRef} className="shrink-0">

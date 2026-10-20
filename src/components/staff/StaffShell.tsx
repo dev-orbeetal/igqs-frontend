@@ -10,6 +10,7 @@ import {
   Info,
   LayoutDashboard,
   type LucideIcon,
+  Mail,
   Menu,
   Newspaper,
   Phone,
@@ -21,9 +22,22 @@ import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { clearStaffToken, getStaffToken, staffLogout, staffRequest, type StaffUser } from "@/lib/staff";
+import {
+  adminLoginDisabled,
+  clearStaffToken,
+  getStaffToken,
+  staffLogout,
+  staffRequest,
+  type StaffUser,
+} from "@/lib/staff";
 
-const adminLoginDisabled = process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true";
+type NavLink = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  match: boolean;
+  external?: boolean;
+};
 
 export function StaffShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("staff");
@@ -62,7 +76,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const groups: { label: string; links: { href: string; label: string; icon: LucideIcon; match: boolean }[] }[] = [
+  const groups: { label: string; links: NavLink[] }[] = [
     {
       label: t("navOverview"),
       links: [
@@ -86,7 +100,14 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
         { href: "/content/news", label: cms("news"), icon: Newspaper, match: pathname.startsWith("/content/news") },
         { href: "/content/gallery", label: cms("gallery"), icon: Images, match: pathname.startsWith("/content/gallery") },
         { href: "/content/contact", label: cms("contact"), icon: Phone, match: pathname.startsWith("/content/contact") },
+        { href: "/content/messages", label: cms("messages"), icon: Mail, match: pathname.startsWith("/content/messages") },
         { href: "/content/admission", label: cms("admission"), icon: GraduationCap, match: pathname.startsWith("/content/admission") },
+      ],
+    },
+    {
+      label: t("navSupport"),
+      links: [
+        { href: "/staff-support", label: t("supportMail"), icon: Mail, match: false, external: true },
       ],
     },
   ];
@@ -115,17 +136,32 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto text-sm">
           {groups.map((group) => (
             <div key={group.label} className="mb-2">
-              <p className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">{group.label}</p>
+              <p className="px-3 pt-2 text-[13.75px] font-semibold uppercase tracking-[0.16em] text-white/45">{group.label}</p>
               {group.links.map((link) => {
                 const Icon = link.icon;
+                const className = `mt-1 flex items-center gap-2 rounded-lg px-3 py-2 font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold ${
+                  link.match ? "bg-white/20 font-semibold text-white" : "text-[#dbe7f3] hover:bg-white/10 active:bg-white/15"
+                }`;
+                if (link.external) {
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={className}
+                    >
+                      <Icon className="size-4 shrink-0" aria-hidden />
+                      {link.label}
+                    </a>
+                  );
+                }
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     aria-current={link.match ? "page" : undefined}
-                    className={`mt-1 flex items-center gap-2 rounded-lg px-3 py-2 font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold ${
-                      link.match ? "bg-white/20 font-semibold text-white" : "text-[#dbe7f3] hover:bg-white/10 active:bg-white/15"
-                    }`}
+                    className={className}
                   >
                     <Icon className="size-4 shrink-0" aria-hidden />
                     {link.label}

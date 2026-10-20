@@ -96,7 +96,11 @@ async function parseError(res: Response) {
   throw new Error(data.detail || JSON.stringify(data) || res.statusText);
 }
 
-const adminLoginDisabled = process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true";
+// Local-dev convenience only. Gated on NODE_ENV so a stray env var set on a
+// shared/staging/preview deployment can never disable staff auth there.
+export const adminLoginDisabled =
+  process.env.NODE_ENV !== "production" &&
+  process.env.NEXT_PUBLIC_ADMIN_LOGIN_DISABLED === "true";
 
 export async function staffRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = adminLoginDisabled ? "" : getStaffToken();

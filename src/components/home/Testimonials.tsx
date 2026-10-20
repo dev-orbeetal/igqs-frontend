@@ -72,11 +72,11 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   }
 
   return (
-    <section className="section-cream section-pad" aria-labelledby="home-testimonials">
+    <section className="section-white section-pad" aria-labelledby="home-testimonials">
       <div className="section-shell">
         <div className="mb-10 text-center">
           <p className="eyebrow">{t("testimonialsKicker")}</p>
-          <h2 id="home-testimonials" className="mt-2 font-display text-3xl leading-tight text-igqs-green md:text-[2.45rem] dark:text-igqs-gold-soft">
+          <h2 id="home-testimonials" className="mt-2 font-display text-3xl leading-tight text-igqs-forest md:text-[3.0625rem] dark:text-igqs-gold-soft">
             {t("testimonials")}
           </h2>
           <div className="heading-rule mx-auto mt-3" />

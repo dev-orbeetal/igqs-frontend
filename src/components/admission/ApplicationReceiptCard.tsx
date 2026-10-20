@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import type { ApplicationDetail } from "@/lib/api";
+import { formatAmountNumber } from "@/lib/format";
 
 export type { ApplicationDetail };
 
@@ -133,7 +134,7 @@ export function ApplicationReceiptCard({
             <Detail label={t("transactionId")} value={trx.transaction_id} />
             <Detail
               label={t("admissionFee")}
-              value={`BDT ${Number(trx.payment_amount).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}`}
+              value={`BDT ${formatAmountNumber(trx.payment_amount, locale)}`}
             />
             <Detail label={t("paymentDate")} value={trx.payment_date} />
             <Detail label={t("payerMobile")} value={trx.payer_mobile} />

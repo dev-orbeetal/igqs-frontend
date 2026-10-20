@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export function FadeIn({
   children,
@@ -13,13 +13,21 @@ export function FadeIn({
   delay?: number;
   id?: string;
 }) {
+  const reduced = useReducedMotion();
+  if (reduced) {
+    return (
+      <div id={id} className={className}>
+        {children}
+      </div>
+    );
+  }
   return (
     <motion.div
       id={id}
-      initial={{ opacity: 0, y: 22 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-72px" }}
-      transition={{ duration: 0.85, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}

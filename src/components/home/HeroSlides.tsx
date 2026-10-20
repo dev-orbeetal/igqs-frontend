@@ -1,9 +1,11 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function HeroSlides({ images }: { images: string[] }) {
+  const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -12,17 +14,16 @@ export function HeroSlides({ images }: { images: string[] }) {
   }, [images.join("|")]);
 
   useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (media.matches) setPaused(true);
-  }, []);
+    if (reduced) setPaused(true);
+  }, [reduced]);
 
   useEffect(() => {
-    if (paused || images.length < 2) return;
+    if (paused || reduced || images.length < 2) return;
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % images.length);
     }, 5000);
     return () => window.clearInterval(timer);
-  }, [images.length, paused]);
+  }, [images.length, paused, reduced]);
 
   if (!images.length) return null;
 
@@ -30,20 +31,28 @@ export function HeroSlides({ images }: { images: string[] }) {
     setIndex((current) => (current + direction + images.length) % images.length);
   }
 
+  const src = images[index];
+
   return (
     <div className="absolute inset-0">
-      {images.map((src, imageIndex) => (
-        <img
+      <AnimatePresence>
+        <motion.img
           key={src}
           src={src}
           alt=""
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
-            imageIndex === index ? "opacity-100" : "opacity-0"
-          }`}
+          className="absolute inset-0 h-full w-full object-cover"
+          initial={reduced ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1 }}
+          animate={{ opacity: 1, scale: reduced ? 1 : 1.04 }}
+          exit={reduced ? { opacity: 1 } : { opacity: 0 }}
+          transition={
+            reduced
+              ? { duration: 0 }
+              : { opacity: { duration: 0.7, ease: "easeOut" }, scale: { duration: 5, ease: "linear" } }
+          }
         />
-      ))}
+      </AnimatePresence>
       {images.length > 1 && (
-        <div className="pointer-events-auto absolute bottom-6 right-4 z-10 flex items-center gap-2 sm:right-6">
+        <div className="pointer-events-auto absolute right-4 bottom-6 z-10 flex items-center gap-2 sm:right-6">
           <button
             type="button"
             className="inline-flex size-8 items-center justify-center rounded-full bg-black/45 text-sm text-white"
@@ -52,9 +61,9 @@ export function HeroSlides({ images }: { images: string[] }) {
           >
             ‹
           </button>
-          {images.map((src, imageIndex) => (
+          {images.map((image, imageIndex) => (
             <button
-              key={src}
+              key={image}
               type="button"
               aria-label={`Photo ${imageIndex + 1}`}
               aria-current={imageIndex === index ? "true" : undefined}

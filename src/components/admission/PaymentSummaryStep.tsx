@@ -1,8 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { paymentMethodRows, type AdmissionFeeInfo, type PaymentMethodInfo } from "@/lib/api";
 import { ImageFileInput } from "@/components/ui/ImageFileInput";
+import { formatAmountNumber } from "@/lib/format";
 import { controlClass, fieldClass, fieldErrorClass, type WizardForm } from "./fields";
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -30,7 +31,8 @@ export function PaymentSummaryStep({
   onScreenshot: (file?: File) => void;
 }) {
   const t = useTranslations("admission");
-  const amount = fee ? `৳${Number(fee.amount).toLocaleString("bn-BD")}` : "—";
+  const locale = useLocale();
+  const amount = fee ? `৳${formatAmountNumber(fee.amount, locale)}` : "—";
   const selected = methods.find((method) => method.code === form.payment_method) ?? methods[0];
   const detailLabels = {
     accountName: t("accountLabel"),

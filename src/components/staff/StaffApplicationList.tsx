@@ -69,9 +69,14 @@ export function StaffApplicationList() {
   const [classes, setClasses] = useState<string[]>([]);
   const [rows, setRows] = useState<StaffApplicationListItem[]>([]);
   const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loadError, setLoadError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [reloadTick, setReloadTick] = useState(0);
+  const pageSize = 25;
+  const pageCount = Math.max(1, Math.ceil(count / pageSize));
 
-  const query = useMemo(() => {
+  const filters = useMemo(() => {
     const params = new URLSearchParams();
     if (q.trim()) params.set("q", q.trim());
     if (status) params.set("status", status);
@@ -79,9 +84,20 @@ export function StaffApplicationList() {
     if (dateFrom) params.set("date_from", dateFrom);
     if (dateTo) params.set("date_to", dateTo);
     if (sort) params.set("sort", sort);
-    const qs = params.toString();
-    return qs ? `?${qs}` : "";
+    return params.toString();
   }, [q, status, applyingClass, dateFrom, dateTo, sort]);
+
+  // Any filter change invalidates the current page.
+  useEffect(() => {
+    setPage(1);
+  }, [filters]);
+
+  const query = useMemo(() => {
+    const params = new URLSearchParams(filters);
+    params.set("page", String(page));
+    params.set("page_size", String(pageSize));
+    return `?${params.toString()}`;
+  }, [filters, page]);
 
   useEffect(() => {
     setLoading(true);
@@ -94,13 +110,19 @@ export function StaffApplicationList() {
         setRows(data.results);
         setCount(data.count);
         setClasses(data.classes);
+        setLoadError(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        if (err instanceof Error && err.message === "unauthorized") {
+          router.replace("/login");
+          return;
+        }
         setRows([]);
         setCount(0);
+        setLoadError(true);
       })
       .finally(() => setLoading(false));
-  }, [query]);
+  }, [query, router, reloadTick]);
 
   function onSort(field: string) {
     if (sort === field || sort === `-${field}`) {
@@ -188,9 +210,41 @@ export function StaffApplicationList() {
         </label>
       </form>
 
-      <p className="mt-4 text-sm text-igqs-muted">
-        {loading ? t("loading") : t("resultCount", { count })}
-      </p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-igqs-muted">
+          {loading ? t("loading") : t("resultCount", { count })}
+        </p>
+        {!loading && count > pageSize && (
+          <div className="flex items-center gap-2 text-sm">
+            <button
+              type="button"
+              className={btn.secondary}
+              disabled={page <= 1}
+              onClick={() => setPage((value) => Math.max(1, value - 1))}
+            >
+              {t("previousPage")}
+            </button>
+            <span className="text-igqs-muted">{t("pageOf", { page, pageCount })}</span>
+            <button
+              type="button"
+              className={btn.secondary}
+              disabled={page >= pageCount}
+              onClick={() => setPage((value) => Math.min(pageCount, value + 1))}
+            >
+              {t("nextPage")}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {loadError && (
+        <div className="mt-4 flex items-center justify-between rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+          {t("loadError")}
+          <button type="button" className="font-semibold underline" onClick={() => setReloadTick((value) => value + 1)}>
+            {t("retry")}
+          </button>
+        </div>
+      )}
 
       <div className="mt-4 space-y-3 md:hidden">
         {rows.map((row) => (
@@ -257,11 +311,11 @@ export function StaffApplicationList() {
             ))}
           </tbody>
         </table>
-        {!loading && rows.length === 0 && (
+        {!loading && !loadError && rows.length === 0 && (
           <p className="px-4 py-8 text-center text-sm text-igqs-muted">{t("noApplications")}</p>
         )}
       </div>
-      {!loading && rows.length === 0 && (
+      {!loading && !loadError && rows.length === 0 && (
         <p className="mt-6 text-center text-sm text-igqs-muted md:hidden">{t("noApplications")}</p>
       )}
     </div>

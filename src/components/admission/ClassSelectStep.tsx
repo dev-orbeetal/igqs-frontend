@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { AdmissionFeeInfo, ClassOption } from "@/lib/api";
+import { formatAmountNumber } from "@/lib/format";
 
 export function ClassSelectStep({
   classes,
@@ -17,6 +18,7 @@ export function ClassSelectStep({
   onSelect: (option: ClassOption) => void;
 }) {
   const t = useTranslations("admission");
+  const locale = useLocale();
 
   return (
     <div>
@@ -48,7 +50,7 @@ export function ClassSelectStep({
       {selectedSlug && fee && (
         <div className="mt-6 rounded-3xl bg-igqs-green px-5 py-6 text-center text-igqs-cream dark:bg-[#0b241c]">
           <p className="text-sm text-igqs-gold-soft">{t("feeFixed")}</p>
-          <p className="mt-2 font-display text-4xl">৳{Number(fee.amount).toLocaleString("bn-BD")}</p>
+          <p className="mt-2 font-display text-4xl">৳{formatAmountNumber(fee.amount, locale)}</p>
         </div>
       )}
     </div>

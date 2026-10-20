@@ -9,6 +9,13 @@ const PUBLIC_ORIGIN = "https://igqsbd.com";
 const ADMIN_ORIGIN = "https://admin.igqsbd.com";
 const PUBLIC_HOSTS = new Set(["igqsbd.com", "www.igqsbd.com"]);
 const ADMIN_HOSTS = new Set(["admin.igqsbd.com"]);
+// Local dev runs one server for both the public site and the staff panel, by
+// path, with no host split — these are the only hosts allowed to keep that
+// behavior. Every other host (including a Vercel preview URL, which ends up
+// documented and public) is treated as the public site: deny-by-default,
+// so admin paths always bounce to the real admin host rather than rendering
+// directly on an unrecognized domain.
+const DEV_HOSTS = new Set(["localhost", "127.0.0.1"]);
 
 function requestHost(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-host");
@@ -20,7 +27,7 @@ export default function middleware(request: NextRequest) {
   const host = requestHost(request);
   const { pathname, search } = request.nextUrl;
   const onAdmin = ADMIN_HOSTS.has(host);
-  const onPublic = PUBLIC_HOSTS.has(host);
+  const onPublic = PUBLIC_HOSTS.has(host) || (!onAdmin && !DEV_HOSTS.has(host));
   const canonical = canonicalAdminPath(pathname, onAdmin);
   if (pathname.length > 1 && pathname.endsWith("/")) {
     const url = request.nextUrl.clone();

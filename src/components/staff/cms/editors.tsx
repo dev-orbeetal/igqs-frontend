@@ -123,8 +123,8 @@ function useSingleton(path: string) {
       });
       setValues(updated);
       setSaved(true);
-    } catch {
-      setError(copy.error);
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : copy.error);
     } finally {
       setSaving(false);
     }
@@ -217,8 +217,8 @@ function CollectionBlock({
       setSelected(updated);
       setSaved(true);
       await reload();
-    } catch {
-      setError(copy.error);
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : copy.error);
     } finally {
       setSaving(false);
     }

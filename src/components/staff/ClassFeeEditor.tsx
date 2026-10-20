@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
 import { btn } from "@/components/staff/buttons";
 import { fieldClass } from "@/lib/cms";
 import { staffRequest } from "@/lib/staff";
@@ -16,6 +17,7 @@ type ClassFee = {
 
 export function ClassFeeEditor() {
   const t = useTranslations("staff");
+  const tc = useTranslations("cms");
   const locale = useLocale();
   const [fees, setFees] = useState<ClassFee[] | null>(null);
   const [nameEn, setNameEn] = useState("");
@@ -24,6 +26,7 @@ export function ClassFeeEditor() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [pendingRemove, setPendingRemove] = useState<number | null>(null);
 
   useEffect(() => {
     staffRequest<{ fees: ClassFee[] }>("/api/admissions/staff/class-fees/")
@@ -162,7 +165,7 @@ export function ClassFeeEditor() {
                         type="button"
                         className={btn.danger}
                         disabled={saving}
-                        onClick={() => void removeClass(fee.grade_id as number)}
+                        onClick={() => setPendingRemove(fee.grade_id as number)}
                       >
                         {t("removeClass")}
                       </button>
@@ -195,6 +198,19 @@ export function ClassFeeEditor() {
           </div>
         </form>
       )}
+      <ConfirmDialog
+        open={pendingRemove !== null}
+        title={tc("confirmTitle")}
+        message={tc("confirmDelete")}
+        confirmLabel={tc("delete")}
+        cancelLabel={tc("cancel")}
+        onCancel={() => setPendingRemove(null)}
+        onConfirm={() => {
+          const gradeId = pendingRemove;
+          setPendingRemove(null);
+          if (gradeId !== null) void removeClass(gradeId);
+        }}
+      />
     </section>
   );
 }

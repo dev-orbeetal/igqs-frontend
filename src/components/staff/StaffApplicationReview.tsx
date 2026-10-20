@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
 import { btn } from "@/components/staff/buttons";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { formatMoney, staffDownload, staffRequest, type StaffApplicationDetail } from "@/lib/staff";
 
 function Row({ label, value }: { label: string; value?: string | null }) {
@@ -21,20 +21,32 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
   const t = useTranslations("staff");
   const ta = useTranslations("admission");
   const locale = useLocale();
+  const router = useRouter();
   const [data, setData] = useState<StaffApplicationDetail | null>(null);
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState(false);
+  const [reloadTick, setReloadTick] = useState(0);
   const [saving, setSaving] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<"approved" | "rejected" | "pending" | null>(null);
 
   useEffect(() => {
+    setLoadError(false);
     staffRequest<StaffApplicationDetail>(
       `/api/admissions/staff/applications/${encodeURIComponent(applicationId)}/`
-    ).then((detail) => {
-      setData(detail);
-      setReason(detail.rejection_reason || "");
-    });
-  }, [applicationId]);
+    )
+      .then((detail) => {
+        setData(detail);
+        setReason(detail.rejection_reason || "");
+      })
+      .catch((err) => {
+        if (err instanceof Error && err.message === "unauthorized") {
+          router.replace("/login");
+          return;
+        }
+        setLoadError(true);
+      });
+  }, [applicationId, router, reloadTick]);
 
   function askStatus(status: "approved" | "rejected" | "pending") {
     if (status === "rejected" && !reason.trim()) {
@@ -74,6 +86,25 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
     }
   }
 
+  if (loadError) {
+    return (
+      <div className="rounded-3xl border border-red-300 bg-red-50 p-6 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+        <p>{t("loadError")}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="font-semibold underline"
+            onClick={() => setReloadTick((value) => value + 1)}
+          >
+            {t("retry")}
+          </button>
+          <Link href="/payments/applications" className="font-semibold underline">
+            ← {t("applicationsPage")}
+          </Link>
+        </div>
+      </div>
+    );
+  }
   if (!data) return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
 
   const amount = formatMoney(data.payment_amount || data.transaction.payment_amount, locale);
@@ -97,7 +128,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
             className={btn.secondary}
             onClick={() =>
               staffDownload(
-                `/api/admissions/staff/applications/${data.application_id}/export/`,
+                `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/export/`,
                 `${data.application_id}.csv`
               )
             }
@@ -109,7 +140,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
             className={btn.secondary}
             onClick={() =>
               staffDownload(
-                `/api/admissions/staff/applications/${data.application_id}/receipt/`,
+                `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/receipt/`,
                 `${data.receipt_id}.pdf`
               )
             }

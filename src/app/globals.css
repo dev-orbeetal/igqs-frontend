@@ -15,8 +15,21 @@
   --container-7xl: min(100%, calc((100% + 80rem) / 2));
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
-  --font-bengali: var(--font-kalpurush), var(--font-outfit), sans-serif;
-  --font-bengali-display: var(--font-kalpurush), var(--font-cormorant), serif;
+  --font-bengali: var(--font-noto-bengali), var(--font-outfit), sans-serif;
+  --font-bengali-display: var(--font-noto-bengali), var(--font-cormorant), serif;
+  --text-xs: 0.9375rem;
+  --text-sm: 1.09375rem;
+  --text-base: 1.25rem;
+  --text-lg: 1.40625rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.34375rem;
+  --text-4xl: 2.8125rem;
+  --text-5xl: 3.75rem;
+  --text-6xl: 4.6875rem;
+  --text-7xl: 5.625rem;
+  --text-8xl: 7.5rem;
+  --text-9xl: 10rem;
 }
 
 html {
@@ -25,6 +38,7 @@ html {
 
 body {
   @apply bg-igqs-cream text-igqs-ink antialiased;
+  font-size: 1.25rem;
 }
 
 .dark body {
@@ -38,7 +52,7 @@ select optgroup {
 }
 
 .font-bn {
-  font-family: var(--font-kalpurush), var(--font-outfit), sans-serif;
+  font-family: var(--font-noto-bengali), var(--font-outfit), sans-serif;
   letter-spacing: 0;
   word-spacing: 0;
   text-rendering: optimizeLegibility;
@@ -48,7 +62,7 @@ select optgroup {
 .font-bn h1,
 .font-bn h2,
 .font-bn h3 {
-  font-family: var(--font-kalpurush), var(--font-cormorant), serif;
+  font-family: var(--font-noto-bengali), var(--font-cormorant), serif;
   letter-spacing: 0;
   line-height: 1.45;
 }
@@ -65,23 +79,39 @@ select optgroup {
 }
 
 .eyebrow {
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
+  color: var(--color-igqs-forest);
+}
+
+.dark .eyebrow,
+.on-dark .eyebrow,
+.section-forest .eyebrow {
   color: var(--color-igqs-gold);
 }
 
 .section-cream {
-  background: #f6f1e7;
+  background-color: #f6f1e7;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c4a35a' stroke-opacity='0.28' stroke-width='0.8'%3E%3Cpath d='M40 8 L47 25 L64 32 L47 39 L40 56 L33 39 L16 32 L33 25 Z'/%3E%3Cpath d='M40 20 L44 30 L54 34 L44 38 L40 48 L36 38 L26 34 L36 30 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 80px 80px;
 }
 
 .dark .section-cream {
   background: #0a1a14;
 }
 
+.section-white {
+  background: #fff;
+}
+
+.dark .section-white {
+  background: #0d2119;
+}
+
 .section-cream-alt {
-  background: #efe8d8;
+  background: #fff;
 }
 
 .dark .section-cream-alt {
@@ -90,9 +120,11 @@ select optgroup {
 
 .section-forest {
   background:
-    linear-gradient(180deg, rgb(15 61 48 / 0.96), rgb(12 40 32 / 0.98)),
-    var(--color-igqs-green);
+    linear-gradient(180deg, rgb(26 92 69 / 0.97), rgb(20 74 56 / 0.98)),
+    var(--color-igqs-forest);
   color: var(--color-igqs-cream);
+  border-top: 1px solid var(--color-igqs-gold);
+  border-bottom: 1px solid var(--color-igqs-gold);
 }
 
 .dark .section-forest {
@@ -179,7 +211,7 @@ select optgroup {
 }
 
 .img-frame {
-  @apply relative overflow-hidden rounded-2xl border border-igqs-gold/20;
+  @apply relative overflow-hidden rounded-2xl border border-igqs-gold/45;
 }
 
 .img-zoom {
@@ -196,11 +228,19 @@ select optgroup {
 }
 
 .link-gold {
-  @apply text-sm text-igqs-gold;
+  @apply text-sm text-igqs-forest;
   transition: color 0.4s ease;
 }
 
 .link-gold:hover {
+  color: var(--color-igqs-green);
+}
+
+.dark .link-gold {
+  color: var(--color-igqs-gold);
+}
+
+.dark .link-gold:hover {
   color: #d4b56a;
 }
 

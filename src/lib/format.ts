@@ -20,3 +20,11 @@ export function formatDate(iso: string, locale: string, withTime = false) {
     timeStyle: withTime ? "short" : undefined,
   }).format(new Date(iso));
 }
+
+// Shared locale resolution for every guardian-facing amount display, so a
+// page rendered in English never shows Bengali numerals (or vice versa).
+export function formatAmountNumber(amount: number | string, locale: string) {
+  const value = Number(amount);
+  if (!Number.isFinite(value)) return String(amount);
+  return value.toLocaleString(locale === "bn" ? "bn-BD" : "en-GB");
+}

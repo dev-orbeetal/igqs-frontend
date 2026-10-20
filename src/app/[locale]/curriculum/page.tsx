@@ -25,7 +25,7 @@ export default async function CurriculumPage({
             id={`grade-${grade.slug}`}
             className="scroll-mt-28 rounded-3xl border border-igqs-gold/20 bg-white p-6 dark:bg-[#0d1f18] md:p-8"
           >
-            <h2 className="font-display text-3xl text-igqs-green dark:text-igqs-gold-soft">
+            <h2 className="font-display text-3xl text-igqs-forest dark:text-igqs-gold-soft">
               {grade.name}
             </h2>
             <p className="mt-3 max-w-3xl text-igqs-muted">{grade.description}</p>
@@ -35,7 +35,7 @@ export default async function CurriculumPage({
                 if (!items.length) return null;
                 return (
                   <div key={key}>
-                    <h3 className="text-sm uppercase tracking-[0.2em] text-igqs-gold">
+                    <h3 className="text-sm uppercase tracking-[0.2em] text-igqs-forest dark:text-igqs-gold">
                       {t(key)}
                     </h3>
                     <ul className="mt-3 space-y-2">
@@ -51,13 +51,13 @@ export default async function CurriculumPage({
             </div>
             {grade.documents.length > 0 && (
               <div className="mt-6">
-                <h3 className="text-sm uppercase tracking-[0.2em] text-igqs-gold">
+                <h3 className="text-sm uppercase tracking-[0.2em] text-igqs-forest dark:text-igqs-gold">
                   {t("documents")}
                 </h3>
                 <ul className="mt-3">
                   {grade.documents.map((doc) => (
                     <li key={doc.id}>
-                      <a href={doc.download_url} className="text-sm text-igqs-green underline dark:text-igqs-gold-soft">
+                      <a href={doc.download_url} className="text-sm text-igqs-forest underline dark:text-igqs-gold-soft">
                         {doc.title}
                       </a>
                     </li>

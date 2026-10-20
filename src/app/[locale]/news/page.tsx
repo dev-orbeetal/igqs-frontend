@@ -55,7 +55,7 @@ export default async function NewsPage({
             <FadeIn key={post.slug}>
               <Link
                 href={`/news/${post.slug}`}
-                className="block overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]"
+                className="img-frame block rounded-3xl bg-white dark:bg-[#0d1f18]"
               >
                 <div className="relative h-48">
                   {post.image && (
@@ -69,7 +69,7 @@ export default async function NewsPage({
                   )}
                 </div>
                 <div className="p-5">
-                  <p className="text-xs uppercase tracking-wide text-igqs-gold">{t(newsCategoryKey(post.category))}</p>
+                  <p className="text-xs uppercase tracking-wide text-igqs-forest dark:text-igqs-gold">{t(newsCategoryKey(post.category))}</p>
                   <h2 className="mt-2 font-display text-2xl">{post.title}</h2>
                   <p className="mt-2 text-sm text-igqs-muted">
                     {formatDate(post.published_at, locale)}

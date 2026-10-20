@@ -29,10 +29,10 @@ export default async function AdmissionPage({
           </p>
         )}
         <div className="mb-6 flex flex-wrap gap-x-4 gap-y-2 text-sm text-igqs-muted">
-          <Link href="/admission/payments" className="text-igqs-gold underline">
+          <Link href="/admission/payments" className="text-igqs-forest underline dark:text-igqs-gold">
             {tn("myPayments")}
           </Link>
-          <Link href="/admission/receipt" className="text-igqs-gold underline">
+          <Link href="/admission/receipt" className="text-igqs-forest underline dark:text-igqs-gold">
             {t("downloadPageTitle")}
           </Link>
         </div>

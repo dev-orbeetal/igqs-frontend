@@ -1,5 +1,4 @@
-import { Cormorant_Garamond, Outfit } from "next/font/google";
-import localFont from "next/font/local";
+import { Cormorant_Garamond, Noto_Sans_Bengali, Outfit } from "next/font/google";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -26,14 +25,10 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-const kalpurush = localFont({
-  src: [
-    { path: "../../fonts/Kalpurush.ttf", weight: "400", style: "normal" },
-    { path: "../../fonts/Kalpurush.ttf", weight: "500", style: "normal" },
-    { path: "../../fonts/Kalpurush.ttf", weight: "600", style: "normal" },
-    { path: "../../fonts/Kalpurush.ttf", weight: "700", style: "normal" },
-  ],
-  variable: "--font-kalpurush",
+const notoSansBengali = Noto_Sans_Bengali({
+  subsets: ["bengali"],
+  weight: "400",
+  variable: "--font-noto-bengali",
   display: "swap",
 });
 
@@ -73,13 +68,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${outfit.variable} ${cormorant.variable} ${kalpurush.variable} ${
+        className={`${outfit.variable} ${cormorant.variable} ${notoSansBengali.variable} ${
           locale === "bn" ? "font-bn" : "font-sans"
         }`}
       >
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
-            <Header site={site} adminSite={adminSite} />
+            <Header adminSite={adminSite} />
             <main>{children}</main>
             <HideOnStaff adminSite={adminSite}>
               <Footer site={site} />

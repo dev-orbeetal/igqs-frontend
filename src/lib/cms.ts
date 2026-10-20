@@ -35,6 +35,16 @@ export function fromDateTimeLocal(value: string) {
   return new Date(value).toISOString();
 }
 
+const uploadKeys = new Set([
+  "hero_image",
+  "principal_photo",
+  "image",
+  "photo",
+  "logo",
+  "featured_image",
+  "cover_image",
+]);
+
 export function preparePayload(fields: CmsField[], values: Record<string, unknown>) {
   const payload: Record<string, unknown> = { ...values };
   for (const key of [
@@ -48,6 +58,9 @@ export function preparePayload(fields: CmsField[], values: Record<string, unknow
     "grade_name",
   ]) {
     delete payload[key];
+  }
+  for (const key of Object.keys(payload)) {
+    if (uploadKeys.has(key) && !(payload[key] instanceof File)) delete payload[key];
   }
   for (const field of fields) {
     if (field.type === "datetime") {

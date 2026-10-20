@@ -1,6 +1,7 @@
 import { compressFormImages } from "@/lib/compress-image";
 
 const SITE_HOSTS = new Set(["igqsbd.com", "www.igqsbd.com", "admin.igqsbd.com"]);
+const REQUEST_TIMEOUT_MS = 15000;
 
 function configuredApi() {
   return (
@@ -46,7 +47,7 @@ export async function apiGet<T>(path: string, locale: string): Promise<T | null>
     }
 
     const res = await fetch(apiUrl(path, locale), {
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       ...(typeof window === "undefined"
         ? { next: { revalidate: 60 } }
         : { cache: "no-store" as const }),
@@ -68,6 +69,7 @@ export async function apiPost(path: string, body: FormData | object, token?: str
     method: "POST",
     body: payload,
     headers,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -80,6 +82,7 @@ export async function apiGetAuth<T>(path: string, token: string, locale?: string
   const res = await fetch(apiUrl(path, locale), {
     cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

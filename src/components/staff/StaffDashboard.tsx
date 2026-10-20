@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { StatusBadge } from "@/components/staff/StatusBadge";
 import { btn } from "@/components/staff/buttons";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { formatMoney, staffRequest, type StaffApplicationListItem, type StaffStats } from "@/lib/staff";
+
+function isUnauthorized(err: unknown) {
+  return err instanceof Error && err.message === "unauthorized";
+}
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
@@ -26,18 +30,36 @@ export function StaffDashboard() {
   const t = useTranslations("staff");
   const ta = useTranslations("admission");
   const locale = useLocale();
+  const router = useRouter();
   const [stats, setStats] = useState<StaffStats | null>(null);
   const [recent, setRecent] = useState<StaffApplicationListItem[]>([]);
+  const [recentError, setRecentError] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     staffRequest<StaffStats>("/api/admissions/staff/stats/")
       .then(setStats)
-      .catch(() => setError(t("loadError")));
-    staffRequest<{ results: StaffApplicationListItem[] }>("/api/admissions/staff/applications/?sort=-created_at")
-      .then((data) => setRecent(data.results.slice(0, 8)))
-      .catch(() => setRecent([]));
-  }, [t]);
+      .catch((err) => {
+        if (isUnauthorized(err)) {
+          router.replace("/login");
+          return;
+        }
+        setError(t("loadError"));
+      });
+    staffRequest<{ results: StaffApplicationListItem[] }>("/api/admissions/staff/applications/?sort=-created_at&page_size=8")
+      .then((data) => {
+        setRecent(data.results.slice(0, 8));
+        setRecentError(false);
+      })
+      .catch((err) => {
+        if (isUnauthorized(err)) {
+          router.replace("/login");
+          return;
+        }
+        setRecent([]);
+        setRecentError(true);
+      });
+  }, [t, router]);
 
   if (error) return <p className="text-sm text-red-700">{error}</p>;
   if (!stats) return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
@@ -65,7 +87,9 @@ export function StaffDashboard() {
             {t("manageApplications")}
           </Link>
         </div>
-        {recent.length === 0 ? (
+        {recentError ? (
+          <p className="px-6 py-6 text-sm text-red-700 dark:text-red-300">{t("loadError")}</p>
+        ) : recent.length === 0 ? (
           <p className="px-6 py-6 text-sm text-igqs-muted">{t("noApplications")}</p>
         ) : (
           <>

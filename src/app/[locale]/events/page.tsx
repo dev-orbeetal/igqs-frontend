@@ -33,7 +33,7 @@ function EventGrid({
               )}
             </div>
             <div className="p-5">
-              <p className="text-xs text-igqs-gold">{formatDate(event.start_at, locale, true)}</p>
+              <p className="text-xs text-igqs-forest dark:text-igqs-gold">{formatDate(event.start_at, locale, true)}</p>
               <h3 className="mt-2 font-display text-2xl">{event.title}</h3>
               <p className="mt-1 text-sm text-igqs-muted">{event.location}</p>
             </div>

@@ -10,12 +10,14 @@ import {
   HomeEditor,
   NewsManager,
 } from "@/components/staff/cms/editors";
+import { MessagesManager } from "@/components/staff/cms/messages";
 import { StaffShell } from "@/components/staff/StaffShell";
 
 const sections = {
   home: HomeEditor,
   about: AboutEditor,
   contact: ContactEditor,
+  messages: MessagesManager,
   admission: AdmissionEditor,
   events: EventsManager,
   news: NewsManager,

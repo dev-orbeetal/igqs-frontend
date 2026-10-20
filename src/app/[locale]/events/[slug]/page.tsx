@@ -23,11 +23,11 @@ export default async function EventDetailPage({
       <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <FadeIn>
           {event.image && (
-            <div className="relative mb-8 h-80 overflow-hidden rounded-3xl">
+            <div className="img-frame mb-8 h-80 rounded-3xl">
               <Image src={event.image} alt="" fill sizes="(min-width: 768px) 48rem, 100vw" className="object-cover" />
             </div>
           )}
-          <p className="text-sm text-igqs-gold">
+          <p className="text-sm text-igqs-forest dark:text-igqs-gold">
             {t("when")}: {formatDate(event.start_at, locale, true)}
           </p>
           <p className="mt-1 text-sm text-igqs-muted">
