@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
 import { btn } from "@/components/staff/buttons";
+import { StatusBadge } from "@/components/staff/StatusBadge";
+import { fieldClass } from "@/lib/cms";
 import { staffRequest } from "@/lib/staff";
-
-const fieldClass =
-  "mt-1.5 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
 
 type ContactMessage = {
   id: number;
@@ -27,6 +26,9 @@ export function MessagesManager() {
   const [query, setQuery] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [busyId, setBusyId] = useState<number | null>(null);
+  const [tick, setTick] = useState(0);
   const [pendingDelete, setPendingDelete] = useState<ContactMessage | null>(null);
 
   useEffect(() => {
@@ -37,21 +39,41 @@ export function MessagesManager() {
       })
       .catch(() => setLoadError(true))
       .finally(() => setLoaded(true));
-  }, []);
+  }, [tick]);
 
+  // Both of these used to `await` with no error handling: a failed PATCH or
+  // DELETE left the row untouched and said nothing, so the click looked
+  // like it had simply been ignored.
   async function toggleRead(row: ContactMessage) {
-    const updated = await staffRequest<ContactMessage>(`/api/staff/messages/${row.id}/`, {
-      method: "PATCH",
-      body: JSON.stringify({ is_read: !row.is_read }),
-    });
-    setRows((current) => current.map((item) => (item.id === row.id ? updated : item)));
+    setActionError("");
+    setBusyId(row.id);
+    try {
+      const updated = await staffRequest<ContactMessage>(`/api/staff/messages/${row.id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_read: !row.is_read }),
+      });
+      setRows((current) => current.map((item) => (item.id === row.id ? updated : item)));
+    } catch (err) {
+      setActionError(err instanceof Error && err.message ? err.message : t("error"));
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function confirmDelete() {
     if (!pendingDelete) return;
-    await staffRequest(`/api/staff/messages/${pendingDelete.id}/`, { method: "DELETE" });
-    setRows((current) => current.filter((item) => item.id !== pendingDelete.id));
+    const target = pendingDelete;
     setPendingDelete(null);
+    setActionError("");
+    setBusyId(target.id);
+    try {
+      await staffRequest(`/api/staff/messages/${target.id}/`, { method: "DELETE" });
+      setRows((current) => current.filter((item) => item.id !== target.id));
+    } catch (err) {
+      setActionError(err instanceof Error && err.message ? err.message : t("error"));
+    } finally {
+      setBusyId(null);
+    }
   }
 
   const visible = rows.filter((row) => {
@@ -73,11 +95,29 @@ export function MessagesManager() {
       {loadError && (
         <p className="mt-4 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
           {t("error")}
+          <button
+            type="button"
+            className="ml-3 font-semibold underline"
+            onClick={() => setTick((value) => value + 1)}
+          >
+            {t("retry")}
+          </button>
         </p>
       )}
 
+      <p
+        role="alert"
+        className={
+          actionError
+            ? "mt-4 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300"
+            : "sr-only"
+        }
+      >
+        {actionError}
+      </p>
+
       {loaded && !loadError && visible.length === 0 && (
-        <p className="mt-4 rounded-2xl border border-dashed border-igqs-gold/40 px-4 py-8 text-center text-sm text-igqs-muted">
+        <p className="mt-4 rounded-2xl border border-dashed border-igqs-border-strong dark:border-igqs-gold/70 px-4 py-8 text-center text-sm text-igqs-muted">
           {t("noMessages")}
         </p>
       )}
@@ -100,25 +140,32 @@ export function MessagesManager() {
                   {row.phone ? ` · ${row.phone}` : ""}
                 </p>
               </div>
-              <span
-                className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
-                  row.is_read
-                    ? "bg-igqs-sand text-igqs-muted dark:bg-white/10"
-                    : "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
-                }`}
-              >
-                {row.is_read ? t("readStatus") : t("unreadStatus")}
-              </span>
+              {/* Same badge the application list uses, instead of a third
+                  bespoke pill style for the same idea. */}
+              <StatusBadge
+                status={row.is_read ? "approved" : "pending"}
+                label={row.is_read ? t("readStatus") : t("unreadStatus")}
+              />
             </div>
             <p className="mt-3 whitespace-pre-wrap text-sm">{row.message}</p>
             <p className="mt-2 text-xs text-igqs-muted">
               {new Date(row.created_at).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" className={btn.secondary} onClick={() => toggleRead(row)}>
+              <button
+                type="button"
+                className={btn.secondary}
+                disabled={busyId === row.id}
+                onClick={() => toggleRead(row)}
+              >
                 {row.is_read ? t("markUnread") : t("markRead")}
               </button>
-              <button type="button" className={btn.danger} onClick={() => setPendingDelete(row)}>
+              <button
+                type="button"
+                className={btn.danger}
+                disabled={busyId === row.id}
+                onClick={() => setPendingDelete(row)}
+              >
                 {t("delete")}
               </button>
             </div>

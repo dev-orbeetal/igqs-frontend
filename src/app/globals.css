@@ -12,6 +12,16 @@
   --color-igqs-sand: #efe6d4;
   --color-igqs-muted: #5c6b64;
   --color-igqs-surface: #163d32;
+  /* Meets WCAG 1.4.11 (3:1) against cream and white, for the borders that
+     define a control — form fields, chips, anything interactive. The softer
+     --color-igqs-gold at low alpha stays for purely decorative edges. */
+  --color-igqs-border-strong: #9a7c3a;
+  /* Label/eyebrow text. --color-igqs-gold is 2.4:1 on white, so it fails AA
+     wherever it is used for the small uppercase labels on light surfaces
+     (stat cards, table headings, definition lists). This is the same hue,
+     darkened until it passes; dark mode re-points it back to gold below,
+     where gold already clears 7:1. */
+  --color-igqs-label: #7a6329;
   --container-7xl: min(100%, calc((100% + 80rem) / 2));
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
@@ -43,6 +53,41 @@ body {
 
 .dark body {
   @apply bg-[#07140f] text-igqs-sand;
+}
+
+/* Muted text is 5.0:1 on cream but only 3.0:1 on the dark surfaces, which
+   fails AA for body copy. Re-point the token in dark mode so every
+   text-igqs-muted usage lifts at once; explicit dark: overrides still win. */
+.dark {
+  --color-igqs-muted: #9fb0a8;
+  --color-igqs-label: #c4a35a;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-igqs-forest);
+  outline-offset: 2px;
+  border-radius: 0.35rem;
+}
+
+.dark :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline-color: var(--color-igqs-gold);
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 100;
+  border-radius: 0.75rem;
+  background: var(--color-igqs-green);
+  color: var(--color-igqs-cream);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0.75rem;
 }
 
 select option,
@@ -86,10 +131,55 @@ select optgroup {
   color: var(--color-igqs-forest);
 }
 
+/* gold on forest is only 3.28:1 — too low for 14px text. gold-soft is 7.9:1. */
 .dark .eyebrow,
 .on-dark .eyebrow,
 .section-forest .eyebrow {
-  color: var(--color-igqs-gold);
+  color: var(--color-igqs-gold-soft);
+}
+
+/* Reveal animations are CSS-only and start from the visible state in the
+   HTML, so content is never server-rendered at opacity:0 (it used to be,
+   which left the page blank until hydration and permanently blank with JS
+   off). Browsers without scroll-driven animation support simply show the
+   content with no reveal. */
+.page-fade {
+  animation: page-fade-in 0.25s ease-out both;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+
+  .reveal-now {
+    animation: reveal-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--reveal-delay, 0s);
+  }
 }
 
 .section-cream {
@@ -323,7 +413,10 @@ select optgroup {
   .btn-gold,
   .btn-gold-outline,
   .btn-ghost,
-  .surface-card {
+  .surface-card,
+  .page-fade,
+  .reveal,
+  .reveal-now {
     animation: none;
     transition: none;
   }

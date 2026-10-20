@@ -14,7 +14,7 @@ function isUnauthorized(err: unknown) {
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18]">
-      <p className="text-xs uppercase tracking-[0.18em] text-igqs-gold">{label}</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-igqs-label">{label}</p>
       <p className="mt-2 font-display text-3xl">{value}</p>
     </div>
   );
@@ -35,8 +35,10 @@ export function StaffDashboard() {
   const [recent, setRecent] = useState<StaffApplicationListItem[]>([]);
   const [recentError, setRecentError] = useState(false);
   const [error, setError] = useState("");
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
+    setError("");
     staffRequest<StaffStats>("/api/admissions/staff/stats/")
       .then(setStats)
       .catch((err) => {
@@ -59,27 +61,44 @@ export function StaffDashboard() {
         setRecent([]);
         setRecentError(true);
       });
-  }, [t, router]);
+  }, [t, router, reloadTick]);
 
-  if (error) return <p className="text-sm text-red-700">{error}</p>;
-  if (!stats) return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
-
-  const money = (value: string) => formatMoney(value, locale, stats.currency);
+  const money = (value: string) => formatMoney(value, locale, stats?.currency);
 
   return (
     <div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard label={t("total")} value={stats.total} />
-        <StatCard label={t("successful")} value={stats.approved} />
-        <StatCard label={t("pending")} value={stats.pending} />
-        <StatCard label={t("failed")} value={stats.rejected} />
-        <StatCard label={t("feeCollected")} value={money(stats.fee_collected)} />
-      </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label={t("today")} value={stats.today} />
-        <StatCard label={t("feePending")} value={money(stats.fee_pending)} />
-        <StatCard label={t("feeSubmitted")} value={money(stats.fee_submitted)} />
-      </div>
+      {/* A failed stats request used to replace the entire dashboard, taking
+          the recent-applications table with it. Now only the cards fail, and
+          they offer a retry. */}
+      {error ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+          {error}
+          <button type="button" className="font-semibold underline" onClick={() => setReloadTick((v) => v + 1)}>
+            {t("retry")}
+          </button>
+        </div>
+      ) : !stats ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5" aria-busy="true">
+          {[0, 1, 2, 3, 4].map((card) => (
+            <div key={card} className="h-28 animate-pulse rounded-3xl bg-white dark:bg-white/5" />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <StatCard label={t("total")} value={stats.total} />
+            <StatCard label={t("successful")} value={stats.approved} />
+            <StatCard label={t("pending")} value={stats.pending} />
+            <StatCard label={t("failed")} value={stats.rejected} />
+            <StatCard label={t("feeCollected")} value={money(stats.fee_collected)} />
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <StatCard label={t("today")} value={stats.today} />
+            <StatCard label={t("feePending")} value={money(stats.fee_pending)} />
+            <StatCard label={t("feeSubmitted")} value={money(stats.fee_submitted)} />
+          </div>
+        </>
+      )}
       <div className="mt-10 overflow-hidden rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18]">
         <div className="flex items-center justify-between gap-3 px-6 pt-6">
           <h2 className="font-display text-2xl">{t("applications")}</h2>
@@ -105,13 +124,13 @@ export function StaffDashboard() {
                     <StatusBadge status={row.status} label={statusLabel(row.status, ta)} />
                   </div>
                   <p className="mt-1 text-sm text-igqs-muted">{row.applying_class}</p>
-                  <p className="mt-2 text-sm">{formatMoney(row.payment_amount, locale, stats.currency)}</p>
+                  <p className="mt-2 text-sm">{formatMoney(row.payment_amount, locale, stats?.currency)}</p>
                 </Link>
               ))}
             </div>
             <div className="mt-4 hidden overflow-x-auto md:block">
               <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
+                <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-label">
                   <tr>
                     <th className="px-6 py-3">{t("student")}</th>
                     <th className="px-3 py-3">{t("applyingClass")}</th>
@@ -129,7 +148,7 @@ export function StaffDashboard() {
                         </Link>
                       </td>
                       <td className="px-3 py-3">{row.applying_class}</td>
-                      <td className="px-3 py-3">{formatMoney(row.payment_amount, locale, stats.currency)}</td>
+                      <td className="px-3 py-3">{formatMoney(row.payment_amount, locale, stats?.currency)}</td>
                       <td className="px-3 py-3">
                         <StatusBadge status={row.status} label={statusLabel(row.status, ta)} />
                       </td>
@@ -146,14 +165,19 @@ export function StaffDashboard() {
       </div>
       <div className="mt-10 rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
         <h2 className="font-display text-2xl">{t("byClass")}</h2>
-        {stats.by_class.length === 0 ? (
+        {!stats ? null : stats.by_class.length === 0 ? (
           <p className="mt-4 text-sm text-igqs-muted">{t("noApplications")}</p>
         ) : (
           <ul className="mt-4 divide-y divide-igqs-gold/15">
             {stats.by_class.map((row) => (
-              <li key={row.applying_class} className="flex justify-between py-3 text-sm">
-                <span>{row.applying_class}</span>
-                <strong>{row.total}</strong>
+              <li key={row.applying_class}>
+                <Link
+                  href={`/payments/applications?applying_class=${encodeURIComponent(row.applying_class)}`}
+                  className="flex min-h-11 items-center justify-between py-3 text-sm hover:underline"
+                >
+                  <span>{row.applying_class}</span>
+                  <strong>{row.total}</strong>
+                </Link>
               </li>
             ))}
           </ul>

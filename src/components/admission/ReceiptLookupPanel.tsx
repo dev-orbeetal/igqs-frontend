@@ -76,7 +76,7 @@ export function ReceiptLookupPanel() {
         <label className="block text-sm">
           {t("enterLookupId")}
           <input
-            className="mt-2 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 font-mono"
+            className="mt-2 w-full min-h-12 rounded-xl border border-igqs-border-strong bg-white px-3 py-2 font-mono dark:border-igqs-gold/70 dark:bg-[#10261e]"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t("lookupPlaceholder")}
@@ -91,7 +91,9 @@ export function ReceiptLookupPanel() {
         >
           {searching ? t("searchingReceipt") : t("searchReceipt")}
         </button>
-        {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
+        <p role="status" aria-live="polite" className="mt-4 text-sm text-red-700 empty:mt-0">
+          {error}
+        </p>
       </form>
 
       {data && (

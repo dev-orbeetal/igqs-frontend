@@ -74,6 +74,7 @@ export default async function HomePage({
           subtitle={content?.hero_subtitle}
           applyLabel={t("common.applyNow")}
           curriculumLabel={t("common.viewCurriculum")}
+          fallbackTitle={t("home.heroFallbackTitle")}
         />
       </section>
 
@@ -83,7 +84,7 @@ export default async function HomePage({
         <section className="section-cream section-pad">
           <FadeIn className="section-shell">
             <SectionHeading kicker={t("brand.name")} title={t("home.welcome")} />
-            <p className="max-w-3xl text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
+            <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
               {content.welcome}
             </p>
           </FadeIn>
@@ -96,7 +97,7 @@ export default async function HomePage({
             {content?.about_preview && (
               <FadeIn>
                 <SectionHeading title={t("home.about")} />
-                <p className="text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
+                <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
                   {content.about_preview}
                 </p>
                 <Link href="/about" className="link-gold mt-6 inline-block font-medium">
@@ -141,7 +142,7 @@ export default async function HomePage({
               {(content.principal_message || content.principal_name) && (
                 <blockquote>
                   {content.principal_message && (
-                    <p className="font-display text-xl leading-relaxed text-igqs-forest sm:text-2xl dark:text-igqs-gold-soft">
+                    <p className="max-w-prose whitespace-pre-line font-display text-xl leading-relaxed text-igqs-forest sm:text-2xl dark:text-igqs-gold-soft">
                       “{content.principal_message}”
                     </p>
                   )}
@@ -235,7 +236,7 @@ export default async function HomePage({
           <FadeIn className="section-shell flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <p className="eyebrow">{t("home.admission")}</p>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed sm:text-lg">
+              <p className="mt-3 max-w-prose whitespace-pre-line text-base leading-relaxed sm:text-lg">
                 {site.admission_announcement}
               </p>
             </div>

@@ -3,7 +3,7 @@
 import { ArrowUp, ChevronRight, Mail, MapPin, Phone } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/icons/Social";
+import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/components/icons/Social";
 import { Link } from "@/i18n/navigation";
 import type { SiteSettings } from "@/lib/api";
 
@@ -22,18 +22,10 @@ function FooterHeading({ children }: { children: React.ReactNode }) {
 
 function FooterLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="group flex items-start gap-1.5 text-white/75 transition hover:text-white">
+    <Link href={href} className="group flex min-h-11 items-start gap-1.5 py-1.5 text-white/75 transition hover:text-white">
       <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-white/55 transition group-hover:text-white" aria-hidden />
       <span>{label}</span>
     </Link>
-  );
-}
-
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M12.04 2C6.58 2 2.15 6.4 2.15 11.83c0 1.74.46 3.44 1.34 4.94L2 22l5.39-1.41a10 10 0 0 0 4.65 1.18h.01c5.46 0 9.89-4.4 9.89-9.83C21.94 6.4 17.5 2 12.04 2zm5.76 13.95c-.24.68-1.4 1.3-1.94 1.38-.5.07-1.12.1-1.81-.11-.41-.13-.95-.31-1.63-.61-2.86-1.24-4.72-4.12-4.86-4.31-.14-.19-1.15-1.53-1.15-2.92s.73-2.07 1-2.35c.24-.26.64-.38.85-.38.21 0 .42 0 .6.01.19.01.45-.07.7.54.26.63.87 2.16.95 2.32.08.16.13.35.03.56-.1.21-.16.34-.31.52-.16.18-.33.4-.47.54-.16.16-.32.33-.14.64.19.31.83 1.37 1.78 2.22 1.22 1.09 2.25 1.43 2.57 1.59.31.16.5.13.68-.08.18-.21.78-.91.99-1.22.21-.31.42-.26.7-.16.28.1 1.78.84 2.08.99.31.16.51.23.58.36.08.13.08.75-.16 1.43z" />
-    </svg>
   );
 }
 
@@ -84,7 +76,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={item.label}
-                  className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-igqs-gold hover:text-igqs-ink"
+                  className="flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-igqs-gold hover:text-igqs-ink"
                 >
                   <item.icon className="size-4" />
                 </a>
@@ -125,27 +117,28 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                   <span>{site.address}</span>
                 </li>
               )}
-              {phones.map((phone, index) => {
-                const digits = digitsOnly(phone);
-                const whatsapp = digits ? `https://wa.me/${digits}` : undefined;
-                return (
-                  <li key={phone}>
-                    <a
-                      href={whatsapp || `tel:${phone}`}
-                      target={whatsapp ? "_blank" : undefined}
-                      rel={whatsapp ? "noopener noreferrer" : undefined}
-                      className="flex gap-2.5 transition hover:text-white"
-                    >
-                      {index === 0 ? <Phone className="mt-0.5 size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}
-                      <span>{phone}</span>
-                    </a>
-                  </li>
-                );
-              })}
+              {/* A phone number should dial. WhatsApp is offered separately in
+                  the social row when the school has configured it — routing
+                  every number (including the landline) to wa.me meant nobody
+                  could actually call from here. */}
+              {phones.map((phone, index) => (
+                <li key={phone}>
+                  <a
+                    href={`tel:${digitsOnly(phone) ? `+${digitsOnly(phone)}` : phone}`}
+                    className="flex min-h-11 items-center gap-2.5 transition hover:text-white"
+                  >
+                    {index === 0 ? <Phone className="size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}
+                    <span>{phone}</span>
+                  </a>
+                </li>
+              ))}
               {emails.map((email, index) => (
                 <li key={email}>
-                  <a href={`mailto:${email}`} className="flex gap-2.5 transition hover:text-white">
-                    {index === 0 ? <Mail className="mt-0.5 size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}
+                  <a
+                    href={`mailto:${email}`}
+                    className="flex min-h-11 items-center gap-2.5 transition hover:text-white"
+                  >
+                    {index === 0 ? <Mail className="size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}
                     <span>{email}</span>
                   </a>
                 </li>
@@ -156,14 +149,19 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="relative mx-auto flex max-w-7xl items-center justify-center px-4 py-5">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-4 py-5 sm:flex-row">
           <p className="text-center text-sm text-white/60">
             © {year} {tf("school")}. {tf("rights")}
           </p>
           <button
             type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="absolute right-4 flex size-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-igqs-gold hover:text-igqs-ink"
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+              })
+            }
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-igqs-gold hover:text-igqs-ink sm:absolute sm:right-4"
             aria-label={tf("top")}
           >
             <ArrowUp className="size-4" />

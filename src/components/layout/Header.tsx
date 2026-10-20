@@ -82,15 +82,22 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
     if (!drawerOpen) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setDrawerOpen(false);
+      menuRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKey);
     };
   }, [drawerOpen]);
 
   if (adminSite || isAdminPath(pathname)) return null;
 
   const linkClass = (active: boolean) =>
-    `inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
+    `inline-flex min-h-11 items-center rounded-md px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
       active
         ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
         : "text-igqs-ink hover:bg-igqs-sand/70 dark:text-igqs-cream dark:hover:bg-white/10"
@@ -107,7 +114,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
           <div ref={logoRef} className="shrink-0">
             <Logo compact href="/" />
           </div>
-          <nav aria-label="Primary" className={`min-w-0 flex-1 ${compact ? "hidden" : "hidden md:block"}`}>
+          <nav aria-label={ta("primaryNav")} className={`min-w-0 flex-1 ${compact ? "hidden" : "hidden md:block"}`}>
             <ul className="flex items-center gap-1">
               <li>
                 <Link href="/" className={`${linkClass(isActive("/"))} gap-1 font-semibold`}>
@@ -128,13 +135,13 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
             <Link
               href="/notices"
               onClick={() => setDrawerOpen(false)}
-              className={`${compact ? "hidden" : "hidden md:inline-flex"} items-center rounded-md border border-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-igqs-green transition hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink`}
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} min-h-11 items-center rounded-md border border-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-igqs-green transition hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink`}
             >
               {t("notices")}
             </Link>
             <Link
               href="/admission"
-              className={`${compact ? "hidden" : "hidden md:inline-flex"} items-center rounded-md bg-igqs-green px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white transition hover:brightness-110 dark:bg-igqs-gold dark:text-igqs-ink`}
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} min-h-11 items-center rounded-md bg-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-white transition hover:brightness-110 dark:bg-igqs-gold dark:text-igqs-ink`}
             >
               {t("apply")}
             </Link>
@@ -144,12 +151,13 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
               <button
                 ref={menuRef}
                 type="button"
-                className={`${compact ? "inline-flex" : "inline-flex md:hidden"} size-8 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-ink dark:text-igqs-cream`}
+                className={`${compact ? "inline-flex" : "inline-flex md:hidden"} size-11 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-ink dark:text-igqs-cream`}
                 onClick={() => setDrawerOpen((open) => !open)}
-                aria-label={ta("menu")}
+                aria-label={drawerOpen ? ta("closeMenu") : ta("menu")}
                 aria-expanded={drawerOpen}
+                aria-controls="site-menu"
               >
-                {drawerOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+                {drawerOpen ? <X className="size-5" /> : <Menu className="size-5" />}
               </button>
             </div>
           </div>
@@ -183,7 +191,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
       </div>
 
       {drawerOpen && (
-        <div className="border-b border-igqs-gold/20 bg-igqs-cream px-4 py-4 dark:bg-[#07140f]">
+        <div id="site-menu" className="border-b border-igqs-gold/20 bg-igqs-cream px-4 py-4 dark:bg-[#07140f]">
           <div className="grid gap-1">
             <Link href="/" onClick={() => setDrawerOpen(false)} className={linkClass(isActive("/"))}>
               {t("home")}
@@ -201,14 +209,14 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
             <Link
               href="/notices"
               onClick={() => setDrawerOpen(false)}
-              className="mt-2 inline-flex justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green dark:border-igqs-gold dark:text-igqs-gold"
+              className="mt-2 inline-flex min-h-12 items-center justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green dark:border-igqs-gold dark:text-igqs-gold"
             >
               {t("notices")}
             </Link>
             <Link
               href="/admission"
               onClick={() => setDrawerOpen(false)}
-              className="inline-flex justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
+              className="inline-flex min-h-12 items-center justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {t("apply")}
             </Link>

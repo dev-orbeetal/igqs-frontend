@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { btn } from "@/components/staff/buttons";
+import { fieldClass, fieldClassInvalid } from "@/lib/cms";
 import { useRouter } from "@/i18n/navigation";
 import { staffLogin } from "@/lib/staff";
 
@@ -36,10 +37,12 @@ export function StaffLoginForm() {
       <label className="mt-6 block text-sm">
         {t("username")}
         <input
-          className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2"
+          className={error ? fieldClassInvalid : fieldClass}
           value={username}
           onChange={(event) => setUsername(event.target.value)}
           autoComplete="username"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "login-error" : undefined}
           required
         />
       </label>
@@ -47,14 +50,20 @@ export function StaffLoginForm() {
         {t("password")}
         <input
           type="password"
-          className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2"
+          className={error ? fieldClassInvalid : fieldClass}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="current-password"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "login-error" : undefined}
           required
         />
       </label>
-      {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
+      {error && (
+        <p id="login-error" role="alert" className="mt-4 text-sm font-medium text-red-700">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
         disabled={sending}

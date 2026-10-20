@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
@@ -9,17 +10,26 @@ import { formatDate } from "@/lib/format";
 function EventGrid({
   items,
   locale,
+  empty,
 }: {
   items: EventItem[];
   locale: string;
+  empty: string;
 }) {
+  if (items.length === 0) {
+    return (
+      <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-5 py-10 text-center text-igqs-muted">
+        {empty}
+      </p>
+    );
+  }
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {items.map((event) => (
         <FadeIn key={event.slug}>
           <Link
             href={`/events/${event.slug}`}
-            className="group block overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]"
+            className="surface-card surface-card-hover group block overflow-hidden bg-white dark:bg-[#0d1f18]"
           >
             <div className="relative h-48">
               {event.image && (
@@ -28,7 +38,7 @@ function EventGrid({
                   alt=""
                   fill
                   sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover transition group-hover:scale-105"
+                  className="img-zoom object-cover"
                 />
               )}
             </div>
@@ -42,6 +52,16 @@ function EventGrid({
       ))}
     </div>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "events" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/events" } };
 }
 
 export default async function EventsPage({
@@ -63,11 +83,11 @@ export default async function EventsPage({
       <div className="mx-auto max-w-7xl space-y-16 px-4 py-16 sm:px-6">
         <section>
           <SectionHeading title={t("upcoming")} />
-          <EventGrid items={data?.upcoming ?? []} locale={locale} />
+          <EventGrid items={data?.upcoming ?? []} locale={locale} empty={t("emptyUpcoming")} />
         </section>
         <section>
           <SectionHeading title={t("previous")} />
-          <EventGrid items={data?.previous ?? []} locale={locale} />
+          <EventGrid items={data?.previous ?? []} locale={locale} empty={t("emptyPrevious")} />
         </section>
       </div>
     </div>

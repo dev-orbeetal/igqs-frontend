@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/locale/LanguageSwitcher";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -46,6 +46,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StaffUser | null>(null);
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!adminLoginDisabled && !getStaffToken()) {
@@ -67,13 +68,19 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
     setOpen(false);
   }, [pathname]);
 
-  if (!ready) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center text-sm text-igqs-muted">
-        {t("loading")}
-      </div>
-    );
-  }
+  // Escape closes the drawer and focus goes back to the button that opened
+  // it; neither used to happen, so a keyboard user could not get out.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   const groups: { label: string; links: NavLink[] }[] = [
     {
@@ -123,6 +130,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
         />
       )}
       <aside
+        id="staff-sidebar"
         className={`fixed inset-y-0 left-0 z-40 flex w-[260px] flex-col gap-4 bg-gradient-to-b from-[#0f3d30] to-[#07140f] px-4 py-5 text-[#dbe7f3] transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -134,7 +142,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto text-sm">
           {groups.map((group) => (
             <div key={group.label} className="mb-2">
-              <p className="px-3 pt-2 text-[13.75px] font-semibold uppercase tracking-[0.16em] text-white/45">{group.label}</p>
+              <p className="px-3 pt-2 text-[13.75px] font-semibold uppercase tracking-[0.16em] text-white/70">{group.label}</p>
               {group.links.map((link) => {
                 const Icon = link.icon;
                 const className = `mt-1 flex items-center gap-2 rounded-lg px-3 py-2 font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold ${
@@ -188,9 +196,12 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
       <div className="min-w-0">
         <header className="flex items-center gap-3 border-b border-igqs-gold/15 bg-white px-4 py-4 dark:bg-[#0d1f18]">
           <button
+            ref={menuButtonRef}
             type="button"
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-igqs-gold/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-lg border border-igqs-border-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold lg:hidden"
             onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="staff-sidebar"
             aria-label={open ? t("closeMenu") : t("openMenu")}
           >
             {open ? <X className="size-4" /> : <Menu className="size-4" />}
@@ -198,7 +209,21 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
           <h1 className="min-w-0 flex-1 font-display text-2xl">{current}</h1>
           <LanguageSwitcher />
         </header>
-        <div className="px-4 py-6 sm:px-6">{children}</div>
+        <div className="px-4 py-6 sm:px-6">
+          {/* The shell used to unmount itself until /me resolved, so the
+              sidebar and header vanished and reappeared on every
+              navigation. Only the content area waits now. */}
+          {ready ? (
+            children
+          ) : (
+            <div className="grid gap-3" aria-busy="true" aria-live="polite">
+              <span className="sr-only">{t("loading")}</span>
+              {[0, 1, 2].map((row) => (
+                <div key={row} className="h-24 animate-pulse rounded-2xl bg-white dark:bg-white/5" />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

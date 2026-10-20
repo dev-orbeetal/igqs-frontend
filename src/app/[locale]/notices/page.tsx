@@ -1,10 +1,22 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHero } from "@/components/ui/PageHero";
+import { FilterChips } from "@/components/ui/FilterChips";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type NewsItem } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 
 const TOPICS = ["", "notice", "admission", "holiday", "exam", "announcement", "update", "news"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "noticesPage" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/notices" } };
+}
 
 export default async function NoticesPage({
   params,
@@ -36,21 +48,11 @@ export default async function NoticesPage({
     <div>
       <PageHero title={t("title")} subtitle={t("subtitle")} />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-        <div className="mb-10 flex flex-wrap gap-2">
-          {TOPICS.map((key) => (
-            <Link
-              key={key || "all"}
-              href={key ? `/notices?topic=${key}` : "/notices"}
-              className={`rounded-full px-4 py-1.5 text-sm ${
-                selected === key
-                  ? "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
-                  : "border border-igqs-gold/30"
-              }`}
-            >
-              {key ? topics(key) : t("all")}
-            </Link>
-          ))}
-        </div>
+        <FilterChips
+          param="topic"
+          selected={selected}
+          chips={TOPICS.map((key) => ({ value: key, label: key ? topics(key) : t("all") }))}
+        />
 
         {groups.length === 0 ? (
           <p className="text-igqs-muted">{t("empty")}</p>

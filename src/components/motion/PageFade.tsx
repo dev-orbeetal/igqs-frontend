@@ -1,13 +1,9 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-
+/**
+ * Page transition fade. CSS-only so the page content is present and visible
+ * in the server-rendered HTML — the previous framer-motion version emitted
+ * <div style="opacity:0"> around every page, leaving the site blank until
+ * hydration finished.
+ */
 export function PageFade({ children }: { children: React.ReactNode }) {
-  const reduced = useReducedMotion();
-  if (reduced) return children;
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25, ease: "easeOut" }}>
-      {children}
-    </motion.div>
-  );
+  return <div className="page-fade">{children}</div>;
 }

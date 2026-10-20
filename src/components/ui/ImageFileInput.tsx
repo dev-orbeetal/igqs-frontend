@@ -7,6 +7,7 @@ export function ImageFileInput({
   accept = "image/*",
   invalid,
   dataField,
+  describedBy,
   multiple,
   disabled,
   onChange,
@@ -15,6 +16,7 @@ export function ImageFileInput({
   accept?: string;
   invalid?: boolean;
   dataField?: string;
+  describedBy?: string;
   multiple?: boolean;
   disabled?: boolean;
   onChange?: (file?: File) => void;
@@ -27,7 +29,9 @@ export function ImageFileInput({
     <label
       data-field={dataField}
       className={`mt-1.5 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border bg-white px-4 py-3 text-sm dark:bg-[#0d1f18] ${
-        invalid ? "border-red-500 ring-1 ring-red-500" : "border-igqs-gold/30"
+        invalid
+          ? "border-red-600 ring-1 ring-red-600"
+          : "border-igqs-border-strong dark:border-igqs-gold/70"
       }`}
     >
       <span className="font-bold">{t("chooseFile")}</span>
@@ -37,6 +41,8 @@ export function ImageFileInput({
         accept={accept}
         multiple={multiple}
         disabled={disabled}
+        aria-invalid={invalid ? true : undefined}
+        aria-describedby={describedBy}
         className="sr-only"
         onChange={(event) => {
           const files = Array.from(event.currentTarget.files ?? []);

@@ -50,7 +50,7 @@ export function LanguageSwitcher() {
         aria-controls={listId}
         aria-label={t("language")}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-1 rounded-full border border-igqs-gold/40 bg-white/70 px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-igqs-ink transition hover:border-igqs-gold dark:bg-white/5 dark:text-igqs-cream"
+        className="inline-flex min-h-11 items-center gap-1 rounded-full border border-igqs-gold/40 bg-white/70 px-3 py-2 text-xs font-semibold whitespace-nowrap text-igqs-ink transition hover:border-igqs-gold dark:bg-white/5 dark:text-igqs-cream"
       >
         {current.label}
         <ChevronDown className={`size-3.5 shrink-0 opacity-70 transition ${open ? "rotate-180" : ""}`} />
@@ -71,7 +71,7 @@ export function LanguageSwitcher() {
                   role="option"
                   aria-selected={selected}
                   onClick={() => setLocale(item.id)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
+                  className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
                     selected
                       ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
                       : "text-igqs-ink hover:bg-igqs-sand/80 dark:text-igqs-cream dark:hover:bg-white/10"

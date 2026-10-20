@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
+import { FilterChips } from "@/components/ui/FilterChips";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type NewsItem } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
@@ -16,6 +18,16 @@ const CATEGORIES = [
   "exam",
   "update",
 ] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "news" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/news" } };
+}
 
 export default async function NewsPage({
   params,
@@ -35,27 +47,22 @@ export default async function NewsPage({
     <div>
       <PageHero title={t("title")} subtitle={t("subtitle")} />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="mb-10 flex flex-wrap gap-2">
-          {CATEGORIES.map((key) => (
-            <Link
-              key={key || "all"}
-              href={key ? `/news?category=${key}` : "/news"}
-              className={`rounded-full px-4 py-1.5 text-sm ${
-                category === key
-                  ? "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
-                  : "border border-igqs-gold/30"
-              }`}
-            >
-              {key ? t(key) : t("all")}
-            </Link>
-          ))}
-        </div>
+        <FilterChips
+          param="category"
+          selected={category}
+          chips={CATEGORIES.map((key) => ({ value: key, label: key ? t(key) : t("all") }))}
+        />
+        {(posts?.length ?? 0) === 0 && (
+          <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-5 py-10 text-center text-igqs-muted">
+            {t("empty")}
+          </p>
+        )}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts?.map((post) => (
             <FadeIn key={post.slug}>
               <Link
                 href={`/news/${post.slug}`}
-                className="img-frame block rounded-3xl bg-white dark:bg-[#0d1f18]"
+                className="surface-card surface-card-hover group block overflow-hidden bg-white dark:bg-[#0d1f18]"
               >
                 <div className="relative h-48">
                   {post.image && (

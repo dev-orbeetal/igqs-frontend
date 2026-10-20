@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GalleryGrid } from "@/components/gallery/GalleryGrid";
 import { PageHero } from "@/components/ui/PageHero";
 import { apiGet, type GalleryAlbum } from "@/lib/api";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "gallery" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/gallery" } };
+}
 
 export default async function GalleryPage({
   params,

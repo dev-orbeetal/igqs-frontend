@@ -91,9 +91,58 @@ export function clearStaffToken() {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+/**
+ * A failed staff request. DRF answers a rejected write with
+ * `{"field_name": ["message", ...]}`, which used to be flattened into
+ * `JSON.stringify(data)` and shown to staff as a raw JSON blob — or, in the
+ * item editors, swallowed entirely. Keeping the parsed shape lets a form put
+ * each message under the field it belongs to.
+ */
+export class StaffApiError extends Error {
+  readonly status: number;
+  readonly fieldErrors: Record<string, string>;
+
+  constructor(message: string, status: number, fieldErrors: Record<string, string>) {
+    super(message);
+    this.name = "StaffApiError";
+    this.status = status;
+    this.fieldErrors = fieldErrors;
+  }
+}
+
+const NON_FIELD_KEYS = new Set(["detail", "non_field_errors"]);
+
+function flatten(value: unknown): string {
+  if (Array.isArray(value)) return value.map(flatten).filter(Boolean).join(" ");
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).map(flatten).filter(Boolean).join(" ");
+  }
+  return value === null || value === undefined ? "" : String(value);
+}
+
 async function parseError(res: Response) {
-  const data = await res.json().catch(() => ({}));
-  throw new Error(data.detail || JSON.stringify(data) || res.statusText);
+  const data: unknown = await res.json().catch(() => ({}));
+  const fieldErrors: Record<string, string> = {};
+  const summary: string[] = [];
+
+  if (data && typeof data === "object" && !Array.isArray(data)) {
+    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+      const message = flatten(value);
+      if (!message) continue;
+      if (NON_FIELD_KEYS.has(key)) summary.push(message);
+      else fieldErrors[key] = message;
+    }
+  } else {
+    const message = flatten(data);
+    if (message) summary.push(message);
+  }
+
+  // With field errors in hand the caller shows those; a bare "Bad Request"
+  // on top of them tells staff nothing, so the message stays empty and the
+  // caller falls back to its own translated summary.
+  const message =
+    summary.join(" ") || (Object.keys(fieldErrors).length > 0 ? "" : res.statusText);
+  throw new StaffApiError(message, res.status, fieldErrors);
 }
 
 // Local-dev convenience only. Gated on NODE_ENV so a stray env var set on a

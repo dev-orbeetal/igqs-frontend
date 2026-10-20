@@ -251,7 +251,11 @@ export function AdmissionForm({
         {step === 3 && (
           <PaymentStatusStep data={application} processing={processing} onRetry={retry} />
         )}
-        {formError && <p className="mt-4 text-sm text-red-700 dark:text-red-300">{formError}</p>}
+        {/* role="alert" so the error is announced; it was previously silent
+            for screen reader users, who only heard "invalid" on the field. */}
+        <p role="alert" aria-live="assertive" className="mt-4 text-sm text-red-700 dark:text-red-300">
+          {formError}
+        </p>
       </div>
       {step < 3 && (
         <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-igqs-gold/20 bg-white/95 px-4 py-4 backdrop-blur dark:bg-[#0d1f18]/95 sm:flex-row sm:justify-between sm:px-7">

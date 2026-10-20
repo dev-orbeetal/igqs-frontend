@@ -28,23 +28,29 @@ export function ContactForm() {
       <h2 className="font-display text-3xl">{t("formTitle")}</h2>
       <label className="block text-sm">
         {t("name")}
-        <input name="name" required className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2" />
+        <input name="name" required className="mt-1 w-full min-h-12 rounded-xl border border-igqs-border-strong bg-white px-3 py-2 dark:border-igqs-gold/70 dark:bg-[#10261e]" />
       </label>
       <label className="block text-sm">
         {t("email")}
-        <input name="email" type="email" required className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2" />
+        <input name="email" type="email" required className="mt-1 w-full min-h-12 rounded-xl border border-igqs-border-strong bg-white px-3 py-2 dark:border-igqs-gold/70 dark:bg-[#10261e]" />
       </label>
       <label className="block text-sm">
         {t("phoneField")}
-        <input name="phone" className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2" />
+        <input
+          name="phone"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          className="mt-1 w-full min-h-12 rounded-xl border border-igqs-border-strong bg-white px-3 py-2 dark:border-igqs-gold/70 dark:bg-[#10261e]"
+        />
       </label>
       <label className="block text-sm">
         {t("subject")}
-        <input name="subject" required className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2" />
+        <input name="subject" required className="mt-1 w-full min-h-12 rounded-xl border border-igqs-border-strong bg-white px-3 py-2 dark:border-igqs-gold/70 dark:bg-[#10261e]" />
       </label>
       <label className="block text-sm">
         {t("message")}
-        <textarea name="message" required rows={5} className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2" />
+        <textarea name="message" required rows={5} className="mt-1 w-full min-h-12 rounded-xl border border-igqs-border-strong bg-white px-3 py-2 dark:border-igqs-gold/70 dark:bg-[#10261e]" />
       </label>
       <button
         type="submit"
@@ -53,8 +59,21 @@ export function ContactForm() {
       >
         {status === "sending" ? tc("sending") : tc("send")}
       </button>
-      {status === "ok" && <p className="text-sm text-igqs-forest">{t("success")}</p>}
-      {status === "error" && <p className="text-sm text-red-700">{t("error")}</p>}
+      {/* Announced to assistive tech; previously the result was a silent
+          line of text below a long form. */}
+      <p aria-live="polite" className="sr-only">
+        {status === "ok" ? t("success") : status === "error" ? t("error") : ""}
+      </p>
+      {status === "ok" && (
+        <p className="rounded-xl border border-igqs-forest/30 bg-igqs-forest/10 px-4 py-3 text-sm text-igqs-forest dark:border-igqs-gold/40 dark:bg-igqs-gold/10 dark:text-igqs-gold-soft">
+          {t("success")}
+        </p>
+      )}
+      {status === "error" && (
+        <p className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+          {t("error")}
+        </p>
+      )}
     </form>
   );
 }

@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
+import { StatusBadge } from "@/components/staff/StatusBadge";
 import { btn } from "@/components/staff/buttons";
 import { Link, useRouter } from "@/i18n/navigation";
+import { fieldClass, fieldClassInvalid } from "@/lib/cms";
 import { formatMoney, staffDownload, staffRequest, type StaffApplicationDetail } from "@/lib/staff";
 
 function Row({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
     <div>
-      <dt className="text-xs uppercase tracking-[0.14em] text-igqs-gold">{label}</dt>
+      <dt className="text-xs uppercase tracking-[0.14em] text-igqs-label">{label}</dt>
       <dd className="mt-1 text-sm">{value}</dd>
     </div>
   );
@@ -29,6 +31,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
   const [reloadTick, setReloadTick] = useState(0);
   const [saving, setSaving] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<"approved" | "rejected" | "pending" | null>(null);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setLoadError(false);
@@ -51,6 +54,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
   function askStatus(status: "approved" | "rejected" | "pending") {
     if (status === "rejected" && !reason.trim()) {
       setError(t("rejectionRequired"));
+      reasonRef.current?.focus();
       return;
     }
     setError("");
@@ -116,11 +120,15 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
       </Link>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-sm text-igqs-gold">{data.application_id}</p>
-          <h1 className="mt-1 font-display text-4xl">{data.student_name}</h1>
-          <p className="mt-1 text-sm text-igqs-muted">
-            {data.status === "approved" ? ta("approved") : data.status === "rejected" ? ta("rejected") : ta("pending")} · {data.receipt_id}
-          </p>
+          <p className="font-mono text-sm text-igqs-label">{data.application_id}</p>
+          <p className="mt-1 font-display text-4xl">{data.student_name}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-igqs-muted">
+            <StatusBadge
+              status={data.status}
+              label={data.status === "approved" ? ta("approved") : data.status === "rejected" ? ta("rejected") : ta("pending")}
+            />
+            <span>{data.receipt_id}</span>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -164,6 +172,7 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
               <Row label={ta("address")} value={data.student_address} />
             </dl>
             {data.student_photo && (
+              // eslint-disable-next-line @next/next/no-img-element -- admin-only view of an uploaded photo
               <img src={data.student_photo} alt={data.student_name} className="mt-4 h-40 rounded-2xl object-cover" />
             )}
             {data.birth_certificate && (
@@ -215,10 +224,11 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
             </dl>
             {data.transaction.payment_screenshot && (
               <a href={data.transaction.payment_screenshot} target="_blank" rel="noreferrer">
+                {/* eslint-disable-next-line @next/next/no-img-element -- admin-only view of an uploaded proof image */}
                 <img
                   src={data.transaction.payment_screenshot}
                   alt={ta("screenshot")}
-                  className="mt-4 rounded-2xl border border-igqs-gold/20"
+                  className="mt-4 max-h-80 w-full rounded-2xl border border-igqs-gold/20 object-contain"
                 />
               </a>
             )}
@@ -227,16 +237,29 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
             <h2 className="font-display text-2xl">{t("decision")}</h2>
             <p className="mt-2 text-sm text-igqs-muted">{t("decisionHint")}</p>
-            <label className="mt-4 block text-sm">
+            <label className="mt-4 block text-sm font-medium">
               {t("rejectionReason")}
+              <span className="mt-1 block text-xs font-normal leading-relaxed text-igqs-muted">
+                {t("rejectionReasonHint")}
+              </span>
               <textarea
-                className="mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2"
+                ref={reasonRef}
+                className={`${error ? fieldClassInvalid : fieldClass} min-h-28`}
                 rows={4}
                 value={reason}
-                onChange={(event) => setReason(event.target.value)}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? "decision-error" : undefined}
+                onChange={(event) => {
+                  setReason(event.target.value);
+                  if (error) setError("");
+                }}
               />
             </label>
-            {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
+            {error && (
+              <p id="decision-error" role="alert" className="mt-3 text-sm font-medium text-red-700 dark:text-red-300">
+                {error}
+              </p>
+            )}
             <div className="mt-4 grid gap-2">
               <button
                 type="button"
@@ -266,6 +289,9 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
             {data.reviewed_by && (
               <p className="mt-4 text-xs text-igqs-muted">
                 {t("reviewedBy", { name: data.reviewed_by })}
+                {data.reviewed_at
+                  ? ` · ${new Date(data.reviewed_at).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}`
+                  : ""}
               </p>
             )}
           </section>

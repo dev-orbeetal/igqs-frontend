@@ -22,7 +22,7 @@ function Stars({ count }: { count: number }) {
   const filled = Math.max(0, Math.min(5, count));
   if (!filled) return null;
   return (
-    <p className="mt-4 flex gap-0.5" aria-label={`${filled} / 5`}>
+    <p className="mt-4 flex gap-0.5" role="img" aria-label={`${filled} / 5`}>
       {Array.from({ length: 5 }, (_, index) => (
         <svg key={index} viewBox="0 0 20 20" className="size-4 text-igqs-gold" aria-hidden>
           <path
@@ -37,9 +37,15 @@ function Stars({ count }: { count: number }) {
   );
 }
 
+const PER_VIEW_QUERIES = [
+  { query: "(min-width: 1024px)", value: 3 },
+  { query: "(min-width: 768px)", value: 2 },
+] as const;
+
 function cardsPerView() {
-  if (window.innerWidth >= 1024) return 3;
-  if (window.innerWidth >= 768) return 2;
+  for (const { query, value } of PER_VIEW_QUERIES) {
+    if (window.matchMedia(query).matches) return value;
+  }
   return 1;
 }
 
@@ -47,13 +53,14 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   const t = useTranslations("home");
   const locale = useLocale();
   const [page, setPage] = useState(0);
-  const [perPage, setPerPage] = useState(1);
+  const [perPage, setPerPage] = useState(3);
 
   useEffect(() => {
     const update = () => setPerPage(cardsPerView());
     update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    const lists = PER_VIEW_QUERIES.map(({ query }) => window.matchMedia(query));
+    lists.forEach((list) => list.addEventListener("change", update));
+    return () => lists.forEach((list) => list.removeEventListener("change", update));
   }, []);
 
   const pageCount = Math.max(1, Math.ceil(items.length / perPage));
@@ -87,10 +94,10 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             <button
               type="button"
               onClick={() => step(-1)}
-              className="absolute top-1/2 left-0 z-10 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm dark:bg-[#12352b] dark:text-igqs-gold-soft"
+              className="absolute top-1/2 left-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm transition hover:bg-igqs-gold/10 lg:-translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
               aria-label={t("testimonialsPrevious")}
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-5" />
             </button>
           )}
 
@@ -132,7 +139,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
                   </div>
                 </div>
                 <Stars count={item.rating} />
-                <p className="mt-3 text-sm leading-relaxed text-igqs-ink/80 dark:text-igqs-sand/80">{item.quote}</p>
+                <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-igqs-ink/80 dark:text-igqs-sand/80">{item.quote}</p>
               </article>
             ))}
           </div>
@@ -141,10 +148,10 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             <button
               type="button"
               onClick={() => step(1)}
-              className="absolute top-1/2 right-0 z-10 flex size-9 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm dark:bg-[#12352b] dark:text-igqs-gold-soft"
+              className="absolute top-1/2 right-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm transition hover:bg-igqs-gold/10 lg:translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
               aria-label={t("testimonialsNext")}
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-5" />
             </button>
           )}
         </div>
@@ -158,8 +165,14 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
                 aria-label={t("testimonialsPage", { page: index + 1 })}
                 aria-current={index === page}
                 onClick={() => setPage(index)}
-                className={`size-2 rounded-full ${index === page ? "bg-igqs-green dark:bg-igqs-gold" : "bg-igqs-gold/40"}`}
-              />
+                className="inline-flex size-11 items-center justify-center rounded-full"
+              >
+                <span
+                  className={`block size-2.5 rounded-full transition ${
+                    index === page ? "bg-igqs-green dark:bg-igqs-gold" : "bg-igqs-gold/40"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         )}

@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdmissionForm } from "@/components/admission/AdmissionForm";
 import { PageHero } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type AdmissionInfo, type SiteSettings } from "@/lib/api";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "admission" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/admission" } };
+}
 
 export default async function AdmissionPage({
   params,

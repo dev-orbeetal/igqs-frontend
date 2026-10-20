@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
 import { apiGet, type Grade } from "@/lib/api";
 
 const CATEGORY_KEYS = ["quranic", "islamic", "general", "cocurricular"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "curriculum" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/curriculum" } };
+}
 
 export default async function CurriculumPage({
   params,
@@ -19,6 +30,11 @@ export default async function CurriculumPage({
     <div>
       <PageHero title={t("title")} subtitle={t("subtitle")} />
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6">
+        {(grades?.length ?? 0) === 0 && (
+          <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-5 py-10 text-center text-igqs-muted">
+            {t("empty")}
+          </p>
+        )}
         {grades?.map((grade) => (
           <FadeIn
             key={grade.slug}
@@ -28,7 +44,7 @@ export default async function CurriculumPage({
             <h2 className="font-display text-3xl text-igqs-forest dark:text-igqs-gold-soft">
               {grade.name}
             </h2>
-            <p className="mt-3 max-w-3xl text-igqs-muted">{grade.description}</p>
+            <p className="mt-3 max-w-prose whitespace-pre-line text-igqs-muted">{grade.description}</p>
             <div className="mt-8 grid gap-6 md:grid-cols-2">
               {CATEGORY_KEYS.map((key) => {
                 const items = grade.subjects.filter((s) => s.category === key);

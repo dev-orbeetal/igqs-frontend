@@ -25,17 +25,22 @@ function CountValue({ value }: { value: string }) {
   const suffix = match?.[2] ?? "";
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
-  const motionValue = useMotionValue(0);
+  // Starts at the real figure so the server-rendered HTML shows the actual
+  // number — it used to render "0" and only reach the real value once JS ran.
+  const motionValue = useMotionValue(target ?? 0);
   const rounded = useTransform(motionValue, (latest) =>
     target === null ? value : `${Math.round(latest)}${suffix}`
   );
+  const counted = useRef(false);
 
   useEffect(() => {
-    if (target === null || !inView) return;
+    if (target === null || !inView || counted.current) return;
+    counted.current = true;
     if (reduced) {
       motionValue.set(target);
       return;
     }
+    motionValue.set(0);
     const controls = animate(motionValue, target, { duration: 1.1, ease: [0.22, 1, 0.36, 1] });
     return () => controls.stop();
   }, [inView, motionValue, reduced, target]);
@@ -59,14 +64,11 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
           const Icon = ICONS[item.icon as keyof typeof ICONS] ?? Users;
           return (
             <div key={item.id} className="flex flex-col items-center px-3 text-center">
-              <motion.div
-                initial={reduced ? false : { opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: reduced ? 0 : 0.5, delay: reduced ? 0 : index * 0.08 }}
-              >
+              {/* CSS reveal: the previous motion.div server-rendered at
+                  opacity:0, so these icons were invisible until hydration. */}
+              <div className="reveal" style={{ animationDelay: `${index * 0.08}s` }}>
                 <Icon className="size-8 text-igqs-gold" strokeWidth={1.5} aria-hidden />
-              </motion.div>
+              </div>
               <p className="mt-2 font-display text-4xl leading-none text-igqs-gold">
                 <CountValue value={item.value} />
               </p>

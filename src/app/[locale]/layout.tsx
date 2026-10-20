@@ -43,9 +43,28 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
+  const title = t("title");
+  const description = t("description");
   return {
-    title: t("title"),
-    description: t("description"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://igqsbd.com"),
+    // Pages set their own title; this is the fallback and the suffix.
+    title: { default: title, template: `%s — ${title}` },
+    description,
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      siteName: title,
+      title,
+      description,
+      locale: locale === "bn" ? "bn_BD" : "en_US",
+      images: [{ url: "/brand/igqs-logo-256.png", width: 256, height: 249, alt: title }],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: ["/brand/igqs-logo-256.png"],
+    },
   };
 }
 
@@ -62,6 +81,7 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
   const messages = await getMessages();
+  const a11y = await getTranslations({ locale, namespace: "a11y" });
   const adminSite = isAdminHost(await headers());
   const site = await apiGet<SiteSettings>("/api/site/", locale);
 
@@ -74,8 +94,13 @@ export default async function LocaleLayout({
       >
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
+            <HideOnStaff adminSite={adminSite}>
+              <a href="#main" className="skip-link">
+                {a11y("skipToContent")}
+              </a>
+            </HideOnStaff>
             <Header adminSite={adminSite} />
-            <main>{children}</main>
+            <main id="main">{children}</main>
             <HideOnStaff adminSite={adminSite}>
               <Footer site={site} />
             </HideOnStaff>

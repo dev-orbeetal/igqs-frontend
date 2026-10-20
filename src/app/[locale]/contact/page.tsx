@@ -1,9 +1,20 @@
 import { Mail, MapPin, Phone } from "lucide-react";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/icons/Social";
+import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/components/icons/Social";
 import { PageHero } from "@/components/ui/PageHero";
 import { apiGet, type SiteSettings } from "@/lib/api";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "contact" });
+  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/contact" } };
+}
 
 export default async function ContactPage({
   params,
@@ -28,41 +39,63 @@ export default async function ContactPage({
                 {site?.address}
               </span>
             </p>
-            <p className="mt-4 flex gap-3 text-sm">
-              <Phone className="mt-0.5 h-5 w-5 text-igqs-gold" />
-              <span>
+            {/* Phone and email are the primary actions on this page — they
+                must be tappable, not plain text. */}
+            <div className="mt-4 flex gap-3 text-sm">
+              <Phone className="mt-0.5 h-5 w-5 shrink-0 text-igqs-forest dark:text-igqs-gold" />
+              <div>
                 <strong className="block">{t("phone")}</strong>
-                {site?.phone_primary}
-                {site?.phone_secondary ? <span className="block">{site.phone_secondary}</span> : null}
-              </span>
-            </p>
-            <p className="mt-4 flex gap-3 text-sm">
-              <Mail className="mt-0.5 h-5 w-5 text-igqs-gold" />
-              <span>
+                {[site?.phone_primary, site?.phone_secondary]
+                  .filter((value): value is string => Boolean(value))
+                  .map((phone) => (
+                    <a
+                      key={phone}
+                      href={`tel:${phone.replace(/\D/g, "") ? `+${phone.replace(/\D/g, "")}` : phone}`}
+                      className="flex min-h-11 items-center underline-offset-2 hover:underline"
+                    >
+                      {phone}
+                    </a>
+                  ))}
+              </div>
+            </div>
+            <div className="mt-4 flex gap-3 text-sm">
+              <Mail className="mt-0.5 h-5 w-5 shrink-0 text-igqs-forest dark:text-igqs-gold" />
+              <div>
                 <strong className="block">{t("email")}</strong>
-                {site?.email}
-              </span>
-            </p>
+                {site?.email && (
+                  <a
+                    href={`mailto:${site.email}`}
+                    className="flex min-h-11 items-center break-all underline-offset-2 hover:underline"
+                  >
+                    {site.email}
+                  </a>
+                )}
+              </div>
+            </div>
             <p className="mt-4 text-sm">
               <strong className="block">{t("hours")}</strong>
               {site?.office_hours}
             </p>
-            <div className="mt-6 flex gap-2">
-              {site?.facebook_url && (
-                <a href={site.facebook_url} aria-label={t("facebook")} className="inline-flex h-11 w-11 items-center justify-center">
-                  <FacebookIcon className="h-5 w-5" />
-                </a>
-              )}
-              {site?.youtube_url && (
-                <a href={site.youtube_url} aria-label={t("youtube")} className="inline-flex h-11 w-11 items-center justify-center">
-                  <YoutubeIcon className="h-5 w-5" />
-                </a>
-              )}
-              {site?.instagram_url && (
-                <a href={site.instagram_url} aria-label={t("instagram")} className="inline-flex h-11 w-11 items-center justify-center">
-                  <InstagramIcon className="h-5 w-5" />
-                </a>
-              )}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {[
+                site?.facebook_url ? { href: site.facebook_url, label: t("facebook"), Icon: FacebookIcon } : null,
+                site?.youtube_url ? { href: site.youtube_url, label: t("youtube"), Icon: YoutubeIcon } : null,
+                site?.instagram_url ? { href: site.instagram_url, label: t("instagram"), Icon: InstagramIcon } : null,
+                site?.whatsapp_url ? { href: site.whatsapp_url, label: "WhatsApp", Icon: WhatsAppIcon } : null,
+              ]
+                .filter((item): item is { href: string; label: string; Icon: typeof FacebookIcon } => Boolean(item))
+                .map(({ href, label, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="inline-flex size-11 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-forest transition hover:bg-igqs-gold/15 dark:text-igqs-gold"
+                  >
+                    <Icon className="size-5" />
+                  </a>
+                ))}
             </div>
           </div>
           {site?.map_embed_url && (

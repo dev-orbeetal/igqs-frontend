@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { btn } from "@/components/staff/buttons";
 
 export function ConfirmDialog({
@@ -23,6 +23,7 @@ export function ConfirmDialog({
   onCancel: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -34,13 +35,16 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="w-[min(100%-2rem,28rem)] rounded-2xl border border-igqs-gold/30 bg-white p-6 text-igqs-ink backdrop:bg-black/40 dark:bg-[#0d1f18] dark:text-igqs-sand"
+      aria-labelledby={titleId}
+      className="w-[min(100%-2rem,28rem)] rounded-2xl border border-igqs-border-strong bg-white p-6 text-igqs-ink backdrop:bg-black/40 dark:border-igqs-gold/70 dark:bg-[#0d1f18] dark:text-igqs-sand"
       onCancel={(event) => {
         event.preventDefault();
         onCancel();
       }}
     >
-      <h2 className="font-display text-2xl">{title}</h2>
+      <h2 id={titleId} className="font-display text-2xl">
+        {title}
+      </h2>
       <p className="mt-2 text-sm text-igqs-muted">{message}</p>
       <div className="mt-5 flex flex-wrap justify-end gap-2">
         <button

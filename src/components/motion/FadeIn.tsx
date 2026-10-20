@@ -1,7 +1,10 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-
+/**
+ * Scroll reveal that is safe to server-render: the element is visible in the
+ * HTML and the animation is applied purely in CSS (scroll-driven where the
+ * browser supports it). Previously this used framer-motion's whileInView,
+ * which server-rendered every section at opacity:0 — the page stayed blank
+ * until hydration, and never appeared at all without JavaScript.
+ */
 export function FadeIn({
   children,
   className,
@@ -10,27 +13,17 @@ export function FadeIn({
 }: {
   children: React.ReactNode;
   className?: string;
+  /** Kept for call-site compatibility; used as a small stagger offset. */
   delay?: number;
   id?: string;
 }) {
-  const reduced = useReducedMotion();
-  if (reduced) {
-    return (
-      <div id={id} className={className}>
-        {children}
-      </div>
-    );
-  }
   return (
-    <motion.div
+    <div
       id={id}
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-72px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
+      className={className ? `reveal ${className}` : "reveal"}
+      style={delay ? { animationDelay: `${delay}s` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

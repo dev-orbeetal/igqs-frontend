@@ -5,10 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { StatusBadge } from "@/components/staff/StatusBadge";
 import { btn } from "@/components/staff/buttons";
 import { Link, useRouter } from "@/i18n/navigation";
+import { fieldClass } from "@/lib/cms";
 import { formatMoney, staffDownload, staffRequest, type StaffApplicationListItem } from "@/lib/staff";
-
-const fieldClass =
-  "mt-1 w-full rounded-xl border border-igqs-gold/30 bg-transparent px-3 py-2 text-sm";
 
 function applicationStatus(status: string, t: (key: "approved" | "rejected" | "pending") => string) {
   if (status === "approved") return t("approved");
@@ -43,11 +41,11 @@ function SortHeader({
     <th className={`px-4 py-3 ${align === "right" ? "text-right" : ""}`} aria-sort={active ? (descending ? "descending" : "ascending") : "none"}>
       <button
         type="button"
-        className={`inline-flex items-center gap-1 text-xs uppercase tracking-[0.12em] text-igqs-gold ${align === "right" ? "ml-auto" : ""}`}
+        className={`inline-flex items-center gap-1 text-xs uppercase tracking-[0.12em] text-igqs-label ${align === "right" ? "ml-auto" : ""}`}
         onClick={() => onSort(field)}
       >
         {label}
-        <span className={active ? "text-igqs-green dark:text-igqs-gold-soft" : "text-igqs-gold/40"} aria-hidden>
+        <span className={active ? "text-igqs-green dark:text-igqs-gold-soft" : "text-igqs-label/70"} aria-hidden>
           {active ? (descending ? "↓" : "↑") : "↕"}
         </span>
       </button>
@@ -193,7 +191,7 @@ export function StaffApplicationList() {
             onChange={(event) => setDateTo(event.target.value)}
           />
         </label>
-        <label className="text-sm md:col-span-2">
+        <label className="text-sm md:col-span-2 md:hidden">
           {t("sort")}
           <select className={fieldClass} value={sort} onChange={(event) => setSort(event.target.value)}>
             <option value="-created_at">{t("sortNewest")}</option>
@@ -211,7 +209,7 @@ export function StaffApplicationList() {
       </form>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-igqs-muted">
+        <p aria-live="polite" className="text-sm text-igqs-muted">
           {loading ? t("loading") : t("resultCount", { count })}
         </p>
         {!loading && count > pageSize && (
@@ -249,7 +247,7 @@ export function StaffApplicationList() {
       <div className="mt-4 space-y-3 md:hidden">
         {rows.map((row) => (
           <article key={row.application_id} className="rounded-3xl border border-igqs-gold/25 bg-white p-4 dark:bg-[#0d1f18]">
-            <p className="font-mono text-xs text-igqs-gold">{row.application_id}</p>
+            <p className="font-mono text-xs text-igqs-label">{row.application_id}</p>
             <h2 className="mt-1 font-display text-2xl">{row.student_name}</h2>
             <p className="mt-1 text-sm text-igqs-muted">{row.guardian_name} · {row.applying_class}</p>
             <p className="mt-2 text-sm">{formatMoney(row.payment_amount, locale)}</p>
@@ -268,7 +266,7 @@ export function StaffApplicationList() {
 
       <div className="mt-4 hidden overflow-x-auto rounded-3xl border border-igqs-gold/25 bg-white dark:bg-[#0d1f18] md:block">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-gold">
+          <thead className="border-b border-igqs-gold/20 text-xs uppercase tracking-[0.12em] text-igqs-label">
             <tr>
               <SortHeader label={t("student")} field="student_name" sort={sort} onSort={onSort} />
               <SortHeader label={t("applyingClass")} field="applying_class" sort={sort} onSort={onSort} />
@@ -288,7 +286,7 @@ export function StaffApplicationList() {
                 <td className="px-4 py-3">
                   {row.student_name}
                   <div className="text-igqs-muted">{row.mobile}</div>
-                  <div className="font-mono text-xs text-igqs-gold">{row.application_id}</div>
+                  <div className="font-mono text-xs text-igqs-label">{row.application_id}</div>
                 </td>
                 <td className="px-4 py-3">{row.applying_class}</td>
                 <td className="px-4 py-3">{formatMoney(row.payment_amount, locale)}</td>

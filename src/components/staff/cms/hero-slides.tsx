@@ -62,7 +62,8 @@ export function HeroSlideEditor() {
           {slides.map((slide) => (
             <div key={slide.id} className="grid gap-1">
               {slide.image_src && (
-                <img src={slide.image_src} alt="" className="h-24 w-36 rounded-xl object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element -- admin-only thumbnail of a stored media URL
+                <img src={slide.image_src} alt="" width={144} height={96} className="h-24 w-36 rounded-xl object-cover" />
               )}
               <button type="button" className={btn.danger} onClick={() => setPendingId(slide.id)}>
                 {t("removeUpload")}
@@ -71,13 +72,19 @@ export function HeroSlideEditor() {
           ))}
         </div>
       )}
-      <div className="rounded-2xl border border-dashed border-igqs-gold/50 bg-white p-4 text-sm dark:bg-[#10261e]">
+      <div className="rounded-2xl border border-dashed border-igqs-border-strong bg-white p-4 text-sm dark:border-igqs-gold/70 dark:bg-[#10261e]">
         <p className="font-medium">{t("addHeroSlides")}</p>
         <span className="mt-1 block text-xs text-igqs-muted">{t("heroSlidesHint")}</span>
         <ImageFileInput key={inputKey} multiple disabled={uploading} onFiles={(files) => void upload(files)} />
       </div>
-      {uploading && <p className="text-sm text-igqs-muted">{t("uploading")}</p>}
-      {error && <p className="text-sm text-red-700">{error}</p>}
+      <p aria-live="polite" className="text-sm text-igqs-muted">
+        {uploading ? t("uploading") : ""}
+      </p>
+      {error && (
+        <p role="alert" className="text-sm text-red-700 dark:text-red-300">
+          {error}
+        </p>
+      )}
       <ConfirmDialog
         open={pendingId !== null}
         title={t("confirmTitle")}
