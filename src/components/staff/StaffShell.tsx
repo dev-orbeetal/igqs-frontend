@@ -14,7 +14,6 @@ import {
   Menu,
   Newspaper,
   Phone,
-  Wallet,
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -87,7 +86,6 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
       label: t("navAdmissions"),
       links: [
         { href: "/payments/applications", label: t("applicationsPage"), icon: ClipboardList, match: pathname.startsWith("/payments/applications") },
-        { href: "/payments/fees", label: t("fees"), icon: Wallet, match: pathname.startsWith("/payments/fees") },
       ],
     },
     {

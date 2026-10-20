@@ -1,18 +1,12 @@
-import { setRequestLocale } from "next-intl/server";
-import { ClassFeeEditor } from "@/components/staff/ClassFeeEditor";
-import { StaffShell } from "@/components/staff/StaffShell";
+import { redirect } from "@/i18n/navigation";
 
+// Class fees now live on the Curriculum page, alongside the rest of that
+// class's details — keeps old bookmarks/links working.
 export default async function StaffFeesPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  setRequestLocale(locale);
-
-  return (
-    <StaffShell>
-      <ClassFeeEditor />
-    </StaffShell>
-  );
+  redirect({ href: "/content/curriculum", locale });
 }

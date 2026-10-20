@@ -499,6 +499,9 @@
     "sectionSchedule": "সময়সূচি",
     "sectionMedia": "ছবি",
     "sectionPublishing": "প্রকাশ",
+    "sectionAdmission": "ভর্তি ও ফি",
+    "feeAmountHint": "এই শ্রেণি ভর্তির জন্য খোলা না থাকলে ০ রাখুন।",
+    "admissionOpenBadge": "ভর্তির জন্য খোলা",
     "uploadImages": "ছবি যোগ করুন",
     "uploadImagesHint": "এক বা একাধিক ছবি বেছে নিন। বেছে নেওয়ার সাথে সাথে অ্যালবামে যোগ হবে।",
     "uploading": "আপলোড হচ্ছে…",
@@ -525,6 +528,7 @@
     "draft": "খসড়া",
     "notice": "নোটিশ",
     "defaultFee": "সাধারণ ফি",
+    "defaultFeeHint": "কোনো শ্রেণির জন্য পাঠ্যক্রম পাতায় আলাদা ফি নির্ধারণ করা না থাকলে এটি ব্যবহৃত হয়।",
     "imageUrl": "ছবির লিংক",
     "uploadImage": "ছবি আপলোড করুন",
     "removeUpload": "আপলোড করা ছবি সরান"

@@ -12,7 +12,7 @@ import {
   emptyRecord,
   eventFields,
   facilityFields,
-  feeFields,
+  defaultFeeFields,
   fieldClass,
   gradeFields,
   highlightFields,
@@ -30,7 +30,7 @@ import { staffRequest } from "@/lib/staff";
 import { btn } from "@/components/staff/buttons";
 import { AlbumImages } from "@/components/staff/cms/album-images";
 import { HeroSlideEditor } from "@/components/staff/cms/hero-slides";
-import { CmsFields, FormActions } from "@/components/staff/cms/fields";
+import { CmsFields, FormActions, SectionNav } from "@/components/staff/cms/fields";
 import { PaymentMethodsEditor } from "@/components/staff/cms/payment-methods";
 
 function useCmsCopy() {
@@ -307,9 +307,12 @@ function CollectionBlock({
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border border-igqs-gold/25 bg-white p-5 shadow-sm dark:bg-[#0d1f18] sm:p-6">
+    <section
+      id={id}
+      className="scroll-mt-16 rounded-3xl border border-igqs-gold/25 bg-white p-5 shadow-sm dark:bg-[#0d1f18] sm:p-6"
+    >
       <h2 className="border-b border-igqs-gold/20 pb-3 font-display text-2xl">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
@@ -327,13 +330,21 @@ function useMeta() {
 export function HomeEditor() {
   const t = useTranslations("cms");
   const meta = useMeta();
+  const sections = [
+    { id: "hero-slides", label: t("heroSlides") },
+    { id: "highlights", label: t("highlights") },
+    { id: "home", label: t("home") },
+    { id: "why-choose", label: t("whyChoose") },
+    { id: "testimonials", label: t("testimonials") },
+  ];
   return (
     <div>
+      <SectionNav sections={sections} />
       <div className="space-y-6">
-        <Card title={t("heroSlides")}>
+        <Card id="hero-slides" title={t("heroSlides")}>
           <HeroSlideEditor />
         </Card>
-        <Card title={t("highlights")}>
+        <Card id="highlights" title={t("highlights")}>
           <CollectionBlock
             path="/api/staff/highlights/"
             fields={highlightFields(meta?.stat_icons ?? [])}
@@ -341,10 +352,10 @@ export function HomeEditor() {
             defaults={{ icon: "users", order: 0, value: "" }}
           />
         </Card>
-        <Card title={t("home")}>
+        <Card id="home" title={t("home")}>
           <SingletonBlock path="/api/staff/home/" fields={homeFields} />
         </Card>
-        <Card title={t("whyChoose")}>
+        <Card id="why-choose" title={t("whyChoose")}>
           <CollectionBlock
             path="/api/staff/why-choose/"
             fields={whyFields(meta?.why_icons ?? [])}
@@ -352,7 +363,7 @@ export function HomeEditor() {
             defaults={{ icon: "book-open", order: 0 }}
           />
         </Card>
-        <Card title={t("testimonials")}>
+        <Card id="testimonials" title={t("testimonials")}>
           <CollectionBlock
             path="/api/staff/testimonials/"
             fields={testimonialFields}
@@ -367,16 +378,22 @@ export function HomeEditor() {
 
 export function AboutEditor() {
   const t = useTranslations("cms");
+  const sections = [
+    { id: "about", label: t("about") },
+    { id: "leadership", label: t("leadership") },
+    { id: "facilities", label: t("facilities") },
+  ];
   return (
     <div>
+      <SectionNav sections={sections} />
       <div className="space-y-6">
-        <Card title={t("about")}>
+        <Card id="about" title={t("about")}>
           <SingletonBlock path="/api/staff/about/" fields={aboutFields} />
         </Card>
-        <Card title={t("leadership")}>
+        <Card id="leadership" title={t("leadership")}>
           <CollectionBlock path="/api/staff/leaders/" fields={leaderFields} titleField="name_en" defaults={{ order: 0 }} />
         </Card>
-        <Card title={t("facilities")}>
+        <Card id="facilities" title={t("facilities")}>
           <CollectionBlock
             path="/api/staff/facilities/"
             fields={facilityFields}
@@ -402,26 +419,28 @@ export function ContactEditor() {
 
 export function AdmissionEditor() {
   const t = useTranslations("cms");
-  const meta = useMeta();
-  const gradeOptions = [
-    { value: "", label: t("defaultFee") },
-    ...(meta?.grades ?? []).map((grade) => ({ value: String(grade.id), label: grade.name_en })),
+  const sections = [
+    { id: "admission-info", label: t("admissionInfo") },
+    { id: "default-fee", label: t("defaultFee") },
+    { id: "payments", label: t("payments") },
   ];
   return (
     <div>
+      <SectionNav sections={sections} />
       <div className="space-y-6">
-        <Card title={t("admissionInfo")}>
+        <Card id="admission-info" title={t("admissionInfo")}>
           <SingletonBlock path="/api/staff/site/" fields={admissionInfoFields} />
         </Card>
-        <Card title={t("fees")}>
+        <Card id="default-fee" title={t("defaultFee")}>
+          <p className="-mt-2 mb-4 text-sm text-igqs-muted">{t("defaultFeeHint")}</p>
           <CollectionBlock
             path="/api/staff/fees/"
-            fields={feeFields(gradeOptions)}
+            fields={defaultFeeFields}
             titleField="label_en"
             defaults={{ currency: "BDT", is_active: true, amount: 0 }}
           />
         </Card>
-        <Card title={t("payments")}>
+        <Card id="payments" title={t("payments")}>
           <PaymentMethodsEditor />
         </Card>
       </div>
@@ -519,11 +538,13 @@ function ItemEditor({
   fields,
   defaults,
   listHref,
+  cardId,
 }: {
   path: string;
   fields: CmsField[];
   defaults: Record<string, unknown>;
   listHref: string;
+  cardId?: string;
 }) {
   const copy = useCmsCopy();
   const router = useRouter();
@@ -578,7 +599,7 @@ function ItemEditor({
 
   if (!values) return <Loading />;
   return (
-    <Card title={String(values.title_en || values.name_en || copy.t("edit"))}>
+    <Card id={cardId} title={String(values.title_en || values.name_en || copy.t("edit"))}>
       <RecordForm
         fields={fields}
         values={values}
@@ -653,22 +674,37 @@ export function CurriculumManager({ id }: { id?: string }) {
   if (!id) {
     return (
       <div>
-        <ItemTable path="/api/staff/grades/" hrefBase="/content/curriculum" titleField="name_en" extra={(row) => String(row.slug)} />
+        <ItemTable
+          path="/api/staff/grades/"
+          hrefBase="/content/curriculum"
+          titleField="name_en"
+          extra={(row) => {
+            if (!row.open_for_admission) return String(row.slug);
+            const fee = row.fee_amount ? ` · ৳${String(row.fee_amount)}` : "";
+            return `${String(row.slug)} · ${t("admissionOpenBadge")}${fee}`;
+          }}
+        />
       </div>
     );
   }
+  const sections = [
+    { id: "details", label: t("sectionDetails") },
+    ...(id !== "new" ? [{ id: "subjects", label: t("subjects") }, { id: "documents", label: t("documents") }] : []),
+  ];
   return (
     <div>
+      <SectionNav sections={sections} />
       <div className="space-y-6">
         <ItemEditor
+          cardId="details"
           path={id === "new" ? "/api/staff/grades/new" : `/api/staff/grades/${id}/`}
           fields={gradeFields}
-          defaults={{ order: 0 }}
+          defaults={{ order: 0, listed_on_curriculum: true, open_for_admission: false }}
           listHref="/content/curriculum"
         />
         {id !== "new" && meta && (
           <>
-            <Card title={t("subjects")}>
+            <Card id="subjects" title={t("subjects")}>
               <CollectionBlock
                 path="/api/staff/subjects/"
                 query={`?grade=${id}`}
@@ -677,7 +713,7 @@ export function CurriculumManager({ id }: { id?: string }) {
                 defaults={{ grade: Number(id), category: "general", order: 0 }}
               />
             </Card>
-            <Card title={t("documents")}>
+            <Card id="documents" title={t("documents")}>
               <CollectionBlock
                 path="/api/staff/documents/"
                 query={`?grade=${id}`}
@@ -709,17 +745,23 @@ export function GalleryManager({ id }: { id?: string }) {
       </div>
     );
   }
+  const sections = [
+    { id: "details", label: t("sectionDetails") },
+    ...(id !== "new" ? [{ id: "images", label: t("images") }] : []),
+  ];
   return (
     <div>
+      <SectionNav sections={sections} />
       <div className="space-y-6">
         <ItemEditor
+          cardId="details"
           path={id === "new" ? "/api/staff/albums/new" : `/api/staff/albums/${id}/`}
           fields={fields}
           defaults={{ category: "campus", order: 0 }}
           listHref="/content/gallery"
         />
         {id !== "new" && (
-          <Card title={t("images")}>
+          <Card id="images" title={t("images")}>
             <AlbumImages albumId={id} />
           </Card>
         )}

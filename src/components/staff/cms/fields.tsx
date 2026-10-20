@@ -287,6 +287,26 @@ export function CmsFields({
   );
 }
 
+export function SectionNav({ sections }: { sections: { id: string; label: string }[] }) {
+  if (sections.length < 2) return null;
+  return (
+    <nav
+      aria-label="Page sections"
+      className="sticky top-0 z-10 -mx-4 mb-6 flex gap-2 overflow-x-auto border-b border-igqs-gold/20 bg-[#f4f7fb]/95 px-4 py-2.5 backdrop-blur dark:bg-[#07140f]/95 sm:-mx-6 sm:px-6"
+    >
+      {sections.map((section) => (
+        <a
+          key={section.id}
+          href={`#${section.id}`}
+          className="shrink-0 whitespace-nowrap rounded-full border border-igqs-gold/30 px-3.5 py-1.5 text-xs font-medium text-igqs-ink transition hover:border-igqs-gold hover:bg-igqs-gold/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-igqs-gold dark:text-igqs-sand"
+        >
+          {section.label}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
 export function FormActions({
   saving,
   saveLabel,

@@ -499,6 +499,9 @@
     "sectionSchedule": "Schedule",
     "sectionMedia": "Image",
     "sectionPublishing": "Publishing",
+    "sectionAdmission": "Admission & fee",
+    "feeAmountHint": "Leave as 0 if this class is not open for admission.",
+    "admissionOpenBadge": "Open for admission",
     "uploadImages": "Add photos",
     "uploadImagesHint": "Choose one or more photos. They are added to this album as soon as you select them.",
     "uploading": "Uploading…",
@@ -525,6 +528,7 @@
     "draft": "Draft",
     "notice": "Notice",
     "defaultFee": "Default fee",
+    "defaultFeeHint": "Used only when a class doesn't have its own fee set on the Curriculum page.",
     "imageUrl": "Image URL",
     "uploadImage": "Upload an image",
     "removeUpload": "Remove uploaded image"

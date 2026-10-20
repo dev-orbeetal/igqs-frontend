@@ -249,7 +249,10 @@ export const gradeFields: CmsField[] = [
   { type: "text", name: "slug", label: "Page link", hint: "slugHint", section: "sectionDetails" },
   { type: "pair", name: "name", label: "Name", section: "sectionDetails" },
   { type: "pair", name: "description", label: "Description", textarea: true, section: "sectionDetails" },
+  { type: "checkbox", name: "listed_on_curriculum", label: "Show on the public curriculum page", section: "sectionPublishing" },
   { type: "number", name: "order", label: "Order", section: "sectionPublishing" },
+  { type: "checkbox", name: "open_for_admission", label: "Open for admission", section: "sectionAdmission" },
+  { type: "number", name: "fee_amount", label: "Admission fee (BDT)", hint: "feeAmountHint", section: "sectionAdmission" },
 ];
 
 export const subjectFields = (categories: Option[]): CmsField[] => [
@@ -274,8 +277,10 @@ export const albumFields = (categories: Option[]): CmsField[] => [
   { type: "number", name: "order", label: "Order", section: "sectionPublishing" },
 ];
 
-export const feeFields = (grades: Option[]): CmsField[] => [
-  { type: "select", name: "grade", label: "Class (empty = default fee)", options: grades },
+// Per-class fees are set from the class's own editor (Curriculum page) now —
+// this is only the default fee shown to applicants with no class-specific
+// fee configured, so there's no grade selector here.
+export const defaultFeeFields: CmsField[] = [
   { type: "number", name: "amount", label: "Amount" },
   { type: "text", name: "currency", label: "Currency" },
   { type: "pair", name: "label", label: "Label" },
