@@ -1,4 +1,5 @@
-import { Cormorant_Garamond, Noto_Sans_Bengali, Outfit } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -25,11 +26,14 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-const notoSansBengali = Noto_Sans_Bengali({
-  subsets: ["bengali"],
-  weight: "400",
-  variable: "--font-noto-bengali",
+const bornomala = localFont({
+  src: [
+    { path: "../../fonts/Bornomala-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../../fonts/Bornomala-Bold.ttf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-bornomala",
   display: "swap",
+  adjustFontFallback: false,
 });
 
 export function generateStaticParams() {
@@ -88,7 +92,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${outfit.variable} ${cormorant.variable} ${notoSansBengali.variable} ${
+        className={`${outfit.variable} ${cormorant.variable} ${bornomala.variable} ${
           locale === "bn" ? "font-bn" : "font-sans"
         }`}
       >

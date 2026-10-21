@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { apiUrl, type ApplicationDetail } from "@/lib/api";
 import { PaymentStatusStep } from "@/components/admission/PaymentStatusStep";
 
+
 export function SuccessPanel() {
   const t = useTranslations("admission");
   const locale = useLocale();
