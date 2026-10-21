@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdmissionForm } from "@/components/admission/AdmissionForm";
-import { PageHero } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type AdmissionInfo, type SiteSettings } from "@/lib/api";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -12,7 +13,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "admission" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/admission" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/admission",
+  });
 }
 
 export default async function AdmissionPage({
@@ -32,7 +37,14 @@ export default async function AdmissionPage({
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: tn("home"), path: "/" },
+          { name: t("title"), path: "/admission" },
+        ]}
+      />
       <div className="mx-auto max-w-xl px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
         {site?.admission_announcement && (
           <p className="mb-6 rounded-2xl border border-igqs-gold/30 bg-igqs-sand/40 p-4 text-sm dark:bg-white/5">

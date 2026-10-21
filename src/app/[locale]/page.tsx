@@ -1,4 +1,5 @@
 import { BookOpen, Heart, Layers, Shield } from "lucide-react";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import Image from "next/image";
@@ -14,6 +15,7 @@ import { Link } from "@/i18n/navigation";
 import { isAdminHost } from "@/lib/admin-paths";
 import { apiGet, type HomePayload, type SiteSettings } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
+import { NOINDEX, publicPageMetadata } from "@/lib/seo";
 
 const ICONS: Record<string, typeof BookOpen> = {
   "book-open": BookOpen,
@@ -21,6 +23,22 @@ const ICONS: Record<string, typeof BookOpen> = {
   heart: Heart,
   shield: Shield,
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (isAdminHost(await headers())) return NOINDEX;
+  const t = await getTranslations({ locale, namespace: "meta" });
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("description"),
+    path: "/",
+    absoluteTitle: true,
+  });
+}
 
 export default async function HomePage({
   params,
@@ -109,7 +127,7 @@ export default async function HomePage({
               <FadeIn delay={0.1} className="img-frame group min-h-72">
                 <Image
                   src={aboutImage}
-                  alt=""
+                  alt={t("home.about")}
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   className="img-zoom object-cover"
@@ -173,7 +191,7 @@ export default async function HomePage({
                       <div className="relative h-44 overflow-hidden border-b border-igqs-gold/45">
                         <Image
                           src={item.image}
-                          alt=""
+                          alt={item.title}
                           fill
                           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                           className="object-cover"
@@ -267,7 +285,7 @@ export default async function HomePage({
                     {event.image && (
                       <Image
                         src={event.image}
-                        alt=""
+                        alt={event.title}
                         fill
                         sizes="(min-width: 768px) 33vw, 100vw"
                         className="img-zoom object-cover"
@@ -305,7 +323,7 @@ export default async function HomePage({
                     {item.image && (
                       <Image
                         src={item.image}
-                        alt=""
+                        alt={item.title}
                         fill
                         sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                         className="img-zoom object-cover"

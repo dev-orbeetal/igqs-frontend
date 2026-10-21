@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GalleryGrid } from "@/components/gallery/GalleryGrid";
-import { PageHero } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
 import { apiGet, type GalleryAlbum } from "@/lib/api";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "gallery" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/gallery" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/gallery",
+  });
 }
 
 export default async function GalleryPage({
@@ -22,11 +27,19 @@ export default async function GalleryPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("gallery");
+  const nav = await getTranslations("nav");
   const albums = (await apiGet<GalleryAlbum[]>("/api/gallery/", locale)) ?? [];
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/gallery" },
+        ]}
+      />
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <GalleryGrid albums={albums} />
       </div>

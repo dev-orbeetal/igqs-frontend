@@ -96,7 +96,7 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
                     {album.cover_image_url && (
                       <Image
                         src={album.cover_image_url}
-                        alt=""
+                        alt={album.title}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="img-zoom object-cover"
@@ -142,7 +142,7 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
                 <div key={image.id} className="img-frame h-56">
                   <Image
                     src={image.image}
-                    alt={image.caption}
+                    alt={image.caption || openAlbum.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover"

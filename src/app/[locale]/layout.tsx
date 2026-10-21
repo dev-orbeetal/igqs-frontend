@@ -8,11 +8,14 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { HideOnStaff } from "@/components/layout/HideOnStaff";
+import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { isAdminHost } from "@/lib/admin-paths";
 import { apiGet, type SiteSettings } from "@/lib/api";
+import { SITE_ORIGIN, siteGraph } from "@/lib/seo";
 import "../globals.css";
 
 const outfit = Outfit({
@@ -49,26 +52,35 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "meta" });
   const title = t("title");
   const description = t("description");
+  const metadataBase = new URL(SITE_ORIGIN);
+  const google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+  // The admin host serves the staff dashboard at /. It must not inherit the
+  // public homepage canonical or an indexable description.
+  if (isAdminHost(await headers())) {
+    return {
+      metadataBase,
+      title: { default: title, template: `%s — ${title}` },
+      robots: { index: false, follow: false },
+    };
+  }
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://igqsbd.com"),
+    metadataBase,
     // Pages set their own title; this is the fallback and the suffix.
     title: { default: title, template: `%s — ${title}` },
     description,
-    alternates: { canonical: "/" },
     openGraph: {
       type: "website",
       siteName: title,
       title,
       description,
       locale: locale === "bn" ? "bn_BD" : "en_US",
-      images: [{ url: "/brand/igqs-logo-256.png", width: 256, height: 249, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: ["/brand/igqs-logo-256.png"],
     },
+    ...(google ? { verification: { google } } : {}),
   };
 }
 
@@ -98,6 +110,8 @@ export default async function LocaleLayout({
       >
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
+            {!adminSite && site?.school_name ? <JsonLd data={siteGraph(site)} /> : null}
+            {!adminSite ? <GoogleAnalytics /> : null}
             <HideOnStaff adminSite={adminSite}>
               <a href="#main" className="skip-link">
                 {a11y("skipToContent")}

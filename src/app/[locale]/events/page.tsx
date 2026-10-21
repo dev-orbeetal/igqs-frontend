@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { PageHero, SectionHeading } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
+import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type EventItem } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import { publicPageMetadata } from "@/lib/seo";
 
 function EventGrid({
   items,
@@ -35,7 +37,7 @@ function EventGrid({
               {event.image && (
                 <Image
                   src={event.image}
-                  alt=""
+                  alt={event.title}
                   fill
                   sizes="(min-width: 768px) 33vw, 100vw"
                   className="img-zoom object-cover"
@@ -61,7 +63,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "events" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/events" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/events",
+  });
 }
 
 export default async function EventsPage({
@@ -72,6 +78,7 @@ export default async function EventsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("events");
+  const nav = await getTranslations("nav");
   const data = await apiGet<{ upcoming: EventItem[]; previous: EventItem[] }>(
     "/api/events/",
     locale
@@ -79,7 +86,14 @@ export default async function EventsPage({
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/events" },
+        ]}
+      />
       <div className="mx-auto max-w-7xl space-y-16 px-4 py-16 sm:px-6">
         <section>
           <SectionHeading title={t("upcoming")} />

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { PageHero, SectionHeading } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
+import { SectionHeading } from "@/components/ui/PageHero";
 import { apiGet, type AboutPayload } from "@/lib/api";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -12,7 +14,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/about" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/about",
+  });
 }
 
 export default async function AboutPage({
@@ -23,6 +29,7 @@ export default async function AboutPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("about");
+  const nav = await getTranslations("nav");
   const tc = await getTranslations("common");
   const data = await apiGet<AboutPayload>("/api/about/", locale);
   if (!data) {
@@ -36,7 +43,14 @@ export default async function AboutPage({
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/about" },
+        ]}
+      />
       <div className="mx-auto max-w-7xl space-y-20 px-4 py-16 sm:px-6">
         <FadeIn>
           <SectionHeading title={t("introduction")} />
@@ -126,7 +140,7 @@ export default async function AboutPage({
                   {item.image_url && (
                     <Image
                       src={item.image_url}
-                      alt=""
+                      alt={item.title}
                       fill
                       sizes="(min-width: 768px) 25vw, 100vw"
                       className="object-cover"

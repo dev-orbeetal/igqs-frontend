@@ -3,10 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { PageHero } from "@/components/ui/PageHero";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { PageIntro } from "@/components/seo/PageIntro";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type NewsItem } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
+import { articleJsonLd, NOINDEX, publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -15,19 +17,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params;
   const post = await apiGet<NewsItem>(`/api/news/${slug}/`, locale);
-  if (!post) return {};
-  return {
+  if (!post) return NOINDEX;
+  return publicPageMetadata({
     title: post.title,
     description: post.description?.slice(0, 160),
-    alternates: { canonical: `/news/${slug}` },
-    openGraph: {
-      type: "article",
-      title: post.title,
-      description: post.description?.slice(0, 160),
-      publishedTime: post.published_at,
-      images: post.image ? [{ url: post.image }] : undefined,
-    },
-  };
+    path: `/news/${slug}`,
+    image: post.image,
+    openGraphType: "article",
+    publishedTime: post.published_at,
+  });
 }
 
 export default async function NewsDetailPage({
@@ -46,10 +44,28 @@ export default async function NewsDetailPage({
     throw new Error(`News API unavailable while loading "${slug}"`);
   }
   const t = await getTranslations("news");
+  const nav = await getTranslations("nav");
 
   return (
     <div>
-      <PageHero title={post.title} subtitle={t(newsCategoryKey(post.category))} />
+      <PageIntro
+        title={post.title}
+        subtitle={t(newsCategoryKey(post.category))}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/news" },
+          { name: post.title, path: `/news/${slug}` },
+        ]}
+      />
+      <JsonLd
+        data={articleJsonLd({
+          headline: post.title,
+          description: post.description,
+          path: `/news/${slug}`,
+          datePublished: post.published_at,
+          image: post.image,
+        })}
+      />
       <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <FadeIn>
           <Link href="/news" className="link-gold inline-block">
@@ -57,7 +73,7 @@ export default async function NewsDetailPage({
           </Link>
           {post.image && (
             <div className="img-frame mt-6 mb-8 h-80 rounded-3xl">
-              <Image src={post.image} alt="" fill sizes="(min-width: 768px) 48rem, 100vw" className="object-cover" />
+              <Image src={post.image} alt={post.title} fill sizes="(min-width: 768px) 48rem, 100vw" className="object-cover" />
             </div>
           )}
           <p className="mt-6 text-sm text-igqs-forest dark:text-igqs-gold">{formatDate(post.published_at, locale)}</p>

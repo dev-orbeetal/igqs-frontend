@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { PageHero } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
 import { apiGet, type Grade } from "@/lib/api";
+import { publicPageMetadata } from "@/lib/seo";
 
 const CATEGORY_KEYS = ["quranic", "islamic", "general", "cocurricular"] as const;
 
@@ -13,7 +14,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "curriculum" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/curriculum" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/curriculum",
+  });
 }
 
 export default async function CurriculumPage({
@@ -24,11 +29,19 @@ export default async function CurriculumPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("curriculum");
+  const nav = await getTranslations("nav");
   const grades = await apiGet<Grade[]>("/api/curriculum/", locale);
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/curriculum" },
+        ]}
+      />
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6">
         {(grades?.length ?? 0) === 0 && (
           <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-5 py-10 text-center text-igqs-muted">

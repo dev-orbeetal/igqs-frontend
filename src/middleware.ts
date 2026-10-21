@@ -26,6 +26,14 @@ function requestHost(request: NextRequest) {
 export default function middleware(request: NextRequest) {
   const host = requestHost(request);
   const { pathname, search } = request.nextUrl;
+
+  // One hop to the apex, including a trailing-slash strip, so www is not a
+  // second indexable host and does not chain into the slash redirect below.
+  if (host === "www.igqsbd.com") {
+    const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") || "/" : pathname;
+    return NextResponse.redirect(new URL(`${path}${search}`, PUBLIC_ORIGIN), 301);
+  }
+
   const onAdmin = ADMIN_HOSTS.has(host);
   const onPublic = PUBLIC_HOSTS.has(host) || (!onAdmin && !DEV_HOSTS.has(host));
   const canonical = canonicalAdminPath(pathname, onAdmin);

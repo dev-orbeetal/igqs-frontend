@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PageHero } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type NewsItem } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
+import { publicPageMetadata } from "@/lib/seo";
 
 const TOPICS = ["", "notice", "admission", "holiday", "exam", "announcement", "update", "news"] as const;
 
@@ -15,7 +16,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "noticesPage" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/notices" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/notices",
+  });
 }
 
 export default async function NoticesPage({
@@ -29,6 +34,7 @@ export default async function NoticesPage({
   const { topic = "" } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("noticesPage");
+  const nav = await getTranslations("nav");
   const topics = await getTranslations("news");
   const selected = TOPICS.includes(topic as (typeof TOPICS)[number]) ? topic : "";
   const path = selected
@@ -46,7 +52,14 @@ export default async function NoticesPage({
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/notices" },
+        ]}
+      />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
         <FilterChips
           param="topic"

@@ -1,7 +1,26 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ReceiptLookupPanel } from "@/components/admission/ReceiptLookupPanel";
 import { PageHero } from "@/components/ui/PageHero";
+import { publicPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "admission" });
+  return {
+    ...publicPageMetadata({
+      title: t("downloadPageTitle"),
+      description: t("downloadPageSubtitle"),
+      path: "/admission/receipt",
+    }),
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function DownloadReceiptPage({
   params,

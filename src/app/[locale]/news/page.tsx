@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { PageHero } from "@/components/ui/PageHero";
+import { PageIntro } from "@/components/seo/PageIntro";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Link } from "@/i18n/navigation";
 import { apiGet, type NewsItem } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
+import { publicPageMetadata } from "@/lib/seo";
 
 const CATEGORIES = [
   "",
@@ -26,7 +27,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "news" });
-  return { title: t("title"), description: t("subtitle"), alternates: { canonical: "/news" } };
+  return publicPageMetadata({
+    title: t("title"),
+    description: t("metaDescription"),
+    path: "/news",
+  });
 }
 
 export default async function NewsPage({
@@ -40,12 +45,20 @@ export default async function NewsPage({
   const { category = "" } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("news");
+  const nav = await getTranslations("nav");
   const path = category ? `/api/news/?category=${category}` : "/api/news/";
   const posts = await apiGet<NewsItem[]>(path, locale);
 
   return (
     <div>
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <PageIntro
+        title={t("title")}
+        subtitle={t("subtitle")}
+        crumbs={[
+          { name: nav("home"), path: "/" },
+          { name: t("title"), path: "/news" },
+        ]}
+      />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <FilterChips
           param="category"
@@ -68,7 +81,7 @@ export default async function NewsPage({
                   {post.image && (
                     <Image
                       src={post.image}
-                      alt=""
+                      alt={post.title}
                       fill
                       sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                       className="object-cover"

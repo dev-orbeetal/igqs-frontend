@@ -32,6 +32,7 @@
     "playSlideshow": "Play slideshow",
     "pauseSlideshow": "Pause slideshow",
     "skipToContent": "Skip to main content",
+    "breadcrumb": "Breadcrumb",
     "closeMenu": "Close menu",
     "primaryNav": "Primary"
   },
@@ -94,6 +95,7 @@
   "about": {
     "title": "About Us",
     "subtitle": "Who we are and what we stand for",
+    "metaDescription": "Meet Ideal Global Quranic School in Dhaka: our vision, Qur'anic teaching, leadership, and campus.",
     "introduction": "School introduction",
     "vision": "Vision",
     "mission": "Mission",
@@ -108,6 +110,7 @@
   "curriculum": {
     "title": "Curriculum",
     "subtitle": "Class-wise Qur'anic, Islamic, and general education",
+    "metaDescription": "Class-wise Qur'anic, Islamic, and general studies at Ideal Global Quranic School in Dhaka.",
     "quranic": "Qur'anic studies",
     "islamic": "Islamic studies",
     "general": "General education",
@@ -118,6 +121,7 @@
   "events": {
     "title": "Events",
     "subtitle": "School gatherings, competitions, and celebrations",
+    "metaDescription": "Upcoming and past gatherings, competitions, and celebrations at Ideal Global Quranic School.",
     "upcoming": "Upcoming events",
     "previous": "Previous events",
     "details": "Event details",
@@ -130,6 +134,7 @@
   "news": {
     "title": "News & Notices",
     "subtitle": "Announcements, notices, and school updates",
+    "metaDescription": "Announcements, notices, and school updates from Ideal Global Quranic School in Dhaka.",
     "all": "All",
     "news": "News",
     "announcement": "Announcements",
@@ -143,12 +148,14 @@
   "noticesPage": {
     "title": "Notices",
     "subtitle": "School notices by topic, newest first",
+    "metaDescription": "Important notices from Ideal Global Quranic School, grouped by topic with the newest first.",
     "all": "All topics",
     "empty": "No notices in this topic."
   },
   "gallery": {
     "title": "Gallery",
     "subtitle": "Life at IGQS — campus, class, and community",
+    "metaDescription": "Photos of campus life, classes, and community events at Ideal Global Quranic School in Dhaka.",
     "all": "All albums",
     "activities": "School activities",
     "events": "Events",
@@ -165,6 +172,7 @@
   "contact": {
     "title": "Contact Us",
     "subtitle": "We would be glad to hear from you",
+    "metaDescription": "Address, phone, office hours, and a message form for Ideal Global Quranic School in Dhaka.",
     "address": "Address",
     "phone": "Phone",
     "email": "Email",
@@ -185,6 +193,7 @@
   "admission": {
     "title": "Online Admission",
     "subtitle": "Apply for a place at Ideal Global Qur'anic School",
+    "metaDescription": "Apply online to Ideal Global Quranic School in Dhaka for Hifz and a full academic programme.",
     "stepClass": "Class",
     "stepInformation": "Information",
     "stepVerify": "Verify",
@@ -285,8 +294,8 @@
     "downloadPageSubtitle": "Enter your Application ID or Receipt ID to see the current status and download the receipt.",
     "enterReceiptId": "Enter Receipt ID",
     "enterLookupId": "Application ID or Receipt ID",
-    "receiptPlaceholder": "IGQS-RC-00125",
-    "lookupPlaceholder": "IGQS-2026-00001 or IGQS-RC-00001",
+    "receiptPlaceholder": "125",
+    "lookupPlaceholder": "125",
     "searchReceipt": "Check status",
     "searchingReceipt": "Searching…",
     "receiptNotFound": "No application was found for that ID. Check the ID and try again.",
@@ -422,7 +431,7 @@
     "savingFees": "Saving…",
     "search": "Search",
     "searchHint": "Search by Application ID, Receipt ID, student, guardian, mobile, or transaction ID.",
-    "searchPlaceholder": "IGQS-2026-00001 or student name",
+    "searchPlaceholder": "1 or student name",
     "signIn": "Sign in",
     "signingIn": "Signing in…",
     "sort": "Sort",
