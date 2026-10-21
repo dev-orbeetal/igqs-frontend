@@ -18,7 +18,7 @@ export type Highlight = {
   icon: string;
 };
 
-function CountValue({ value }: { value: string }) {
+function CountValue({ value, delay = 0 }: { value: string; delay?: number }) {
   const reduced = useReducedMotion();
   const match = /^(\d+)(.*)$/.exec(value.trim());
   const target = match ? Number(match[1]) : null;
@@ -41,9 +41,13 @@ function CountValue({ value }: { value: string }) {
       return;
     }
     motionValue.set(0);
-    const controls = animate(motionValue, target, { duration: 1.1, ease: [0.22, 1, 0.36, 1] });
+    const controls = animate(motionValue, target, {
+      duration: 0.8,
+      delay,
+      ease: [0.22, 1, 0.36, 1],
+    });
     return () => controls.stop();
-  }, [inView, motionValue, reduced, target]);
+  }, [delay, inView, motionValue, reduced, target]);
 
   if (target === null) return <span>{value}</span>;
   return <motion.span ref={ref}>{rounded}</motion.span>;
@@ -66,11 +70,14 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
             <div key={item.id} className="flex flex-col items-center px-3 text-center">
               {/* CSS reveal: the previous motion.div server-rendered at
                   opacity:0, so these icons were invisible until hydration. */}
-              <div className="reveal" style={{ animationDelay: `${index * 0.08}s` }}>
+              <div
+                className="reveal"
+                style={{ "--reveal-index": Math.min(index, 4) } as React.CSSProperties}
+              >
                 <Icon className="size-8 text-igqs-gold" strokeWidth={1.5} aria-hidden />
               </div>
               <p className="mt-2 font-display text-4xl leading-none text-igqs-gold">
-                <CountValue value={item.value} />
+                <CountValue value={item.value} delay={index * 0.08} />
               </p>
               <p className="mt-1.5 text-sm text-igqs-cream/80">{item.label}</p>
             </div>

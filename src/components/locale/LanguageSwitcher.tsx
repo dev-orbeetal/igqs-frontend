@@ -16,6 +16,7 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listId = useId();
   const current = LOCALES.find((item) => item.id === locale) ?? LOCALES[0];
@@ -41,6 +42,11 @@ export function LanguageSwitcher() {
     if (next !== locale) router.replace(pathname, { locale: next });
   };
 
+  const toggle = () => {
+    setHasOpened(true);
+    setOpen((value) => !value);
+  };
+
   return (
     <div ref={rootRef} className="relative">
       <button
@@ -49,19 +55,22 @@ export function LanguageSwitcher() {
         aria-expanded={open}
         aria-controls={listId}
         aria-label={t("language")}
-        onClick={() => setOpen((value) => !value)}
-        className="inline-flex min-h-11 items-center gap-1 rounded-full border border-igqs-gold/40 bg-white/70 px-3 py-2 text-xs font-semibold whitespace-nowrap text-igqs-ink transition hover:border-igqs-gold dark:bg-white/5 dark:text-igqs-cream"
+        onClick={toggle}
+        className="motion-micro inline-flex min-h-11 items-center gap-1 rounded-full border border-igqs-gold/40 bg-white/70 px-3 py-2 text-xs font-semibold whitespace-nowrap text-igqs-ink hover:border-igqs-gold dark:bg-white/5 dark:text-igqs-cream"
       >
         {current.label}
-        <ChevronDown className={`size-3.5 shrink-0 opacity-70 transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`motion-chevron size-3.5 shrink-0 opacity-70 ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && (
-        <ul
-          id={listId}
-          role="listbox"
-          aria-label={t("language")}
-          className="absolute right-0 z-50 mt-1.5 min-w-[9.5rem] overflow-hidden rounded-xl border border-igqs-gold/30 bg-igqs-cream p-1 shadow-[0_12px_32px_rgb(16_35_28/0.12)] dark:bg-[#10261e]"
-        >
+      <ul
+        id={listId}
+        role="listbox"
+        aria-label={t("language")}
+        data-open={open ? "true" : "false"}
+        aria-hidden={!open}
+        className={`menu-panel absolute right-0 z-50 mt-1.5 min-w-[9.5rem] overflow-hidden rounded-xl border border-igqs-gold/30 bg-igqs-cream p-1 shadow-[0_12px_32px_rgb(16_35_28/0.12)] dark:bg-[#10261e] ${
+          open ? "panel-in" : hasOpened ? "panel-out" : ""
+        }`}
+      >
           {LOCALES.map((item) => {
             const selected = item.id === locale;
             return (
@@ -71,7 +80,8 @@ export function LanguageSwitcher() {
                   role="option"
                   aria-selected={selected}
                   onClick={() => setLocale(item.id)}
-                  className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
+                  tabIndex={open ? 0 : -1}
+                  className={`motion-micro flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${
                     selected
                       ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
                       : "text-igqs-ink hover:bg-igqs-sand/80 dark:text-igqs-cream dark:hover:bg-white/10"
@@ -84,7 +94,6 @@ export function LanguageSwitcher() {
             );
           })}
         </ul>
-      )}
     </div>
   );
 }

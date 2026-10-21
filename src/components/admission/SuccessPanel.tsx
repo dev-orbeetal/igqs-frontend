@@ -31,12 +31,16 @@ export function SuccessPanel() {
       .finally(() => setLoading(false));
   }, [id, locale]);
 
+  const statusKey = loading ? "loading" : failed ? "error" : (data?.status ?? "empty");
+
   return (
     <div>
-      <PaymentStatusStep data={data} processing={loading} error={failed} />
+      <div key={statusKey} className="fade-status">
+        <PaymentStatusStep data={data} processing={loading} error={failed} />
+      </div>
       <p className="mt-6 text-center text-sm text-igqs-muted print:hidden">
         {t("lostReceiptHint")}{" "}
-        <Link href="/admission/receipt" className="text-igqs-forest underline dark:text-igqs-gold">
+        <Link href="/admission/receipt" className="motion-micro text-igqs-forest underline hover:text-igqs-green dark:text-igqs-gold dark:hover:text-igqs-gold-soft">
           {t("downloadPageTitle")}
         </Link>
       </p>

@@ -125,7 +125,7 @@ export function MyPaymentsPanel() {
 
   if (step === "phone") {
     return (
-      <div>
+      <div className="fade-status">
         <form onSubmit={sendOtp} className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18] sm:p-7">
           <label className="text-sm">
             {t("mobile")}
@@ -139,11 +139,11 @@ export function MyPaymentsPanel() {
             />
           </label>
           <p className="mt-2 text-sm text-igqs-muted">{t("otpHint")}</p>
-          {error && <p className="mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
+          {error && <p className="message-in mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+            className="btn-solid mt-4 min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
           >
             {loading ? t("sendingOtp") : t("sendOtp")}
           </button>
@@ -154,7 +154,7 @@ export function MyPaymentsPanel() {
 
   if (step === "otp") {
     return (
-      <div>
+      <div className="fade-status">
         <form onSubmit={verifyOtp} className="rounded-3xl border border-igqs-gold/25 bg-white p-5 dark:bg-[#0d1f18] sm:p-7">
           <h2 className="font-display text-xl">{t("verifyHeading")}</h2>
           <p className="mt-1 text-sm text-igqs-muted">{phone}</p>
@@ -170,12 +170,12 @@ export function MyPaymentsPanel() {
               onChange={(event) => setOtp(event.target.value)}
             />
           </label>
-          {error && <p className="mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
+          {error && <p className="message-in mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+              className="btn-solid min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {loading ? t("verifyingOtp") : t("verifyOtp")}
             </button>
@@ -183,7 +183,7 @@ export function MyPaymentsPanel() {
               type="button"
               disabled={resendIn > 0 || loading}
               onClick={() => requestOtp(phone)}
-              className="min-h-11 rounded-full border border-igqs-gold/40 px-4 text-sm disabled:opacity-40"
+              className="btn-solid min-h-11 rounded-full border border-igqs-gold/40 px-4 text-sm hover:bg-igqs-gold/10 disabled:opacity-40"
             >
               {resendIn > 0 ? t("resendIn", { seconds: resendIn }) : t("resendOtp")}
             </button>
@@ -201,7 +201,7 @@ export function MyPaymentsPanel() {
   }
 
   return (
-    <div>
+    <div className="fade-status">
       <div className="flex items-center justify-between">
         <p className="text-sm text-igqs-muted">{phone}</p>
         <button type="button" onClick={changeNumber} className="text-sm text-igqs-green underline dark:text-igqs-gold">

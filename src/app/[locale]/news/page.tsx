@@ -71,8 +71,8 @@ export default async function NewsPage({
           </p>
         )}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {posts?.map((post) => (
-            <FadeIn key={post.slug}>
+          {posts?.map((post, index) => (
+            <FadeIn key={post.slug} delay={index * 0.08}>
               <Link
                 href={`/news/${post.slug}`}
                 className="surface-card surface-card-hover group block overflow-hidden bg-white dark:bg-[#0d1f18]"
@@ -84,7 +84,7 @@ export default async function NewsPage({
                       alt={post.title}
                       fill
                       sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                      className="object-cover"
+                      className="img-zoom object-cover"
                     />
                   )}
                 </div>

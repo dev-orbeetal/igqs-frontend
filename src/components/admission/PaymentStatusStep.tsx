@@ -33,7 +33,7 @@ export function PaymentStatusStep({
         <p className="font-display text-2xl">{t("receiptSearchError")}</p>
         <Link
           href="/admission/receipt"
-          className="mt-6 inline-flex min-h-12 items-center rounded-full bg-igqs-green px-5 text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
+          className="btn-solid mt-6 inline-flex min-h-12 items-center rounded-full bg-igqs-green px-5 text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
         >
           {t("downloadPageTitle")}
         </Link>
@@ -58,12 +58,12 @@ export function PaymentStatusStep({
           {data.receipt_pdf_url && (
             <a
               href={data.receipt_pdf_url}
-              className="min-h-12 rounded-full bg-igqs-green px-5 py-3 text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
+              className="btn-solid min-h-12 rounded-full bg-igqs-green px-5 py-3 text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {t("downloadReceiptBn")}
             </a>
           )}
-          <Link href="/admission/payments" className="min-h-12 rounded-full border border-igqs-gold/40 px-5 py-3">
+          <Link href="/admission/payments" className="btn-solid min-h-12 rounded-full border border-igqs-gold/40 px-5 py-3 hover:bg-igqs-gold/10">
             {t("myPaymentsTitle")}
           </Link>
         </div>

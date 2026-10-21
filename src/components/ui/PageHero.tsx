@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { FadeIn } from "@/components/motion/FadeIn";
 import { Link } from "@/i18n/navigation";
 import type { Crumb } from "@/lib/seo";
 
@@ -16,7 +15,7 @@ export function PageHero({
   const a11y = useTranslations("a11y");
   return (
     <section className="on-dark pattern-geo-dark border-y border-igqs-gold bg-igqs-forest py-12 text-igqs-cream print:hidden dark:bg-[#0b241c] sm:py-16">
-      <FadeIn className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {crumbs && crumbs.length > 1 && (
           <nav aria-label={a11y("breadcrumb")} className="mb-4">
             <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-igqs-cream/75">
@@ -30,7 +29,7 @@ export function PageHero({
                         {crumb.name}
                       </span>
                     ) : (
-                      <Link href={crumb.path} className="hover:text-igqs-gold">
+                      <Link href={crumb.path} className="motion-micro hover:text-igqs-gold">
                         {crumb.name}
                       </Link>
                     )}
@@ -40,12 +39,22 @@ export function PageHero({
             </ol>
           </nav>
         )}
-        <p className="eyebrow">{brand("name")}</p>
-        <h1 className="mt-3 font-display text-4xl leading-tight md:text-5xl">{title}</h1>
+        <p className="reveal-now eyebrow">{brand("name")}</p>
+        <h1
+          className="reveal-now mt-3 font-display text-4xl leading-tight md:text-5xl"
+          style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
+        >
+          {title}
+        </h1>
         {subtitle && (
-          <p className="mt-3 max-w-2xl text-igqs-cream/80">{subtitle}</p>
+          <p
+            className="reveal-now mt-3 max-w-2xl text-igqs-cream/80"
+            style={{ "--reveal-delay": "160ms" } as React.CSSProperties}
+          >
+            {subtitle}
+          </p>
         )}
-      </FadeIn>
+      </div>
     </section>
   );
 }

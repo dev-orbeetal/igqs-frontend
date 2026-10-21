@@ -13,15 +13,16 @@ export function FadeIn({
 }: {
   children: React.ReactNode;
   className?: string;
-  /** Kept for call-site compatibility; used as a small stagger offset. */
+  /** Stagger offset in seconds. Converted to a capped scroll-range index. */
   delay?: number;
   id?: string;
 }) {
+  const index = Math.min(4, Math.max(0, Math.round(delay / 0.08)));
   return (
     <div
       id={id}
       className={className ? `reveal ${className}` : "reveal"}
-      style={delay ? { animationDelay: `${delay}s` } : undefined}
+      style={index ? ({ "--reveal-index": index } as React.CSSProperties) : undefined}
     >
       {children}
     </div>

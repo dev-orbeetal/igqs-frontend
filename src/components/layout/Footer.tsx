@@ -22,8 +22,8 @@ function FooterHeading({ children }: { children: React.ReactNode }) {
 
 function FooterLink({ href, label }: { href: string; label: string }) {
   return (
-    <Link href={href} className="group flex min-h-11 items-start gap-1.5 py-1.5 text-white/75 transition hover:text-white">
-      <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-white/55 transition group-hover:text-white" aria-hidden />
+    <Link href={href} className="group motion-micro flex min-h-11 items-start gap-1.5 py-1.5 text-white/75 hover:text-white">
+      <ChevronRight className="motion-micro mt-0.5 size-3.5 shrink-0 text-white/55 group-hover:text-white" aria-hidden />
       <span>{label}</span>
     </Link>
   );
@@ -76,7 +76,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={item.label}
-                  className="flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-igqs-gold hover:text-igqs-ink"
+                  className="motion-control flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-igqs-gold hover:text-igqs-ink"
                 >
                   <item.icon className="size-4" />
                 </a>
@@ -125,7 +125,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                 <li key={phone}>
                   <a
                     href={`tel:${digitsOnly(phone) ? `+${digitsOnly(phone)}` : phone}`}
-                    className="flex min-h-11 items-center gap-2.5 transition hover:text-white"
+                    className="motion-micro flex min-h-11 items-center gap-2.5 hover:text-white"
                   >
                     {index === 0 ? <Phone className="size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}
                     <span>{phone}</span>
@@ -136,7 +136,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                 <li key={email}>
                   <a
                     href={`mailto:${email}`}
-                    className="flex min-h-11 items-center gap-2.5 transition hover:text-white"
+                    className="motion-micro flex min-h-11 items-center gap-2.5 hover:text-white"
                   >
                     {index === 0 ? <Mail className="size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}
                     <span>{email}</span>
@@ -161,7 +161,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                 behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
               })
             }
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-igqs-gold hover:text-igqs-ink sm:absolute sm:right-4"
+            className="motion-control flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-igqs-gold hover:text-igqs-ink sm:absolute sm:right-4"
             aria-label={tf("top")}
           >
             <ArrowUp className="size-4" />

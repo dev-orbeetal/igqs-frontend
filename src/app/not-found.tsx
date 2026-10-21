@@ -12,7 +12,7 @@ export default function RootNotFound() {
   return (
     <html lang={routing.defaultLocale}>
       <body className="bg-igqs-cream text-igqs-ink antialiased dark:bg-[#07140f] dark:text-igqs-sand">
-        <main className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
+        <main className="reveal-section mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
           <p className="eyebrow">404</p>
           <h1 className="mt-3 font-display text-4xl leading-tight">পৃষ্ঠা পাওয়া যায়নি</h1>
           <p className="mt-2 font-display text-2xl text-igqs-muted">Page not found</p>
@@ -24,7 +24,7 @@ export default function RootNotFound() {
           </p>
           <Link
             href="/"
-            className="mt-8 inline-flex min-h-12 items-center rounded-full bg-igqs-green px-6 text-sm text-igqs-cream transition hover:brightness-110 dark:bg-igqs-gold dark:text-igqs-ink"
+            className="btn-solid mt-8 inline-flex min-h-12 items-center rounded-full bg-igqs-green px-6 text-sm text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
           >
             হোমপেজ / Homepage
           </Link>

@@ -208,6 +208,7 @@ export function AdmissionForm({
         <AdmissionStepper step={step} receiptReady={Boolean(receiptReady)} />
       </div>
       <div className="px-4 py-6 pb-28 sm:px-7">
+        <div key={step} className="fade-swap">
         {step === 0 && (
           <ClassSelectStep
             classes={classes}
@@ -252,9 +253,18 @@ export function AdmissionForm({
         {step === 3 && (
           <PaymentStatusStep data={application} processing={processing} onRetry={retry} />
         )}
+        </div>
         {/* role="alert" so the error is announced; it was previously silent
             for screen reader users, who only heard "invalid" on the field. */}
-        <p role="alert" aria-live="assertive" className="mt-4 text-sm text-red-700 dark:text-red-300">
+        <p
+          role="alert"
+          aria-live="assertive"
+          className={
+            formError
+              ? "message-in mt-4 text-sm text-red-700 dark:text-red-300"
+              : "sr-only"
+          }
+        >
           {formError}
         </p>
       </div>
@@ -264,12 +274,12 @@ export function AdmissionForm({
             <button
               type="button"
               onClick={goBack}
-              className="min-h-12 rounded-full border border-igqs-gold/40 px-5 text-sm"
+              className="btn-solid min-h-12 rounded-full border border-igqs-gold/40 px-5 text-sm hover:bg-igqs-gold/10"
             >
               {tc("back")}
             </button>
           ) : (
-            <Link href="/" className="min-h-12 rounded-full border border-igqs-gold/40 px-5 py-3 text-center text-sm">
+            <Link href="/" className="btn-solid min-h-12 rounded-full border border-igqs-gold/40 px-5 py-3 text-center text-sm hover:bg-igqs-gold/10">
               {t("cancelFlow")}
             </Link>
           )}
@@ -277,7 +287,7 @@ export function AdmissionForm({
             <button
               type="button"
               onClick={goNext}
-              className="min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+              className="btn-solid min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {tc("next")}
             </button>
@@ -286,7 +296,7 @@ export function AdmissionForm({
               type="button"
               disabled={sending}
               onClick={submitPayment}
-              className="min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+              className="btn-solid min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {sending ? t("processingPayment") : t("payWithBkash")}
             </button>

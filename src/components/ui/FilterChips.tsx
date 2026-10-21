@@ -25,7 +25,7 @@ export function FilterChips({
   const [pending, startTransition] = useTransition();
 
   return (
-    <div className={`mb-10 flex flex-wrap gap-2 transition-opacity ${pending ? "opacity-60" : ""}`} aria-busy={pending}>
+    <div className={`mb-10 flex flex-wrap gap-2 transition-opacity duration-[160ms] ${pending ? "opacity-60" : ""}`} aria-busy={pending}>
       {chips.map((chip) => {
         const active = chip.value === selected;
         return (
@@ -38,7 +38,7 @@ export function FilterChips({
                 router.push(chip.value ? `${pathname}?${param}=${chip.value}` : pathname);
               })
             }
-            className={`min-h-11 rounded-full px-4 py-2 text-sm transition ${
+            className={`motion-micro min-h-11 rounded-full px-4 py-2 text-sm ${
               active
                 ? "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
                 : "border border-igqs-border-strong hover:bg-igqs-gold/10"

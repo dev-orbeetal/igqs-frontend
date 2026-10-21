@@ -42,6 +42,31 @@
   --text-9xl: 10rem;
 }
 
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --duration-micro: 160ms;
+  --duration-hover: 200ms;
+  --duration-panel: 240ms;
+  --duration-exit: 160ms;
+  --duration-section: 520ms;
+  --duration-hero: 640ms;
+  --duration-page: 180ms;
+  --duration-control: 180ms;
+}
+
+@property --reveal-index {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --photo-index {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -83,7 +108,7 @@ body {
   color: var(--color-igqs-cream);
   padding: 0.75rem 1.25rem;
   font-size: 0.95rem;
-  transition: top 0.2s ease;
+  transition: top var(--duration-hover) var(--ease-out);
 }
 
 .skip-link:focus {
@@ -144,7 +169,7 @@ select optgroup {
    off). Browsers without scroll-driven animation support simply show the
    content with no reveal. */
 .page-fade {
-  animation: page-fade-in 0.25s ease-out both;
+  animation: page-fade-in var(--duration-page) var(--ease-out) both;
 }
 
 @keyframes page-fade-in {
@@ -167,19 +192,150 @@ select optgroup {
   }
 }
 
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes panel-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
     .reveal {
       animation: reveal-in linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 60%;
+      animation-range: entry calc(var(--reveal-index) * 4%) entry calc(60% + var(--reveal-index) * 4%);
     }
   }
 
   .reveal-now {
-    animation: reveal-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: reveal-in var(--duration-hero) var(--ease-out) both;
     animation-delay: var(--reveal-delay, 0s);
   }
+
+  .reveal-section {
+    animation: reveal-in var(--duration-section) var(--ease-out) both;
+  }
+
+  .panel-in {
+    animation: panel-in var(--duration-panel) var(--ease-out) both;
+  }
+
+  .panel-out {
+    animation: panel-out var(--duration-exit) var(--ease-in) both;
+  }
+
+  .fade-swap {
+    animation: page-fade-in var(--duration-panel) var(--ease-out) both;
+  }
+
+  .fade-status,
+  .message-in {
+    animation: page-fade-in var(--duration-page) var(--ease-out) both;
+  }
+
+  .photo-in {
+    animation: page-fade-in var(--duration-section) var(--ease-out) both;
+    animation-delay: calc(var(--photo-index) * 60ms);
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .reveal-now,
+  .reveal-section,
+  .photo-in {
+    animation-name: reveal-fade;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation-name: reveal-fade;
+    }
+  }
+}
+
+.motion-micro {
+  transition-property: color, background-color, border-color, box-shadow, opacity, filter;
+  transition-duration: var(--duration-micro);
+  transition-timing-function: var(--ease-out);
+}
+
+.motion-hover {
+  transition-property: color, background-color, border-color, box-shadow, opacity, filter, transform;
+  transition-duration: var(--duration-hover);
+  transition-timing-function: var(--ease-out);
+}
+
+.motion-control {
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+  transition-duration: var(--duration-control);
+  transition-timing-function: var(--ease-out);
+}
+
+.motion-chevron {
+  transition: transform var(--duration-micro) var(--ease-out);
+}
+
+:where(input, select, textarea) {
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out);
+}
+
+.drawer-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+}
+
+.drawer-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.drawer-panel[data-open="true"] .drawer-panel-inner {
+  border-bottom: 1px solid rgb(196 163 90 / 0.2);
+}
+
+.drawer-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.menu-panel {
+  pointer-events: none;
+}
+
+.menu-panel.panel-in {
+  pointer-events: auto;
+}
+
+.menu-panel:not([data-open="true"]) {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 .section-cream {
@@ -235,64 +391,72 @@ select optgroup {
   @apply items-center justify-center rounded-full bg-igqs-gold px-6 py-3 text-sm font-medium text-igqs-ink;
   box-shadow: 0 10px 24px rgb(196 163 90 / 0.22);
   transition:
-    transform 0.45s ease,
-    box-shadow 0.45s ease,
-    background-color 0.45s ease;
+    transform var(--duration-hover) var(--ease-out),
+    box-shadow var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) var(--ease-out);
 }
 
 .btn-gold:hover {
   background: #d4b56a;
-  transform: translateY(-1px);
   box-shadow: 0 14px 28px rgb(196 163 90 / 0.3);
 }
 
 .btn-gold-outline {
   @apply inline-flex items-center justify-center rounded-full border border-igqs-gold/70 px-6 py-3 text-sm text-igqs-cream;
   transition:
-    transform 0.45s ease,
-    background-color 0.45s ease,
-    border-color 0.45s ease;
+    transform var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) var(--ease-out),
+    border-color var(--duration-hover) var(--ease-out);
 }
 
 .btn-gold-outline:hover {
   background: rgb(196 163 90 / 0.14);
   border-color: var(--color-igqs-gold);
-  transform: translateY(-1px);
 }
 
 .btn-ghost {
   @apply inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm text-white;
   transition:
-    transform 0.45s ease,
-    background-color 0.45s ease,
-    border-color 0.45s ease;
+    transform var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) var(--ease-out),
+    border-color var(--duration-hover) var(--ease-out);
 }
 
 .btn-ghost:hover {
   background: rgb(255 255 255 / 0.08);
   border-color: rgb(232 215 168 / 0.55);
-  transform: translateY(-1px);
+}
+
+.btn-solid {
+  transition:
+    filter var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) var(--ease-out),
+    color var(--duration-hover) var(--ease-out),
+    border-color var(--duration-hover) var(--ease-out),
+    opacity var(--duration-micro) var(--ease-out);
+}
+
+.btn-solid:hover:not(:disabled) {
+  filter: brightness(1.1);
 }
 
 .surface-card {
   border: 1px solid rgb(196 163 90 / 0.22);
   border-radius: 1.15rem;
   box-shadow: 0 10px 28px rgb(16 35 28 / 0.05);
-  transition:
-    transform 0.5s ease,
-    box-shadow 0.5s ease,
-    border-color 0.5s ease,
-    background-color 0.5s ease;
 }
 
 .dark .surface-card {
   box-shadow: none;
 }
 
-.surface-card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgb(196 163 90 / 0.5);
-  box-shadow: 0 18px 36px rgb(16 35 28 / 0.1);
+.surface-card-hover,
+.hover-lift {
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    box-shadow var(--duration-hover) var(--ease-out),
+    border-color var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) var(--ease-out);
 }
 
 .icon-well {
@@ -305,12 +469,7 @@ select optgroup {
 }
 
 .img-zoom {
-  transition: transform 0.8s ease;
-}
-
-.group:hover .img-zoom,
-.img-frame:hover .img-zoom {
-  transform: scale(1.05);
+  transition: transform var(--duration-hover) var(--ease-out);
 }
 
 .img-overlay {
@@ -319,7 +478,7 @@ select optgroup {
 
 .link-gold {
   @apply text-sm text-igqs-forest;
-  transition: color 0.4s ease;
+  transition: color var(--duration-micro) var(--ease-out);
 }
 
 .link-gold:hover {
@@ -343,10 +502,6 @@ select optgroup {
   background-size: auto, auto, 80px 80px;
 }
 
-.pattern-geo {
-  animation: pattern-drift 70s linear infinite;
-}
-
 .dark .pattern-bg,
 .dark .pattern-geo {
   background-image:
@@ -361,7 +516,6 @@ select optgroup {
     radial-gradient(circle at 88% 8%, rgb(232 215 168 / 0.06), transparent 26%),
     url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c4a35a' stroke-opacity='0.14' stroke-width='0.8'%3E%3Cpath d='M40 8 L47 25 L64 32 L47 39 L40 56 L33 39 L16 32 L33 25 Z'/%3E%3Cpath d='M40 20 L44 30 L54 34 L44 38 L40 48 L36 38 L26 34 L36 30 Z'/%3E%3C/g%3E%3C/svg%3E");
   background-size: auto, auto, 80px 80px;
-  animation: pattern-drift 80s linear infinite;
 }
 
 .hero-overlay {
@@ -382,7 +536,6 @@ select optgroup {
 .hero-pattern {
   background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c4a35a' stroke-opacity='0.1' stroke-width='0.7'%3E%3Cpath d='M40 8 L47 25 L64 32 L47 39 L40 56 L33 39 L16 32 L33 25 Z'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 80px 80px;
-  animation: pattern-drift 90s linear infinite;
 }
 
 .gold-rule {
@@ -396,35 +549,105 @@ select optgroup {
   background: linear-gradient(90deg, #c4a35a, transparent);
 }
 
-@keyframes pattern-drift {
-  0% {
-    background-position: 0 0, 0 0, 0 0;
+@media (hover: hover) and (pointer: fine) {
+  .btn-gold:hover,
+  .btn-gold-outline:hover,
+  .btn-ghost:hover {
+    transform: translateY(-1px);
   }
-  100% {
-    background-position: 80px 40px, -40px 20px, 80px 80px;
+
+  .surface-card-hover:hover,
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    border-color: rgb(196 163 90 / 0.5);
+    box-shadow: 0 18px 36px rgb(16 35 28 / 0.1);
+  }
+
+  a:hover .img-zoom,
+  button:hover .img-zoom {
+    transform: scale(1.04);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pattern-geo,
-  .pattern-geo-dark,
-  .hero-pattern,
+  html {
+    scroll-behavior: auto;
+  }
+
+  .page-fade,
+  .reveal,
+  .reveal-now,
+  .reveal-section,
+  .panel-in,
+  .panel-out,
+  .fade-swap,
+  .fade-status,
+  .message-in,
+  .photo-in,
   .img-zoom,
   .btn-gold,
   .btn-gold-outline,
   .btn-ghost,
-  .surface-card,
+  .btn-solid,
+  .surface-card-hover,
+  .hover-lift,
+  .drawer-panel,
+  .drawer-panel.drawer-in,
+  .drawer-panel.drawer-out,
+  .menu-panel,
+  .motion-micro,
+  .motion-hover,
+  .motion-control,
+  .motion-chevron,
+  .skip-link,
+  .animate-pulse,
+  :where(input, select, textarea) {
+    animation: none !important;
+    transition: none !important;
+  }
+
   .page-fade,
   .reveal,
-  .reveal-now {
-    animation: none;
-    transition: none;
+  .reveal-now,
+  .reveal-section,
+  .panel-in,
+  .fade-swap,
+  .fade-status,
+  .message-in,
+  .photo-in {
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .btn-gold:hover,
   .btn-gold-outline:hover,
   .btn-ghost:hover,
-  .surface-card-hover:hover {
+  .btn-solid:hover,
+  .surface-card-hover:hover,
+  .hover-lift:hover,
+  a:hover .img-zoom,
+  button:hover .img-zoom {
     transform: none;
+  }
+
+  .drawer-panel[data-open="true"] {
+    grid-template-rows: 1fr;
+  }
+}
+
+@media print {
+  .page-fade,
+  .reveal,
+  .reveal-now,
+  .reveal-section,
+  .panel-in,
+  .panel-out,
+  .fade-swap,
+  .fade-status,
+  .message-in,
+  .photo-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

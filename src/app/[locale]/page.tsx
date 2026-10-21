@@ -124,13 +124,13 @@ export default async function HomePage({
               </FadeIn>
             )}
             {aboutImage && (
-              <FadeIn delay={0.1} className="img-frame group min-h-72">
+              <FadeIn delay={0.1} className="img-frame min-h-72">
                 <Image
                   src={aboutImage}
                   alt={t("home.about")}
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="img-zoom object-cover"
+                  className="object-cover"
                 />
                 <div className="img-overlay absolute inset-0" />
               </FadeIn>
@@ -153,7 +153,7 @@ export default async function HomePage({
                     alt={content.principal_name}
                     fill
                     sizes="(min-width: 768px) 200px, 100vw"
-                    className="img-zoom object-cover"
+                    className="object-cover"
                   />
                 </div>
               )}
@@ -186,7 +186,7 @@ export default async function HomePage({
               const Icon = ICONS[item.icon] ?? BookOpen;
               return (
                 <FadeIn key={item.id} delay={i * 0.08}>
-                  <article className="surface-card surface-card-hover h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
+                  <article className="surface-card h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
                     {item.image ? (
                       <div className="relative h-44 overflow-hidden border-b border-igqs-gold/45">
                         <Image
@@ -232,8 +232,8 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {grades.map((grade) => (
-              <FadeIn key={grade.slug}>
+            {grades.map((grade, index) => (
+              <FadeIn key={grade.slug} delay={index * 0.08}>
                 <Link href={`/curriculum#grade-${grade.slug}`} className="surface-card surface-card-hover block bg-white/90 p-5 dark:bg-[#12352b]">
                   <h3 className="font-display text-2xl text-igqs-forest dark:text-igqs-gold-soft">
                     {grade.name}
@@ -275,8 +275,8 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
-            {events.map((event) => (
-              <FadeIn key={event.slug}>
+            {events.map((event, index) => (
+              <FadeIn key={event.slug} delay={index * 0.08}>
                 <Link
                   href={`/events/${event.slug}`}
                   className="surface-card surface-card-hover group block overflow-hidden bg-white/90 dark:bg-[#12352b]"
@@ -316,8 +316,8 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {newsItems.map((item) => (
-              <FadeIn key={item.slug}>
+            {newsItems.map((item, index) => (
+              <FadeIn key={item.slug} delay={index * 0.08}>
                 <Link href={`/news/${item.slug}`} className="surface-card surface-card-hover group block overflow-hidden bg-white/90 dark:bg-[#12352b]">
                   <div className="relative h-40">
                     {item.image && (
@@ -354,7 +354,7 @@ export default async function HomePage({
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {albums.map((album, i) => (
-              <FadeIn key={album.slug} delay={i * 0.05} className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
+              <FadeIn key={album.slug} delay={i * 0.08} className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
                 <Link href="/gallery" className="img-frame group relative block min-h-40 md:min-h-44">
                   {album.cover_image_url && (
                     <Image
@@ -395,7 +395,7 @@ export default async function HomePage({
                 <li key={notice.slug}>
                   <Link
                     href={`/news/${notice.slug}`}
-                    className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 transition-colors duration-500 hover:bg-igqs-gold/10"
+                    className="motion-micro flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 hover:bg-igqs-gold/10"
                   >
                     <span className="font-medium">{notice.title}</span>
                     <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>

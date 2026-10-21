@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ReceiptLookupPanel } from "@/components/admission/ReceiptLookupPanel";
+import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
 import { publicPageMetadata } from "@/lib/seo";
 
@@ -34,11 +35,11 @@ export default async function DownloadReceiptPage({
   return (
     <div>
       <PageHero title={t("downloadPageTitle")} subtitle={t("downloadPageSubtitle")} />
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+      <FadeIn className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <Suspense>
           <ReceiptLookupPanel />
         </Suspense>
-      </div>
+      </FadeIn>
     </div>
   );
 }

@@ -51,7 +51,7 @@ export function HeroSlides({ images }: { images: string[] }) {
   useEffect(() => {
     if (previous === null) return;
     window.clearTimeout(previousTimer.current);
-    previousTimer.current = window.setTimeout(() => setPrevious(null), 800);
+    previousTimer.current = window.setTimeout(() => setPrevious(null), 700);
     return () => window.clearTimeout(previousTimer.current);
   }, [previous]);
 
@@ -70,7 +70,7 @@ export function HeroSlides({ images }: { images: string[] }) {
   }
 
   const controlClass =
-    "inline-flex size-11 items-center justify-center rounded-full bg-black/55 text-white transition hover:bg-black/70";
+    "motion-control inline-flex size-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/70";
 
   return (
     <div className="absolute inset-0">
@@ -84,7 +84,7 @@ export function HeroSlides({ images }: { images: string[] }) {
             fill
             priority={slideIndex === 0}
             sizes="100vw"
-            className={`object-cover transition-opacity duration-700 ${
+            className={`object-cover transition-opacity duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               slideIndex === index ? "opacity-100" : "opacity-0"
             }`}
           />
@@ -105,7 +105,7 @@ export function HeroSlides({ images }: { images: string[] }) {
               onClick={() => go(imageIndex)}
             >
               <span
-                className={`block size-2.5 rounded-full transition ${
+                className={`motion-control block size-2.5 rounded-full ${
                   imageIndex === index ? "bg-igqs-gold" : "bg-white/70"
                 }`}
               />

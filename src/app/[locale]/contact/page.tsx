@@ -2,6 +2,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { FadeIn } from "@/components/motion/FadeIn";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/components/icons/Social";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { apiGet, type SiteSettings } from "@/lib/api";
@@ -44,6 +45,7 @@ export default async function ContactPage({
       />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2">
         <div className="space-y-6">
+          <FadeIn>
           <div className="rounded-3xl border border-igqs-gold/20 bg-white p-6 dark:bg-[#0d1f18]">
             <p className="flex gap-3 text-sm">
               <MapPin className="mt-0.5 h-5 w-5 text-igqs-gold" />
@@ -104,13 +106,14 @@ export default async function ContactPage({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="inline-flex size-11 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-forest transition hover:bg-igqs-gold/15 dark:text-igqs-gold"
+                    className="motion-control inline-flex size-11 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-forest hover:bg-igqs-gold/15 dark:text-igqs-gold"
                   >
                     <Icon className="size-5" />
                   </a>
                 ))}
             </div>
           </div>
+          </FadeIn>
           {site?.map_embed_url && (
             <iframe
               title={t("map")}
@@ -120,7 +123,9 @@ export default async function ContactPage({
             />
           )}
         </div>
-        <ContactForm />
+        <FadeIn delay={0.08}>
+          <ContactForm />
+        </FadeIn>
       </div>
     </div>
   );

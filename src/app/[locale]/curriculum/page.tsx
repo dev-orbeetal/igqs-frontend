@@ -86,7 +86,7 @@ export default async function CurriculumPage({
                 <ul className="mt-3">
                   {grade.documents.map((doc) => (
                     <li key={doc.id}>
-                      <a href={doc.download_url} className="text-sm text-igqs-forest underline dark:text-igqs-gold-soft">
+                      <a href={doc.download_url} className="motion-micro text-sm text-igqs-forest underline hover:text-igqs-green dark:text-igqs-gold-soft dark:hover:text-igqs-gold">
                         {doc.title}
                       </a>
                     </li>

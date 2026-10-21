@@ -5,7 +5,7 @@ export function controlClass(invalid?: boolean) {
   return invalid ? `${fieldClass} !border-red-500 ring-1 ring-red-500` : fieldClass;
 }
 
-export const fieldErrorClass = "mt-1 text-sm text-red-700 dark:text-red-300";
+export const fieldErrorClass = "message-in mt-1 text-sm text-red-700 dark:text-red-300";
 
 export type WizardForm = Record<string, string>;
 

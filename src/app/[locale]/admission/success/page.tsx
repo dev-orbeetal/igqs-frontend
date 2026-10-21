@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SuccessPanel } from "@/components/admission/SuccessPanel";
+import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
 import { publicPageMetadata } from "@/lib/seo";
 
@@ -34,11 +35,11 @@ export default async function AdmissionSuccessPage({
   return (
     <div>
       <PageHero title={t("successTitle")} subtitle={t("successBody")} />
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+      <FadeIn className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <Suspense>
           <SuccessPanel />
         </Suspense>
-      </div>
+      </FadeIn>
     </div>
   );
 }

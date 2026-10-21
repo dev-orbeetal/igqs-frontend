@@ -27,8 +27,8 @@ function EventGrid({
   }
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      {items.map((event) => (
-        <FadeIn key={event.slug}>
+      {items.map((event, index) => (
+        <FadeIn key={event.slug} delay={index * 0.08}>
           <Link
             href={`/events/${event.slug}`}
             className="surface-card surface-card-hover group block overflow-hidden bg-white dark:bg-[#0d1f18]"

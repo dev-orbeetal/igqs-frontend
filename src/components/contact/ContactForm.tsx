@@ -55,7 +55,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="rounded-full bg-igqs-green px-6 py-3 text-sm text-igqs-cream disabled:opacity-60 dark:bg-igqs-gold dark:text-igqs-ink"
+        className="btn-solid rounded-full bg-igqs-green px-6 py-3 text-sm text-igqs-cream disabled:opacity-60 dark:bg-igqs-gold dark:text-igqs-ink"
       >
         {status === "sending" ? tc("sending") : tc("send")}
       </button>
@@ -65,12 +65,12 @@ export function ContactForm() {
         {status === "ok" ? t("success") : status === "error" ? t("error") : ""}
       </p>
       {status === "ok" && (
-        <p className="rounded-xl border border-igqs-forest/30 bg-igqs-forest/10 px-4 py-3 text-sm text-igqs-forest dark:border-igqs-gold/40 dark:bg-igqs-gold/10 dark:text-igqs-gold-soft">
+        <p className="message-in rounded-xl border border-igqs-forest/30 bg-igqs-forest/10 px-4 py-3 text-sm text-igqs-forest dark:border-igqs-gold/40 dark:bg-igqs-gold/10 dark:text-igqs-gold-soft">
           {t("success")}
         </p>
       )}
       {status === "error" && (
-        <p className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+        <p className="message-in rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
           {t("error")}
         </p>
       )}

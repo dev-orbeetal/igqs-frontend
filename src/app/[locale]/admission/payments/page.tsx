@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { MyPaymentsPanel } from "@/components/admission/MyPaymentsPanel";
+import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
 import { publicPageMetadata } from "@/lib/seo";
 
@@ -33,9 +34,9 @@ export default async function MyPaymentsPage({
   return (
     <div>
       <PageHero title={t("myPaymentsTitle")} subtitle={t("myPaymentsSubtitle")} />
-      <div className="mx-auto max-w-xl px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
+      <FadeIn className="mx-auto max-w-xl px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
         <MyPaymentsPanel />
-      </div>
+      </FadeIn>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export function ClassSelectStep({
               key={option.slug}
               type="button"
               onClick={() => onSelect(option)}
-              className={`min-h-16 rounded-2xl border px-3 py-4 text-center text-base font-medium transition ${
+              className={`motion-micro min-h-16 rounded-2xl border px-3 py-4 text-center text-base font-medium ${
                 active
                   ? "border-igqs-gold bg-igqs-gold/20 text-igqs-green dark:text-igqs-gold-soft"
                   : "border-igqs-gold/30 bg-white dark:bg-[#0d1f18]"
@@ -46,7 +46,7 @@ export function ClassSelectStep({
           );
         })}
       </div>
-      {error && <p className="mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
+      {error && <p className="message-in mt-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
       {selectedSlug && fee && (
         <div className="mt-6 rounded-3xl bg-igqs-green px-5 py-6 text-center text-igqs-cream dark:bg-[#0b241c]">
           <p className="text-sm text-igqs-gold-soft">{t("feeFixed")}</p>

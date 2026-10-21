@@ -87,16 +87,21 @@ export function ReceiptLookupPanel() {
         <button
           type="submit"
           disabled={searching}
-          className="mt-5 rounded-full bg-igqs-green px-6 py-2.5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+          className="btn-solid mt-5 rounded-full bg-igqs-green px-6 py-2.5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
         >
           {searching ? t("searchingReceipt") : t("searchReceipt")}
         </button>
-        <p role="status" aria-live="polite" className="mt-4 text-sm text-red-700 empty:mt-0">
+        <p
+          role="status"
+          aria-live="polite"
+          className={error ? "message-in mt-4 text-sm text-red-700" : "sr-only"}
+        >
           {error}
         </p>
       </form>
 
       {data && (
+        <div className="fade-status">
         <ApplicationReceiptCard
           data={data}
           kicker={t("downloadPageTitle")}
@@ -104,6 +109,7 @@ export function ReceiptLookupPanel() {
           showPrint
           showViewPdf
         />
+        </div>
       )}
     </div>
   );

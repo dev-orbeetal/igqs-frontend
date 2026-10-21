@@ -21,7 +21,7 @@ export function AdmissionStepper({
         return (
           <li key={key} className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
             <div
-              className={`flex min-h-10 w-full items-center justify-center rounded-full px-2 py-2 text-center leading-tight ${
+              className={`motion-hover flex min-h-10 w-full items-center justify-center rounded-full px-2 py-2 text-center leading-tight ${
                 current
                   ? "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
                   : done

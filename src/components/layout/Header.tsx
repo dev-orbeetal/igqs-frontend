@@ -97,7 +97,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
   if (adminSite || isAdminPath(pathname)) return null;
 
   const linkClass = (active: boolean) =>
-    `inline-flex min-h-11 items-center rounded-md px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
+    `motion-micro inline-flex min-h-11 items-center rounded-md px-3 py-2 text-xs font-medium whitespace-nowrap ${
       active
         ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
         : "text-igqs-ink hover:bg-igqs-sand/70 dark:text-igqs-cream dark:hover:bg-white/10"
@@ -135,13 +135,13 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
             <Link
               href="/notices"
               onClick={() => setDrawerOpen(false)}
-              className={`${compact ? "hidden" : "hidden md:inline-flex"} min-h-11 items-center rounded-md border border-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-igqs-green transition hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink`}
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} motion-hover min-h-11 items-center rounded-md border border-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-igqs-green hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink`}
             >
               {t("notices")}
             </Link>
             <Link
               href="/admission"
-              className={`${compact ? "hidden" : "hidden md:inline-flex"} min-h-11 items-center rounded-md bg-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-white transition hover:brightness-110 dark:bg-igqs-gold dark:text-igqs-ink`}
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} btn-solid min-h-11 items-center rounded-md bg-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-white dark:bg-igqs-gold dark:text-igqs-ink`}
             >
               {t("apply")}
             </Link>
@@ -190,16 +190,22 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
         </div>
       </div>
 
-      {drawerOpen && (
-        <div id="site-menu" className="border-b border-igqs-gold/20 bg-igqs-cream px-4 py-4 dark:bg-[#07140f]">
-          <div className="grid gap-1">
-            <Link href="/" onClick={() => setDrawerOpen(false)} className={linkClass(isActive("/"))}>
+      <div
+        id="site-menu"
+        data-open={drawerOpen ? "true" : "false"}
+        className="drawer-panel bg-igqs-cream dark:bg-[#07140f]"
+        aria-hidden={!drawerOpen}
+      >
+        <div className="drawer-panel-inner">
+          <div className="grid gap-1 px-4 py-4">
+            <Link href="/" tabIndex={drawerOpen ? undefined : -1} onClick={() => setDrawerOpen(false)} className={linkClass(isActive("/"))}>
               {t("home")}
             </Link>
             {LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                tabIndex={drawerOpen ? undefined : -1}
                 onClick={() => setDrawerOpen(false)}
                 className={linkClass(isActive(item.href))}
               >
@@ -208,21 +214,23 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
             ))}
             <Link
               href="/notices"
+              tabIndex={drawerOpen ? undefined : -1}
               onClick={() => setDrawerOpen(false)}
-              className="mt-2 inline-flex min-h-12 items-center justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green dark:border-igqs-gold dark:text-igqs-gold"
+              className="motion-hover mt-2 inline-flex min-h-12 items-center justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink"
             >
               {t("notices")}
             </Link>
             <Link
               href="/admission"
+              tabIndex={drawerOpen ? undefined : -1}
               onClick={() => setDrawerOpen(false)}
-              className="inline-flex min-h-12 items-center justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
+              className="btn-solid inline-flex min-h-12 items-center justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {t("apply")}
             </Link>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

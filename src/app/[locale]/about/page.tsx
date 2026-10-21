@@ -64,7 +64,7 @@ export default async function AboutPage({
             <h2 className="font-display text-3xl text-igqs-gold">{t("vision")}</h2>
             <p className="mt-4 max-w-prose whitespace-pre-line leading-relaxed">{about.vision}</p>
           </FadeIn>
-          <FadeIn className="rounded-3xl border border-igqs-gold/25 p-8">
+          <FadeIn delay={0.08} className="rounded-3xl border border-igqs-gold/25 p-8">
             <h2 className="font-display text-3xl text-igqs-forest dark:text-igqs-gold-soft">
               {t("mission")}
             </h2>
@@ -96,8 +96,8 @@ export default async function AboutPage({
             </p>
           )}
           <div className="grid gap-6 md:grid-cols-3">
-            {data.leadership.map((person) => (
-              <FadeIn key={person.id} className="overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
+            {data.leadership.map((person, index) => (
+              <FadeIn key={person.id} delay={index * 0.08} className="overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
                 <div className="img-frame h-64 rounded-none rounded-t-3xl border-b-0">
                   {person.photo_url && (
                     <Image
@@ -134,8 +134,8 @@ export default async function AboutPage({
             </p>
           )}
           <div className="grid gap-6 md:grid-cols-2">
-            {data.facilities.map((item) => (
-              <FadeIn key={item.id} className="grid overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white md:grid-cols-2 dark:bg-[#0d1f18]">
+            {data.facilities.map((item, index) => (
+              <FadeIn key={item.id} delay={index * 0.08} className="grid overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white md:grid-cols-2 dark:bg-[#0d1f18]">
                 <div className="img-frame min-h-44 rounded-none border-y-0 border-l-0">
                   {item.image_url && (
                     <Image

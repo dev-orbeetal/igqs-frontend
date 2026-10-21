@@ -22,22 +22,24 @@ export function HeroIntro({
 }) {
   return (
     <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pt-16 pb-24 sm:px-6">
-      <p className="reveal-now eyebrow">{kicker}</p>
+      <p className="reveal-now eyebrow" style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
+        {kicker}
+      </p>
       <h1
         className="reveal-now mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-white sm:text-5xl lg:text-6xl"
-        style={{ "--reveal-delay": "0.08s" } as React.CSSProperties}
+        style={{ "--reveal-delay": "160ms" } as React.CSSProperties}
       >
         {title || fallbackTitle}
       </h1>
       {subtitle ? (
-        <div className="reveal-now" style={{ "--reveal-delay": "0.16s" } as React.CSSProperties}>
+        <div className="reveal-now" style={{ "--reveal-delay": "240ms" } as React.CSSProperties}>
           <div className="heading-rule mt-5" />
           <p className="mt-5 max-w-xl text-base leading-relaxed text-igqs-cream/90 sm:text-lg">{subtitle}</p>
         </div>
       ) : null}
       <div
         className="reveal-now mt-8 flex flex-wrap gap-3"
-        style={{ "--reveal-delay": "0.24s" } as React.CSSProperties}
+        style={{ "--reveal-delay": "320ms" } as React.CSSProperties}
       >
         <Link href="/admission" className="btn-gold inline-flex">
           {applyLabel}

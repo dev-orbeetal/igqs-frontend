@@ -22,16 +22,44 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
   const t = useTranslations("gallery");
   const [category, setCategory] = useState("");
   const [active, setActive] = useState<string | null>(null);
+  const [shownSlug, setShownSlug] = useState<string | null>(null);
+  const [closing, setClosing] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const shownRef = useRef<string | null>(null);
+  const closingRef = useRef(false);
 
   const filtered = useMemo(
     () => (category ? albums.filter((a) => a.category === category) : albums),
     [albums, category]
   );
   const openAlbum = filtered.find((a) => a.slug === active);
+  const shownAlbum = filtered.find((a) => a.slug === shownSlug) ?? albums.find((a) => a.slug === shownSlug);
 
   // Opening an album used to append photos far below the album grid with no
   // scroll, no heading and no way to close — it looked like nothing happened.
+  useEffect(() => {
+    if (active) {
+      shownRef.current = active;
+      closingRef.current = false;
+      setClosing(false);
+      setShownSlug(active);
+      return;
+    }
+    if (!shownRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+  }, [active]);
+
+  useEffect(() => {
+    if (!closing) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      shownRef.current = null;
+      closingRef.current = false;
+      setShownSlug(null);
+      setClosing(false);
+    }
+  }, [closing]);
+
   useEffect(() => {
     if (!openAlbum || !panelRef.current) return;
     panelRef.current.scrollIntoView({
@@ -42,13 +70,13 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
   }, [openAlbum]);
 
   useEffect(() => {
-    if (!openAlbum) return;
+    if (!shownAlbum) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setActive(null);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [openAlbum]);
+  }, [shownAlbum]);
 
   return (
     <div>
@@ -62,7 +90,7 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
               setCategory(key);
               setActive(null);
             }}
-            className={`min-h-11 rounded-full px-4 py-2 text-sm transition ${
+            className={`motion-micro min-h-11 rounded-full px-4 py-2 text-sm ${
               category === key
                 ? "bg-igqs-green text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
                 : "border border-igqs-border-strong hover:bg-igqs-gold/10"
@@ -79,10 +107,10 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
         </p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((album) => {
+          {filtered.map((album, index) => {
             const expanded = album.slug === active;
             return (
-              <FadeIn key={album.slug}>
+              <FadeIn key={album.slug} delay={index * 0.08}>
                 <button
                   type="button"
                   onClick={() => setActive(expanded ? null : album.slug)}
@@ -116,33 +144,49 @@ export function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
         </div>
       )}
 
-      {openAlbum && (
+      {shownAlbum && (
         <div
           id="gallery-album-panel"
           ref={panelRef}
           tabIndex={-1}
-          className="mt-12 scroll-mt-24 rounded-3xl border border-igqs-gold/25 bg-white/70 p-5 sm:p-6 dark:bg-white/5"
+          key={shownAlbum.slug}
+          className={`mt-12 scroll-mt-24 rounded-3xl border border-igqs-gold/25 bg-white/70 p-5 sm:p-6 dark:bg-white/5 ${
+            closing ? "panel-out" : "panel-in"
+          }`}
+          onAnimationEnd={(event) => {
+            if (event.target !== event.currentTarget || event.animationName !== "panel-out" || !closingRef.current) {
+              return;
+            }
+            shownRef.current = null;
+            closingRef.current = false;
+            setShownSlug(null);
+            setClosing(false);
+          }}
         >
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-display text-2xl">{t("viewing", { album: openAlbum.title })}</h2>
+            <h2 className="font-display text-2xl">{t("viewing", { album: shownAlbum.title })}</h2>
             <button
               type="button"
               onClick={() => setActive(null)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-igqs-border-strong px-4 text-sm transition hover:bg-igqs-gold/10"
+              className="motion-micro inline-flex min-h-11 items-center gap-2 rounded-full border border-igqs-border-strong px-4 text-sm hover:bg-igqs-gold/10"
             >
               <X className="size-4" aria-hidden />
               {t("close")}
             </button>
           </div>
-          {openAlbum.images.length === 0 ? (
+          {shownAlbum.images.length === 0 ? (
             <p className="py-6 text-center text-igqs-muted">{t("empty")}</p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {openAlbum.images.map((image) => (
-                <div key={image.id} className="img-frame h-56">
+              {shownAlbum.images.map((image, index) => (
+                <div
+                  key={image.id}
+                  className="photo-in img-frame h-56"
+                  style={{ "--photo-index": Math.min(index, 5) } as React.CSSProperties}
+                >
                   <Image
                     src={image.image}
-                    alt={image.caption || openAlbum.title}
+                    alt={image.caption || shownAlbum.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover"

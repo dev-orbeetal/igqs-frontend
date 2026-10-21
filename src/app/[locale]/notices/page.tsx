@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FadeIn } from "@/components/motion/FadeIn";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Link } from "@/i18n/navigation";
@@ -70,7 +71,7 @@ export default async function NoticesPage({
         {groups.length === 0 ? (
           <p className="text-igqs-muted">{t("empty")}</p>
         ) : (
-          <div className="space-y-10">
+          <FadeIn className="space-y-10">
             {groups.map((group) => (
               <section key={group.topic}>
                 <h2 className="text-xs uppercase tracking-[0.18em] text-igqs-forest dark:text-igqs-gold">{topics(group.topic)}</h2>
@@ -79,7 +80,7 @@ export default async function NoticesPage({
                     <li key={notice.slug}>
                       <Link
                         href={`/news/${notice.slug}`}
-                        className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 transition-colors hover:bg-igqs-gold/10"
+                        className="motion-micro flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 hover:bg-igqs-gold/10"
                       >
                         <span className="font-medium">{notice.title}</span>
                         <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>
@@ -89,7 +90,7 @@ export default async function NoticesPage({
                 </ul>
               </section>
             ))}
-          </div>
+          </FadeIn>
         )}
       </div>
     </div>

@@ -94,14 +94,14 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             <button
               type="button"
               onClick={() => step(-1)}
-              className="absolute top-1/2 left-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm transition hover:bg-igqs-gold/10 lg:-translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
+              className="motion-control absolute top-1/2 left-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm hover:bg-igqs-gold/10 lg:-translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
               aria-label={t("testimonialsPrevious")}
             >
               <ChevronLeft className="size-5" />
             </button>
           )}
 
-          <div className="grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div key={page} className="fade-swap grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
             {visible.map((item) => (
               <article
                 key={item.id}
@@ -126,7 +126,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label="Facebook"
-                          className="text-[#1877F2]"
+                          className="motion-micro text-[#1877F2] hover:text-[#0d65d9]"
                         >
                           <FacebookIcon className="size-4" />
                         </a>
@@ -148,7 +148,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             <button
               type="button"
               onClick={() => step(1)}
-              className="absolute top-1/2 right-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm transition hover:bg-igqs-gold/10 lg:translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
+              className="motion-control absolute top-1/2 right-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm hover:bg-igqs-gold/10 lg:translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
               aria-label={t("testimonialsNext")}
             >
               <ChevronRight className="size-5" />
@@ -168,7 +168,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
                 className="inline-flex size-11 items-center justify-center rounded-full"
               >
                 <span
-                  className={`block size-2.5 rounded-full transition ${
+                  className={`motion-control block size-2.5 rounded-full ${
                     index === page ? "bg-igqs-green dark:bg-igqs-gold" : "bg-igqs-gold/40"
                   }`}
                 />
