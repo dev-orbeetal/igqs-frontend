@@ -254,7 +254,7 @@ export function ApplicationReceiptCard({
                 <span className="mb-1 h-[2px] flex-1 bg-[#1a5c45]" aria-hidden />
               </div>
 
-              <dl className="relative mt-3 overflow-hidden rounded-xl border border-[#d9d2c2]">
+              <dl className="mt-3 overflow-hidden rounded-xl border border-[#d9d2c2]">
                 <Row label={t("studentName")}>{data.student_name}</Row>
                 {data.student_name_bn ? (
                   <Row label={t("studentNameBn")}>
@@ -306,7 +306,6 @@ export function ApplicationReceiptCard({
                   <Row label={t("rejectionReason")}>{data.rejection_reason}</Row>
                 ) : null}
               </dl>
-              <BookIcon className="receipt-watermark pointer-events-none absolute right-6 bottom-16 hidden h-24 w-40 text-[#c4a35a] opacity-[0.12] md:block" />
             </section>
           )}
 
@@ -321,6 +320,7 @@ export function ApplicationReceiptCard({
         </div>
         <div className="receipt-footband h-3 border-t-[3px] border-[#c4a35a] bg-[#0f3d30]" aria-hidden />
       </article>
+      <BookIcon className="receipt-watermark pointer-events-none mx-auto mt-5 h-10 w-16 text-[#c4a35a] opacity-40 print:hidden sm:h-12 sm:w-20" />
 
       {data?.receipt_pdf_url && (
         <div className="mt-6 flex flex-wrap justify-center gap-3 print:hidden">
