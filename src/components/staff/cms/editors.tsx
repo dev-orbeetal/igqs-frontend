@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
@@ -679,12 +679,17 @@ function ItemTable({
   titleField,
   extra,
   badge,
+  rowActions,
 }: {
   path: string;
   hrefBase: string;
   titleField: string;
   extra?: (row: Record<string, unknown>) => string;
   badge?: (row: Record<string, unknown>) => RowBadge | null;
+  rowActions?: (
+    row: Record<string, unknown>,
+    patchRow: (next: Record<string, unknown>) => void,
+  ) => ReactNode;
 }) {
   const copy = useCmsCopy();
   const router = useRouter();
@@ -717,6 +722,10 @@ function ItemTable({
     const haystack = `${String(row[titleField] || row.id)} ${details}`.toLowerCase();
     return haystack.includes(listQuery.trim().toLowerCase());
   });
+
+  function patchRow(id: unknown, next: Record<string, unknown>) {
+    setRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...next } : row)));
+  }
 
   const empty = (
     <p className="rounded-2xl border border-dashed border-igqs-border-strong px-4 py-8 text-center text-sm text-igqs-muted dark:border-igqs-gold/70">
@@ -761,9 +770,12 @@ function ItemTable({
                     {mark && <StatusBadge status={mark.status} label={mark.label} />}
                   </div>
                   {extra && <p className="mt-1 text-sm text-igqs-muted">{extra(row)}</p>}
-                  <Link href={`${hrefBase}/${row.id}`} className={`${btn.secondary} mt-3 min-h-11`}>
-                    {copy.t("edit")}
-                  </Link>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {rowActions?.(row, (next) => patchRow(row.id, next))}
+                    <Link href={`${hrefBase}/${row.id}`} className={`${btn.secondary} min-h-11`}>
+                      {copy.t("edit")}
+                    </Link>
+                  </div>
                 </article>
               );
             })}
@@ -789,10 +801,13 @@ function ItemTable({
                           <span className="text-igqs-muted">{extra?.(row)}</span>
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <Link href={`${hrefBase}/${row.id}`} className={btn.secondary}>
-                          {copy.t("edit")}
-                        </Link>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          {rowActions?.(row, (next) => patchRow(row.id, next))}
+                          <Link href={`${hrefBase}/${row.id}`} className={btn.secondary}>
+                            {copy.t("edit")}
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -804,6 +819,55 @@ function ItemTable({
         </>
       )}
     </div>
+  );
+}
+
+function GradeAdmissionToggle({
+  row,
+  onUpdated,
+}: {
+  row: Record<string, unknown>;
+  onUpdated: (next: Record<string, unknown>) => void;
+}) {
+  const t = useTranslations("cms");
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+  const open = Boolean(row.open_for_admission);
+
+  async function toggle() {
+    setBusy(true);
+    setError(false);
+    try {
+      const updated = await staffRequest<Record<string, unknown>>(`/api/staff/grades/${row.id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ open_for_admission: !open }),
+      });
+      onUpdated(updated);
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        router.replace("/login");
+        return;
+      }
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <span className="inline-flex flex-col items-stretch gap-1 sm:items-end">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={toggle}
+        className={`${open ? btn.secondary : btn.primary} min-h-11 whitespace-nowrap`}
+        aria-pressed={open}
+      >
+        {busy ? t("saving") : open ? t("admissionCloseAction") : t("admissionOpenAction")}
+      </button>
+      {error && <span className="text-xs text-red-600 dark:text-red-300">{t("admissionToggleError")}</span>}
+    </span>
   );
 }
 
@@ -996,6 +1060,9 @@ export function CurriculumManager({ id }: { id?: string }) {
           const fee = row.fee_amount ? ` · ৳${String(row.fee_amount)}` : "";
           return `${String(row.slug)}${row.open_for_admission ? fee : ""}`;
         }}
+        rowActions={(row, patchRow) => (
+          <GradeAdmissionToggle row={row} onUpdated={patchRow} />
+        )}
       />
     );
   }
