@@ -3,11 +3,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { apiUrl } from "@/lib/api";
-import {
-  ApplicationReceiptCard,
-  type ApplicationDetail,
-} from "@/components/admission/ApplicationReceiptCard";
+import { apiUrl, type ApplicationDetail } from "@/lib/api";
+import { PaymentStatusStep } from "@/components/admission/PaymentStatusStep";
 
 function normalizeLookupId(value: string) {
   return value.trim().toUpperCase().replace(/\s+/g, "");
@@ -102,13 +99,7 @@ export function ReceiptLookupPanel() {
 
       {data && (
         <div className="fade-status">
-        <ApplicationReceiptCard
-          data={data}
-          kicker={t("downloadPageTitle")}
-          heading={t("viewReceipt")}
-          showPrint
-          showViewPdf
-        />
+          <PaymentStatusStep data={data} />
         </div>
       )}
     </div>

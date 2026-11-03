@@ -868,8 +868,7 @@ select optgroup {
   animation: loader-in 400ms var(--ease-out) 250ms both;
 }
 .loader-arc,
-.loader-orbit,
-.loader-motif {
+.loader-orbit {
   transform-box: view-box;
   transform-origin: 50% 50%;
 }
@@ -880,9 +879,6 @@ select optgroup {
 }
 .loader-orbit {
   animation: loader-spin 14s linear infinite reverse;
-}
-.loader-motif {
-  animation: loader-spin 24s linear infinite;
 }
 .loader-crest {
   animation: loader-breathe 2.8s ease-in-out infinite;
@@ -905,7 +901,6 @@ select optgroup {
   }
   .loader-arc,
   .loader-orbit,
-  .loader-motif,
   .loader-crest,
   .loader-dot,
   .loader-bar > span {

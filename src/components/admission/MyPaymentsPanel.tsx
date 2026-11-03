@@ -150,19 +150,33 @@ export function MyPaymentsPanel() {
                 {t("transactionId")}: {row.transaction.transaction_id}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <Link
-                  href={`/admission/success?id=${encodeURIComponent(row.application_id)}`}
-                  className="min-h-11 rounded-full border border-igqs-gold/40 px-4 py-2 text-sm"
-                >
-                  {t("viewReceiptShort")}
-                </Link>
-                {row.status === "approved" && row.receipt_pdf_url && (
-                  <a
-                    href={row.receipt_pdf_url}
-                    className="min-h-11 rounded-full bg-igqs-green px-4 py-2 text-sm text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
+                {row.status === "approved" ? (
+                  <>
+                    <Link
+                      href={`/admission/success?id=${encodeURIComponent(row.application_id)}`}
+                      className="min-h-11 rounded-full border border-igqs-gold/40 px-4 py-2 text-sm"
+                    >
+                      {t("viewReceiptShort")}
+                    </Link>
+                    {row.receipt_pdf_url && (
+                      <a
+                        href={row.receipt_pdf_url}
+                        className="min-h-11 rounded-full bg-igqs-green px-4 py-2 text-sm text-igqs-cream dark:bg-igqs-gold dark:text-igqs-ink"
+                      >
+                        {t("downloadPdf")}
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <span
+                    className={
+                      row.status === "rejected"
+                        ? "inline-flex min-h-11 items-center rounded-full border border-red-400/50 bg-red-50 px-4 py-2 text-sm text-red-800 dark:bg-red-950/30 dark:text-red-200"
+                        : "inline-flex min-h-11 items-center rounded-full border border-amber-400/50 bg-amber-50 px-4 py-2 text-sm text-amber-950 dark:bg-amber-950/30 dark:text-amber-100"
+                    }
                   >
-                    {t("downloadPdf")}
-                  </a>
+                    {statusLabel(row.status, t)}
+                  </span>
                 )}
               </div>
             </article>
