@@ -60,7 +60,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
   ];
 
   return (
-    <footer className="relative mt-4 bg-[#0f1115] text-white print:hidden">
+    <footer className="footer-green relative mt-4 text-white print:hidden">
       <div className="mx-auto grid max-w-7xl items-start gap-x-6 gap-y-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-12">
         <div className="sm:col-span-2 lg:col-span-3">
           <div className="mb-3">

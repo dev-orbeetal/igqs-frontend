@@ -4,6 +4,7 @@ import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransf
 import { Award, GraduationCap, Sparkles, Users } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useMemo, useRef } from "react";
+import { ArchCorner } from "@/components/ui/Ornaments";
 
 const ICONS = {
   users: Users,
@@ -97,11 +98,13 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
   return (
     <section
       id="highlights"
-      className="scroll-mt-28 border-y border-igqs-gold bg-igqs-forest text-igqs-cream dark:bg-[#0b241c]"
+      className="band-green relative scroll-mt-28 overflow-hidden border-t border-t-igqs-gold/60"
       aria-label={label}
     >
+      <ArchCorner id="stats-arch-left" side="left" />
+      <ArchCorner id="stats-arch-right" side="right" />
       <h2 className="sr-only">{label}</h2>
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-8 px-4 py-8 sm:px-6 md:grid-cols-4">
+      <div className="relative mx-auto grid max-w-5xl grid-cols-2 gap-y-5 px-4 py-5 sm:px-6 sm:py-7 md:grid-cols-4 md:gap-y-0 md:[&>*+*]:border-l md:[&>*+*]:border-white/15">
         {items.map((item, index) => {
           const Icon = ICONS[item.icon as keyof typeof ICONS] ?? Users;
           return (
@@ -114,14 +117,16 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
                 // RevealObserver may tag this before the component hydrates.
                 suppressHydrationWarning
               >
-                <span className="stat-icon">
-                  <Icon className="relative size-8 text-igqs-gold" strokeWidth={1.5} aria-hidden />
+                <span className="stat-icon stat-tile">
+                  <Icon className="relative size-5 text-igqs-gold-soft sm:size-6" strokeWidth={1.6} aria-hidden />
                 </span>
               </div>
-              <p className="mt-1 font-display text-4xl leading-none text-igqs-gold tabular-nums">
+              {/* leading-none! — the Bangla site's `.font-bn .font-display` rule
+                  sets line-height 1.6, which made each figure a tall box. */}
+              <p className="stat-number mt-2 text-[1.7rem] leading-none! text-igqs-gold tabular-nums sm:text-[2.1rem]">
                 <CountValue value={item.value} delay={index * 0.08} />
               </p>
-              <p className="mt-1.5 text-sm text-igqs-cream/80">{item.label}</p>
+              <p className="mt-1.5 text-[0.8rem] leading-snug font-medium text-white/90 sm:text-[0.95rem]">{item.label}</p>
             </div>
           );
         })}

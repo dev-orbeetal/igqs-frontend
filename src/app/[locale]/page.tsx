@@ -11,6 +11,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { HeroDecor } from "@/components/home/HeroDecor";
 import { HeroSlides } from "@/components/home/HeroSlides";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { ArchCorner, MosqueWatermark, WaveEdge } from "@/components/ui/Ornaments";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
 import { isAdminHost } from "@/lib/admin-paths";
@@ -105,41 +106,44 @@ export default async function HomePage({
       <Highlights items={highlights} label={t("home.highlights")} />
 
       {content?.welcome && (
-        <section className="section-cream section-pad">
-          <FadeIn className="section-shell">
+        <section className="section-cream relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
+          <MosqueWatermark className="pointer-events-none absolute right-[4%] bottom-10 hidden w-[min(30rem,34%)] text-igqs-gold opacity-[0.16] md:block dark:opacity-[0.08]" />
+          <FadeIn className="section-shell relative">
             <SectionHeading kicker={t("brand.name")} title={t("home.welcome")} />
-            <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
+            <p className="quote-bar max-w-2xl whitespace-pre-line text-base leading-relaxed text-igqs-ink/85 sm:text-lg dark:text-igqs-sand/85">
               {content.welcome}
             </p>
           </FadeIn>
+          <WaveEdge />
         </section>
       )}
 
       {(content?.about_preview || aboutImage) && (
-        <section className="section-white pb-14 sm:pb-16 lg:pb-20">
-          <div className="section-shell grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <section className="section-white pt-6 pb-14 sm:pb-16 lg:pb-20">
+          <div className="section-shell grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
             {content?.about_preview && (
               <FadeIn variant="left">
                 <SectionHeading title={t("home.about")} />
-                <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
+                <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-ink/85 sm:text-lg dark:text-igqs-sand/85">
                   {content.about_preview}
                 </p>
-                <Link href="/about" className="link-gold group mt-6 inline-flex items-center gap-1 font-medium">
+                <Link href="/about" className="btn-green group mt-7">
                   {t("common.learnMore")}
                   <span className="nudge-x" aria-hidden>→</span>
                 </Link>
               </FadeIn>
             )}
             {aboutImage && (
-              <FadeIn delay={0.1} variant="right" className="img-frame min-h-72">
-                <Image
-                  src={aboutImage}
-                  alt={t("home.about")}
-                  fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="parallax-soft object-cover"
-                />
-                <div className="img-overlay absolute inset-0" />
+              <FadeIn delay={0.1} variant="right" className="img-frame-offset ml-4 mb-4 sm:ml-5">
+                <div className="img-frame min-h-64 shadow-[0_18px_40px_rgb(16_35_28/0.14)] sm:min-h-80">
+                  <Image
+                    src={aboutImage}
+                    alt={t("home.about")}
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="parallax-soft object-cover"
+                  />
+                </div>
               </FadeIn>
             )}
           </div>
@@ -150,9 +154,13 @@ export default async function HomePage({
         <section className="section-cream section-pad">
           <div className="section-shell">
             <FadeIn>
-              <SectionHeading title={t("home.principal")} />
+              <SectionHeading title={t("home.principal")} align="center" />
             </FadeIn>
-            <FadeIn className="surface-card grid gap-8 bg-white/90 p-6 md:grid-cols-[200px_1fr] md:p-9 dark:bg-[#12352b]">
+            <FadeIn
+              className={`surface-card relative mx-auto grid max-w-5xl gap-8 overflow-hidden border-t-4 border-t-igqs-gold bg-white p-6 md:p-10 dark:bg-[#12352b] ${
+                content.principal_photo_url ? "md:grid-cols-[200px_1fr]" : ""
+              }`}
+            >
               {content.principal_photo_url && (
                 <div
                   className="img-frame reveal relative h-56 md:h-auto md:min-h-56"
@@ -170,7 +178,7 @@ export default async function HomePage({
               {(content.principal_message || content.principal_name) && (
                 <blockquote>
                   {content.principal_message && (
-                    <p className="max-w-prose whitespace-pre-line font-display text-xl leading-relaxed text-igqs-forest sm:text-2xl dark:text-igqs-gold-soft">
+                    <p className="principal-quote whitespace-pre-line text-lg leading-relaxed text-igqs-green sm:text-xl dark:text-igqs-gold-soft">
                       “{content.principal_message}”
                     </p>
                   )}
@@ -188,17 +196,19 @@ export default async function HomePage({
       )}
 
       {whyChoose.length > 0 && (
-      <section className="section-forest pattern-geo-dark section-pad">
-        <div className="section-shell">
+      <section className="band-green on-dark relative overflow-hidden section-pad">
+        <ArchCorner id="why-arch-left" side="left" fit="corner" className="opacity-80" />
+        <ArchCorner id="why-arch-right" side="right" fit="corner" className="opacity-80" />
+        <div className="section-shell relative">
           <FadeIn>
-            <SectionHeading title={t("home.why")} tone="onDark" />
+            <SectionHeading title={t("home.why")} tone="onDark" align="center" />
           </FadeIn>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {whyChoose.map((item, i) => {
               const Icon = ICONS[item.icon] ?? BookOpen;
               return (
                 <FadeIn key={item.id} delay={i * 0.08}>
-                  <article className="surface-card surface-card-hover group h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
+                  <article className="surface-card surface-card-hover group h-full overflow-hidden border-igqs-gold/30! bg-white/[0.06] backdrop-blur-[2px] dark:bg-[#12352b]">
                     {item.image ? (
                       <div className="relative h-44 overflow-hidden border-b border-igqs-gold/45">
                         <Image
@@ -216,7 +226,7 @@ export default async function HomePage({
                           <Icon className="h-5 w-5" strokeWidth={1.5} />
                         </span>
                       )}
-                      <h3 className={`font-display text-2xl text-igqs-cream ${item.image ? "" : "mt-5"}`}>
+                      <h3 className={`heading-strong text-[1.4rem] leading-snug text-white ${item.image ? "" : "mt-5"}`}>
                         {item.title}
                       </h3>
                       <p className="mt-2 text-sm leading-relaxed text-igqs-cream/75">
@@ -251,7 +261,7 @@ export default async function HomePage({
                   className="surface-card surface-card-hover group relative block h-full overflow-hidden bg-white/90 p-5 dark:bg-[#12352b]"
                 >
                   <span className="card-accent" aria-hidden />
-                  <h3 className="flex items-baseline justify-between gap-3 font-display text-2xl text-igqs-forest dark:text-igqs-gold-soft">
+                  <h3 className="heading-strong flex items-baseline justify-between gap-3 text-[1.4rem] leading-snug text-igqs-green dark:text-igqs-gold-soft">
                     {grade.name}
                     <span className="nudge-x text-lg text-igqs-gold" aria-hidden>→</span>
                   </h3>
@@ -267,10 +277,12 @@ export default async function HomePage({
       )}
 
       {site?.admission_open && site.admission_announcement && (
-        <section className="section-forest pattern-geo-dark py-14 sm:py-16">
-          <FadeIn className="section-shell flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+        <section className="band-green on-dark relative overflow-hidden py-14 sm:py-16">
+          <ArchCorner id="cta-arch-left" side="left" fit="corner" />
+          <ArchCorner id="cta-arch-right" side="right" fit="corner" />
+          <FadeIn className="section-shell relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center md:px-12 lg:px-24">
             <div>
-              <p className="eyebrow">{t("home.admission")}</p>
+              <p className="eyebrow eyebrow-line">{t("home.admission")}</p>
               <p className="mt-3 max-w-prose whitespace-pre-line text-base leading-relaxed sm:text-lg">
                 {site.admission_announcement}
               </p>
@@ -314,7 +326,7 @@ export default async function HomePage({
                   </div>
                   <div className="p-5">
                     <p className="text-xs text-igqs-forest dark:text-igqs-gold">{formatDate(event.start_at, locale)}</p>
-                    <h3 className="mt-2 font-display text-2xl leading-tight">{event.title}</h3>
+                    <h3 className="heading-strong mt-2 text-[1.35rem] leading-snug text-igqs-green dark:text-igqs-cream">{event.title}</h3>
                     <p className="mt-1 text-sm text-igqs-muted">{event.location}</p>
                   </div>
                 </Link>
@@ -352,7 +364,7 @@ export default async function HomePage({
                   </div>
                   <div className="p-4">
                     <p className="eyebrow nudge-x">{t(`news.${newsCategoryKey(item.category)}`)}</p>
-                    <h3 className="mt-2 font-display text-xl leading-tight">{item.title}</h3>
+                    <h3 className="heading-strong mt-2 text-[1.2rem] leading-snug text-igqs-green dark:text-igqs-cream">{item.title}</h3>
                   </div>
                 </Link>
               </FadeIn>

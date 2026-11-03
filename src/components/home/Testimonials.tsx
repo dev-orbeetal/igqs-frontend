@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FacebookIcon } from "@/components/icons/Social";
 import { formatDate } from "@/lib/format";
+import { SectionHeading } from "@/components/ui/PageHero";
 
 export type TestimonialItem = {
   id: number;
@@ -85,12 +86,13 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   return (
     <section className="section-white section-pad" aria-labelledby="home-testimonials">
       <div className="section-shell">
-        <div className="reveal mb-10 text-center" suppressHydrationWarning>
-          <p className="eyebrow">{t("testimonialsKicker")}</p>
-          <h2 id="home-testimonials" className="mt-2 font-display text-3xl leading-tight text-igqs-forest md:text-[3.0625rem] dark:text-igqs-gold-soft">
-            {t("testimonials")}
-          </h2>
-          <div className="heading-rule reveal mx-auto mt-3" data-reveal="draw" suppressHydrationWarning />
+        <div className="reveal" suppressHydrationWarning>
+          <SectionHeading
+            id="home-testimonials"
+            kicker={t("testimonialsKicker")}
+            title={t("testimonials")}
+            align="center"
+          />
         </div>
 
         <div className="relative">

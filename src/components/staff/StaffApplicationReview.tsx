@@ -137,18 +137,6 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           <button
             type="button"
             className={btn.secondary}
-            onClick={() =>
-              staffDownload(
-                `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/export/`,
-                `${data.application_id}.csv`
-              )
-            }
-          >
-            {t("downloadApplication")}
-          </button>
-          <button
-            type="button"
-            className={btn.secondary}
             onClick={() => {
               setReceiptNotice("");
               staffOpen(

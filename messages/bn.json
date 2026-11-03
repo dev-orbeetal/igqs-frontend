@@ -338,7 +338,8 @@
     "methodBkash": "বিকাশ",
     "methodNagad": "নগদ",
     "methodRocket": "রকেট",
-    "methodBank": "ব্যাংক ট্রান্সফার"
+    "methodBank": "ব্যাংক ট্রান্সফার",
+    "receiptAcknowledgement": "এই রসিদটি ভর্তি আবেদন সফলভাবে জমা দেওয়ার স্বীকৃতি।"
   },
   "footer": {
     "rights": "সর্বস্বত্ব সংরক্ষিত।",
@@ -381,7 +382,6 @@
     "decision": "অনুমোদন",
     "decisionHint": "নথি ও ট্রানজেকশন দেখে অনুমোদন বা প্রত্যাখ্যান করুন।",
     "defaultFee": "সাধারণ",
-    "downloadApplication": "আবেদন ডাউনলোড",
     "downloadList": "তালিকা ডাউনলোড",
     "downloadReceipt": "রসিদ ডাউনলোড",
     "viewReceipt": "রসিদ দেখুন",
