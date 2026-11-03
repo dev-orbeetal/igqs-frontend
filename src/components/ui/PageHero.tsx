@@ -81,7 +81,7 @@ export function SectionHeading({
       >
         {title}
       </h2>
-      <div className="heading-rule mt-3" />
+      <div className="heading-rule reveal mt-3" data-reveal="draw" />
     </div>
   );
 }

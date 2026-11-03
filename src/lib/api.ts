@@ -78,19 +78,6 @@ export async function apiPost(path: string, body: FormData | object, token?: str
   return data;
 }
 
-export async function apiGetAuth<T>(path: string, token: string, locale?: string): Promise<T> {
-  const res = await fetch(apiUrl(path, locale), {
-    cache: "no-store",
-    headers: { Authorization: `Bearer ${token}` },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(JSON.stringify(data));
-  }
-  return data as T;
-}
-
 export type ApplicationDetail = {
   application_id: string;
   receipt_id: string;

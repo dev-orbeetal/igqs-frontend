@@ -72,7 +72,9 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
     update();
     const observer = new ResizeObserver(update);
     observer.observe(row);
-    observer.observe(measure);
+    // The measuring box is clipped to 0×0 (so it can't widen the page on
+    // phones); watch the rows inside it, which keep their natural width.
+    measure.querySelectorAll("[data-links], [data-actions]").forEach((el) => observer.observe(el));
     if (logoRef.current) observer.observe(logoRef.current);
     if (toolsRef.current) observer.observe(toolsRef.current);
     return () => observer.disconnect();
@@ -100,7 +102,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
     `motion-micro inline-flex min-h-11 items-center rounded-md px-3 py-2 text-xs font-medium whitespace-nowrap ${
       active
         ? "bg-igqs-green text-white dark:bg-igqs-gold dark:text-igqs-ink"
-        : "text-igqs-ink hover:bg-igqs-sand/70 dark:text-igqs-cream dark:hover:bg-white/10"
+        : "nav-underline text-igqs-ink hover:bg-igqs-sand/70 dark:text-igqs-cream dark:hover:bg-white/10"
     }`;
 
   return (
@@ -163,7 +165,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
           </div>
           <div
             ref={measureRef}
-            className="pointer-events-none absolute top-0 left-0 -z-10 w-max opacity-0"
+            className="pointer-events-none absolute top-0 left-0 -z-10 size-0 overflow-hidden opacity-0"
             aria-hidden
             inert
           >

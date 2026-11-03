@@ -8,6 +8,7 @@ import { StaffShell } from "@/components/staff/StaffShell";
 import { Highlights } from "@/components/home/Highlights";
 import { HeroIntro } from "@/components/home/HeroIntro";
 import { Testimonials } from "@/components/home/Testimonials";
+import { HeroDecor } from "@/components/home/HeroDecor";
 import { HeroSlides } from "@/components/home/HeroSlides";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { SectionHeading } from "@/components/ui/PageHero";
@@ -80,12 +81,14 @@ export default async function HomePage({
 
   return (
     <div>
-      <section className="on-dark relative flex min-h-[calc(100svh-6.5rem)] flex-col overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
-        <div className="pointer-events-none absolute inset-0">
+      <section className="on-dark hero-timeline relative flex min-h-[min(30rem,calc(100svh-4.5rem))] flex-col sm:min-h-[calc(100svh-6.5rem)] overflow-hidden bg-[#f6f1e7] dark:bg-[#0a1a14]">
+        <div className="hero-parallax-bg pointer-events-none absolute inset-0">
           <HeroSlides images={heroImages} />
           <div className="hero-overlay absolute inset-0" />
           <div className="hero-pattern absolute inset-0" />
+          <HeroDecor />
         </div>
+        <div className="hero-parallax-fg relative flex flex-1 flex-col">
         <HeroIntro
           kicker={brand("name")}
           title={content?.hero_title}
@@ -93,7 +96,10 @@ export default async function HomePage({
           applyLabel={t("common.applyNow")}
           curriculumLabel={t("common.viewCurriculum")}
           fallbackTitle={t("home.heroFallbackTitle")}
+          scrollTarget={highlights.length ? "highlights" : undefined}
+          scrollLabel={t("home.scrollToContent")}
         />
+        </div>
       </section>
 
       <Highlights items={highlights} label={t("home.highlights")} />
@@ -113,24 +119,25 @@ export default async function HomePage({
         <section className="section-white pb-14 sm:pb-16 lg:pb-20">
           <div className="section-shell grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             {content?.about_preview && (
-              <FadeIn>
+              <FadeIn variant="left">
                 <SectionHeading title={t("home.about")} />
                 <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-muted sm:text-lg dark:text-igqs-sand/80">
                   {content.about_preview}
                 </p>
-                <Link href="/about" className="link-gold mt-6 inline-block font-medium">
-                  {t("common.learnMore")} →
+                <Link href="/about" className="link-gold group mt-6 inline-flex items-center gap-1 font-medium">
+                  {t("common.learnMore")}
+                  <span className="nudge-x" aria-hidden>→</span>
                 </Link>
               </FadeIn>
             )}
             {aboutImage && (
-              <FadeIn delay={0.1} className="img-frame min-h-72">
+              <FadeIn delay={0.1} variant="right" className="img-frame min-h-72">
                 <Image
                   src={aboutImage}
                   alt={t("home.about")}
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover"
+                  className="parallax-soft object-cover"
                 />
                 <div className="img-overlay absolute inset-0" />
               </FadeIn>
@@ -147,7 +154,10 @@ export default async function HomePage({
             </FadeIn>
             <FadeIn className="surface-card grid gap-8 bg-white/90 p-6 md:grid-cols-[200px_1fr] md:p-9 dark:bg-[#12352b]">
               {content.principal_photo_url && (
-                <div className="img-frame relative h-56 md:h-auto md:min-h-56">
+                <div
+                  className="img-frame reveal relative h-56 md:h-auto md:min-h-56"
+                  data-reveal="pop"
+                >
                   <Image
                     src={content.principal_photo_url}
                     alt={content.principal_name}
@@ -180,13 +190,15 @@ export default async function HomePage({
       {whyChoose.length > 0 && (
       <section className="section-forest pattern-geo-dark section-pad">
         <div className="section-shell">
-          <SectionHeading title={t("home.why")} tone="onDark" />
+          <FadeIn>
+            <SectionHeading title={t("home.why")} tone="onDark" />
+          </FadeIn>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {whyChoose.map((item, i) => {
               const Icon = ICONS[item.icon] ?? BookOpen;
               return (
                 <FadeIn key={item.id} delay={i * 0.08}>
-                  <article className="surface-card h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
+                  <article className="surface-card surface-card-hover group h-full overflow-hidden bg-[#1a4a3c]/85 dark:bg-[#12352b]">
                     {item.image ? (
                       <div className="relative h-44 overflow-hidden border-b border-igqs-gold/45">
                         <Image
@@ -194,7 +206,7 @@ export default async function HomePage({
                           alt={item.title}
                           fill
                           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
-                          className="object-cover"
+                          className="img-zoom object-cover"
                         />
                       </div>
                     ) : null}
@@ -234,9 +246,14 @@ export default async function HomePage({
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {grades.map((grade, index) => (
               <FadeIn key={grade.slug} delay={index * 0.08}>
-                <Link href={`/curriculum#grade-${grade.slug}`} className="surface-card surface-card-hover block bg-white/90 p-5 dark:bg-[#12352b]">
-                  <h3 className="font-display text-2xl text-igqs-forest dark:text-igqs-gold-soft">
+                <Link
+                  href={`/curriculum#grade-${grade.slug}`}
+                  className="surface-card surface-card-hover group relative block h-full overflow-hidden bg-white/90 p-5 dark:bg-[#12352b]"
+                >
+                  <span className="card-accent" aria-hidden />
+                  <h3 className="flex items-baseline justify-between gap-3 font-display text-2xl text-igqs-forest dark:text-igqs-gold-soft">
                     {grade.name}
+                    <span className="nudge-x text-lg text-igqs-gold" aria-hidden>→</span>
                   </h3>
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-igqs-muted">
                     {grade.description}
@@ -258,9 +275,11 @@ export default async function HomePage({
                 {site.admission_announcement}
               </p>
             </div>
-            <Link href="/admission" className="btn-gold inline-flex">
-              {t("common.applyNow")}
-            </Link>
+            <FadeIn variant="pop" delay={0.16} className="shrink-0">
+              <Link href="/admission" className="btn-gold btn-shine inline-flex">
+                {t("common.applyNow")}
+              </Link>
+            </FadeIn>
           </FadeIn>
         </section>
       )}
@@ -332,7 +351,7 @@ export default async function HomePage({
                     <div className="img-overlay absolute inset-0" />
                   </div>
                   <div className="p-4">
-                    <p className="eyebrow">{t(`news.${newsCategoryKey(item.category)}`)}</p>
+                    <p className="eyebrow nudge-x">{t(`news.${newsCategoryKey(item.category)}`)}</p>
                     <h3 className="mt-2 font-display text-xl leading-tight">{item.title}</h3>
                   </div>
                 </Link>
@@ -370,7 +389,7 @@ export default async function HomePage({
                     />
                   )}
                   <span className="img-overlay absolute inset-0" />
-                  <span className="absolute inset-x-0 bottom-0 p-4 text-sm text-white">
+                  <span className="lift-y absolute inset-x-0 bottom-0 p-4 text-sm text-white">
                     {album.title}
                   </span>
                 </Link>
@@ -392,12 +411,16 @@ export default async function HomePage({
             </div>
             <ul className="surface-card divide-y divide-igqs-gold/15 overflow-hidden bg-white/90 dark:bg-[#12352b]">
               {notices.map((notice) => (
-                <li key={notice.slug}>
+                <li
+                  key={notice.slug}
+                  className="reveal"
+                  data-reveal="fade"
+                >
                   <Link
                     href={`/news/${notice.slug}`}
-                    className="motion-micro flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 hover:bg-igqs-gold/10"
+                    className="notice-row motion-micro group flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 hover:bg-igqs-gold/10"
                   >
-                    <span className="font-medium">{notice.title}</span>
+                    <span className="nudge-x font-medium">{notice.title}</span>
                     <span className="text-sm text-igqs-muted">{formatDate(notice.published_at, locale)}</span>
                   </Link>
                 </li>

@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { HideOnStaff } from "@/components/layout/HideOnStaff";
+import { RevealObserver } from "@/components/motion/RevealObserver";
 import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -118,6 +119,7 @@ export default async function LocaleLayout({
               </a>
             </HideOnStaff>
             <Header adminSite={adminSite} />
+            {!adminSite ? <RevealObserver /> : null}
             <main id="main">{children}</main>
             <HideOnStaff adminSite={adminSite}>
               <Footer site={site} />

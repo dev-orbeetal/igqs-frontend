@@ -1,32 +1,22 @@
+import { getTranslations } from "next-intl/server";
+import { BrandLoader } from "@/components/ui/BrandLoader";
+
 /**
- * Route-level skeleton. Public pages fetch their content on the server, so
- * without this a slow API leaves the user on the previous page with no
- * feedback at all (there was no loading state anywhere on the site).
+ * Route-level loading state. Public pages fetch their content on the
+ * server, so without this a slow API leaves the user on the previous page
+ * with no feedback at all. A thin gold bar runs along the top while the
+ * branded loader fills the content area.
  */
-export default function Loading() {
+export default async function Loading() {
+  const t = await getTranslations("common");
   return (
-    <div aria-hidden className="animate-pulse">
-      <div className="border-y border-igqs-gold/30 bg-igqs-forest/90 py-12 sm:py-16 dark:bg-[#0b241c]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="h-3 w-32 rounded-full bg-igqs-cream/25" />
-          <div className="mt-4 h-9 w-2/3 max-w-md rounded-lg bg-igqs-cream/25" />
-          <div className="mt-3 h-3 w-1/2 max-w-sm rounded-full bg-igqs-cream/20" />
-        </div>
+    <>
+      <div className="loader-bar fixed inset-x-0 top-0 z-[60] h-0.5 overflow-hidden" aria-hidden>
+        <span className="block h-full w-1/3 rounded-full bg-igqs-gold" />
       </div>
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid gap-6 md:grid-cols-3">
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="surface-card overflow-hidden bg-white/80 dark:bg-[#12352b]">
-              <div className="h-44 bg-igqs-sand/70 dark:bg-white/5" />
-              <div className="p-5">
-                <div className="h-3 w-24 rounded-full bg-igqs-sand dark:bg-white/10" />
-                <div className="mt-3 h-5 w-3/4 rounded-lg bg-igqs-sand dark:bg-white/10" />
-                <div className="mt-2 h-3 w-1/2 rounded-full bg-igqs-sand/80 dark:bg-white/5" />
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="hero-pattern flex min-h-[60svh] items-center justify-center px-4 py-20">
+        <BrandLoader label={t("loading")} />
       </div>
-    </div>
+    </>
   );
 }

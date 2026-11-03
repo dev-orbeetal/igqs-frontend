@@ -2,7 +2,8 @@
 
 import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
 import { Award, GraduationCap, Sparkles, Users } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useLocale } from "next-intl";
+import { useEffect, useMemo, useRef } from "react";
 
 const ICONS = {
   users: Users,
@@ -18,19 +19,56 @@ export type Highlight = {
   icon: string;
 };
 
-function CountValue({ value, delay = 0 }: { value: string; delay?: number }) {
+const BENGALI_DIGITS = "০১২৩৪৫৬৭৮৯";
+const NUMBER = /^([^0-9০-৯]*)([0-9০-৯][0-9০-৯,]*(?:\.[0-9০-৯]+)?)([\s\S]*)$/;
+
+/**
+ * Figures are typed into the CMS once, usually with English digits, and
+ * shared by both languages — so the Bangla site rewrites them in Bengali
+ * digits ("600+" → "৬০০+").
+ */
+function localizeDigits(value: string, locale: string) {
+  if (locale !== "bn") return value;
+  return value.replace(/[0-9]/g, (digit) => BENGALI_DIGITS[Number(digit)]);
+}
+
+/**
+ * Splits "1,200+" / "৳৫০০" / "98.5%" into prefix, number and suffix.
+ * Bengali digits are read as numbers and written back as Bengali digits,
+ * and thousands separators / decimal places are kept as authored.
+ */
+function parseCount(value: string) {
+  const match = NUMBER.exec(value.trim());
+  if (!match) return null;
+  const [, prefix, raw, suffix] = match;
+  const ascii = raw.replace(/[০-৯]/g, (digit) => String(BENGALI_DIGITS.indexOf(digit))).replace(/,/g, "");
+  const target = Number(ascii);
+  if (!Number.isFinite(target)) return null;
+  const decimals = ascii.split(".")[1]?.length ?? 0;
+  const formatter = new Intl.NumberFormat(/[০-৯]/.test(raw) ? "bn-BD" : "en-US", {
+    useGrouping: raw.includes(","),
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return { prefix, suffix, target, format: (n: number) => formatter.format(n) };
+}
+
+function CountValue({ value: authored, delay = 0 }: { value: string; delay?: number }) {
+  const locale = useLocale();
+  const value = localizeDigits(authored, locale);
   const reduced = useReducedMotion();
-  const match = /^(\d+)(.*)$/.exec(value.trim());
-  const target = match ? Number(match[1]) : null;
-  const suffix = match?.[2] ?? "";
+  const parsed = useMemo(() => parseCount(value), [value]);
+  const target = parsed?.target ?? null;
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   // Starts at the real figure so the server-rendered HTML shows the actual
   // number — it used to render "0" and only reach the real value once JS ran.
   const motionValue = useMotionValue(target ?? 0);
-  const rounded = useTransform(motionValue, (latest) =>
-    target === null ? value : `${Math.round(latest)}${suffix}`
-  );
+  const display = useTransform(motionValue, (latest) => {
+    // The resting value is always the authored string, verbatim.
+    if (!parsed || latest >= parsed.target) return value;
+    return `${parsed.prefix}${parsed.format(latest)}${parsed.suffix}`;
+  });
   const counted = useRef(false);
 
   useEffect(() => {
@@ -42,24 +80,24 @@ function CountValue({ value, delay = 0 }: { value: string; delay?: number }) {
     }
     motionValue.set(0);
     const controls = animate(motionValue, target, {
-      duration: 0.8,
+      duration: 1.6,
       delay,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.16, 1, 0.3, 1],
     });
     return () => controls.stop();
   }, [delay, inView, motionValue, reduced, target]);
 
   if (target === null) return <span>{value}</span>;
-  return <motion.span ref={ref}>{rounded}</motion.span>;
+  return <motion.span ref={ref}>{display}</motion.span>;
 }
 
 export function Highlights({ items, label }: { items: Highlight[]; label: string }) {
-  const reduced = useReducedMotion();
   if (!items.length) return null;
 
   return (
     <section
-      className="border-y border-igqs-gold bg-igqs-forest text-igqs-cream dark:bg-[#0b241c]"
+      id="highlights"
+      className="scroll-mt-28 border-y border-igqs-gold bg-igqs-forest text-igqs-cream dark:bg-[#0b241c]"
       aria-label={label}
     >
       <h2 className="sr-only">{label}</h2>
@@ -67,16 +105,20 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
         {items.map((item, index) => {
           const Icon = ICONS[item.icon as keyof typeof ICONS] ?? Users;
           return (
-            <div key={item.id} className="flex flex-col items-center px-3 text-center">
+            <div key={item.id} className="group flex flex-col items-center px-3 text-center">
               {/* CSS reveal: the previous motion.div server-rendered at
                   opacity:0, so these icons were invisible until hydration. */}
               <div
                 className="reveal"
-                style={{ "--reveal-index": Math.min(index, 4) } as React.CSSProperties}
+                data-reveal="pop"
+                // RevealObserver may tag this before the component hydrates.
+                suppressHydrationWarning
               >
-                <Icon className="size-8 text-igqs-gold" strokeWidth={1.5} aria-hidden />
+                <span className="stat-icon">
+                  <Icon className="relative size-8 text-igqs-gold" strokeWidth={1.5} aria-hidden />
+                </span>
               </div>
-              <p className="mt-2 font-display text-4xl leading-none text-igqs-gold">
+              <p className="mt-1 font-display text-4xl leading-none text-igqs-gold tabular-nums">
                 <CountValue value={item.value} delay={index * 0.08} />
               </p>
               <p className="mt-1.5 text-sm text-igqs-cream/80">{item.label}</p>

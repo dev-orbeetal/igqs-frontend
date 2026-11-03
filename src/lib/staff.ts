@@ -190,6 +190,56 @@ export async function staffDownload(path: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Opens a staff-only file (e.g. a receipt PDF) in a new tab. The request
+ * needs the staff token header, so the file is fetched here and handed to
+ * the tab as a blob URL. The tab is opened before the await so popup
+ * blockers treat it as part of the click; if a blocker stops it anyway, the
+ * file is downloaded instead of replacing the current page.
+ */
+export async function staffOpen(path: string, fallbackFilename: string) {
+  const tab = window.open("", "_blank");
+  try {
+    const token = getStaffToken();
+    const res = await fetch(apiUrl(path), {
+      headers: token ? { Authorization: `Token ${token}` } : undefined,
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error("Open failed.");
+    const url = URL.createObjectURL(await res.blob());
+    if (tab) {
+      tab.location.href = url;
+    } else {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fallbackFilename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+    // Long enough for the tab to load it; the tab keeps its own copy.
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (error) {
+    tab?.close();
+    throw error;
+  }
+}
+
+/** Fields staff can correct on a receipt (PATCH .../receipt/). */
+export type StaffReceiptFields = {
+  student_name: string;
+  student_name_bn: string;
+  guardian_name: string;
+  applying_class: string;
+  mobile: string;
+  email: string;
+  payment_method: string;
+  transaction_id: string;
+  payment_amount: string;
+  payment_date: string;
+  payer_mobile: string;
+};
+
 export async function staffLogin(username: string, password: string) {
   const data = await staffRequest<{ token: string } & StaffUser>("/api/admissions/staff/login/", {
     method: "POST",

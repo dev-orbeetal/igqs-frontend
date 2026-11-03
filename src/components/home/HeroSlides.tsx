@@ -12,6 +12,10 @@ import { useEffect, useRef, useState } from "react";
  * prioritised because it is the page's LCP element. Only the current and
  * outgoing slide stay mounted, so later slides are fetched when reached
  * rather than all at once.
+ *
+ * Each slide drifts slowly (Ken Burns, CSS-only). The pause control also
+ * stops that drift and the hero's floating shapes, via data-paused, so it
+ * is shown even for a single photo.
  */
 export function HeroSlides({ images }: { images: string[] }) {
   const t = useTranslations("a11y");
@@ -73,7 +77,7 @@ export function HeroSlides({ images }: { images: string[] }) {
     "motion-control inline-flex size-11 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/70";
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 overflow-hidden" data-paused={paused}>
       {images.map((src, slideIndex) => {
         if (slideIndex !== index && slideIndex !== previous) return null;
         return (
@@ -84,42 +88,50 @@ export function HeroSlides({ images }: { images: string[] }) {
             fill
             priority={slideIndex === 0}
             sizes="100vw"
-            className={`object-cover transition-opacity duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            className={`hero-kenburns object-cover transition-opacity duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               slideIndex === index ? "opacity-100" : "opacity-0"
             }`}
           />
         );
       })}
-      {images.length > 1 && (
+      {(images.length > 1 || !reduced) && (
         <div className="pointer-events-auto absolute right-3 bottom-4 z-10 flex items-center gap-1 sm:right-6 sm:bottom-6 sm:gap-2">
-          <button type="button" className={controlClass} onClick={() => step(-1)} aria-label={t("previousPhoto")}>
-            ‹
-          </button>
-          {images.map((image, imageIndex) => (
-            <button
-              key={image}
-              type="button"
-              aria-label={t("photoNumber", { number: imageIndex + 1 })}
-              aria-current={imageIndex === index ? "true" : undefined}
-              className="inline-flex size-11 items-center justify-center rounded-full"
-              onClick={() => go(imageIndex)}
-            >
-              <span
-                className={`motion-control block size-2.5 rounded-full ${
-                  imageIndex === index ? "bg-igqs-gold" : "bg-white/70"
-                }`}
-              />
-            </button>
-          ))}
-          <button type="button" className={controlClass} onClick={() => step(1)} aria-label={t("nextPhoto")}>
-            ›
-          </button>
+          {images.length > 1 && (
+            <>
+              <button type="button" className={controlClass} onClick={() => step(-1)} aria-label={t("previousPhoto")}>
+                ‹
+              </button>
+              {images.map((image, imageIndex) => (
+                <button
+                  key={image}
+                  type="button"
+                  aria-label={t("photoNumber", { number: imageIndex + 1 })}
+                  aria-current={imageIndex === index ? "true" : undefined}
+                  className="inline-flex size-11 items-center justify-center rounded-full"
+                  onClick={() => go(imageIndex)}
+                >
+                  <span
+                    className={`motion-control block size-2.5 rounded-full ${
+                      imageIndex === index ? "bg-igqs-gold" : "bg-white/70"
+                    }`}
+                  />
+                </button>
+              ))}
+              <button type="button" className={controlClass} onClick={() => step(1)} aria-label={t("nextPhoto")}>
+                ›
+              </button>
+            </>
+          )}
           <button
             type="button"
             className={controlClass}
             onClick={() => setPaused((value) => !value)}
             aria-pressed={paused}
-            aria-label={paused ? t("playSlideshow") : t("pauseSlideshow")}
+            aria-label={
+              images.length > 1
+                ? t(paused ? "playSlideshow" : "pauseSlideshow")
+                : t(paused ? "playAnimation" : "pauseAnimation")
+            }
           >
             {paused ? <Play className="size-4 fill-current" /> : <Pause className="size-4 fill-current" />}
           </button>

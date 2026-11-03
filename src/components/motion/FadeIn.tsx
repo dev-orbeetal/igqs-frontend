@@ -1,28 +1,35 @@
 /**
  * Scroll reveal that is safe to server-render: the element is visible in the
- * HTML and the animation is applied purely in CSS (scroll-driven where the
- * browser supports it). Previously this used framer-motion's whileInView,
+ * HTML, and RevealObserver plays its CSS entrance once, when it first
+ * scrolls into view. Previously this used framer-motion's whileInView,
  * which server-rendered every section at opacity:0 — the page stayed blank
  * until hydration, and never appeared at all without JavaScript.
  */
 export function FadeIn({
   children,
   className,
-  delay = 0,
   id,
+  variant,
 }: {
   children: React.ReactNode;
   className?: string;
-  /** Stagger offset in seconds. Converted to a capped scroll-range index. */
+  /**
+   * @deprecated Stagger is now automatic: RevealObserver offsets elements
+   * that enter the viewport together, in document order. Kept so existing
+   * call sites compile; it has no effect.
+   */
   delay?: number;
   id?: string;
+  /** Entrance style; defaults to a short slide-up. */
+  variant?: "pop" | "left" | "right" | "fade";
 }) {
-  const index = Math.min(4, Math.max(0, Math.round(delay / 0.08)));
   return (
     <div
       id={id}
       className={className ? `reveal ${className}` : "reveal"}
-      style={index ? ({ "--reveal-index": index } as React.CSSProperties) : undefined}
+      data-reveal={variant}
+      // RevealObserver may tag this before it hydrates (inside client trees).
+      suppressHydrationWarning
     >
       {children}
     </div>

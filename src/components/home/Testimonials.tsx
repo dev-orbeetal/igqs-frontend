@@ -54,6 +54,9 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   const locale = useLocale();
   const [page, setPage] = useState(0);
   const [perPage, setPerPage] = useState(3);
+  // First appearance is scroll-triggered (.reveal); later page flips
+  // replay a quick staggered fade (.photo-in) since the user is looking.
+  const [paged, setPaged] = useState(false);
 
   useEffect(() => {
     const update = () => setPerPage(cardsPerView());
@@ -75,18 +78,19 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   const roleLabel = (role: string) => (role === "student" ? t("roleStudent") : t("roleGuardian"));
 
   function step(direction: number) {
+    setPaged(true);
     setPage((current) => (current + direction + pageCount) % pageCount);
   }
 
   return (
     <section className="section-white section-pad" aria-labelledby="home-testimonials">
       <div className="section-shell">
-        <div className="mb-10 text-center">
+        <div className="reveal mb-10 text-center" suppressHydrationWarning>
           <p className="eyebrow">{t("testimonialsKicker")}</p>
           <h2 id="home-testimonials" className="mt-2 font-display text-3xl leading-tight text-igqs-forest md:text-[3.0625rem] dark:text-igqs-gold-soft">
             {t("testimonials")}
           </h2>
-          <div className="heading-rule mx-auto mt-3" />
+          <div className="heading-rule reveal mx-auto mt-3" data-reveal="draw" suppressHydrationWarning />
         </div>
 
         <div className="relative">
@@ -101,11 +105,13 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             </button>
           )}
 
-          <div key={page} className="fade-swap grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {visible.map((item) => (
+          <div key={page} className="grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {visible.map((item, index) => (
               <article
                 key={item.id}
-                className="flex h-full flex-col rounded-2xl border border-igqs-gold/20 bg-white p-5 dark:bg-[#12352b]"
+                suppressHydrationWarning
+                className={`${paged ? "photo-in" : "reveal"} hover-lift flex h-full flex-col rounded-2xl border border-igqs-gold/20 bg-white p-5 dark:bg-[#12352b]`}
+                style={paged ? ({ "--photo-index": index * 2 } as React.CSSProperties) : undefined}
               >
                 <div className="flex items-start gap-3">
                   <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-igqs-green text-igqs-cream">
@@ -164,7 +170,10 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
                 type="button"
                 aria-label={t("testimonialsPage", { page: index + 1 })}
                 aria-current={index === page}
-                onClick={() => setPage(index)}
+                onClick={() => {
+                  setPaged(true);
+                  setPage(index);
+                }}
                 className="inline-flex size-11 items-center justify-center rounded-full"
               >
                 <span

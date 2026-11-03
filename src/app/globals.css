@@ -53,12 +53,10 @@
   --duration-hero: 640ms;
   --duration-page: 180ms;
   --duration-control: 180ms;
-}
-
-@property --reveal-index {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
+  /* Gentle overshoot for hovers and pops — playful without bouncing. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-reveal: 640ms;
+  --parallax-distance: 18%;
 }
 
 @property --photo-index {
@@ -74,6 +72,11 @@ html {
 body {
   @apply bg-igqs-cream text-igqs-ink antialiased;
   font-size: 1.25rem;
+  /* Safety net for phones: long CMS words/URLs wrap instead of widening the
+     page, and nothing can make the page pan sideways. clip (not hidden)
+     keeps the sticky header working. */
+  overflow-wrap: break-word;
+  overflow-x: clip;
 }
 
 .dark body {
@@ -163,11 +166,10 @@ select optgroup {
   color: var(--color-igqs-gold-soft);
 }
 
-/* Reveal animations are CSS-only and start from the visible state in the
-   HTML, so content is never server-rendered at opacity:0 (it used to be,
-   which left the page blank until hydration and permanently blank with JS
-   off). Browsers without scroll-driven animation support simply show the
-   content with no reveal. */
+/* Reveal animations start from the visible state in the HTML, so content
+   is never server-rendered at opacity:0 (it used to be, which left the page
+   blank until hydration and permanently blank with JS off). Scroll reveals
+   are triggered once by RevealObserver; see .reveal-js below. */
 .page-fade {
   animation: page-fade-in var(--duration-page) var(--ease-out) both;
 }
@@ -223,13 +225,199 @@ select optgroup {
   }
 }
 
+@keyframes reveal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(6deg);
+  }
+}
+
+@keyframes cue-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes hero-parallax-bg {
+  to {
+    transform: translateY(var(--parallax-distance));
+  }
+}
+
+@keyframes hero-parallax-fg {
+  to {
+    opacity: 0.35;
+    transform: translateY(-6%);
+  }
+}
+
+@keyframes parallax-soft {
+  from {
+    transform: translateY(-16px) scale(1.08);
+  }
+  to {
+    transform: translateY(16px) scale(1.08);
+  }
+}
+
+.heading-rule[data-reveal="draw"],
+.rule-draw-now {
+  transform-origin: left;
+}
+
+.heading-rule.mx-auto[data-reveal="draw"] {
+  transform-origin: center;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
-    .reveal {
-      animation: reveal-in linear both;
-      animation-timeline: view();
-      animation-range: entry calc(var(--reveal-index) * 4%) entry calc(60% + var(--reveal-index) * 4%);
+    /* Hero drifts down behind its copy as it scrolls away. The section
+       names the timeline; layers read it, so nothing moves at rest. */
+    .hero-timeline {
+      view-timeline-name: --hero;
     }
+
+    .hero-parallax-bg,
+    .hero-parallax-fg {
+      animation: hero-parallax-bg linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+
+    .hero-parallax-fg {
+      animation-name: hero-parallax-fg;
+    }
+
+    .parallax-soft {
+      animation: parallax-soft linear both;
+      animation-timeline: view();
+    }
+  }
+
+  /* Scroll-triggered reveals, played once. RevealObserver adds .reveal-js
+     to <html> only after it is watching the page, then sets
+     data-revealed="in" (with a per-batch --reveal-delay stagger) as each
+     element enters the viewport. Without JS, or if setup fails, the class
+     is never added and everything stays visible as server-rendered.
+     Content already on screen at startup is marked "done" and never
+     hidden, so nothing blinks. */
+  .reveal-js .reveal:not([data-revealed]) {
+    opacity: 0;
+  }
+
+  /* backwards, not both: once finished the element returns to its own
+     styles, so hover transforms on it keep working. */
+  .reveal-js .reveal[data-revealed="in"] {
+    animation: reveal-in var(--duration-reveal) var(--ease-out) backwards;
+    animation-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal-js .reveal[data-revealed="in"][data-reveal="pop"] {
+    animation-name: reveal-pop;
+    animation-timing-function: var(--ease-spring);
+  }
+
+  .reveal-js .reveal[data-revealed="in"][data-reveal="left"] {
+    animation-name: reveal-left;
+  }
+
+  .reveal-js .reveal[data-revealed="in"][data-reveal="right"] {
+    animation-name: reveal-right;
+  }
+
+  .reveal-js .reveal[data-revealed="in"][data-reveal="fade"] {
+    animation-name: reveal-fade;
+  }
+
+  .reveal-js .reveal[data-revealed="in"][data-reveal="draw"] {
+    animation-name: rule-draw;
+  }
+
+  .rule-draw-now {
+    animation: rule-draw var(--duration-reveal) var(--ease-out) both;
+    animation-delay: var(--reveal-delay, 0s);
+  }
+
+  .reveal-now[data-reveal="pop"] {
+    animation-name: reveal-pop;
+    animation-timing-function: var(--ease-spring);
+  }
+
+  .hero-kenburns {
+    animation: ken-burns 14s ease-in-out infinite alternate;
+  }
+
+  .hero-float {
+    animation: float var(--float-duration, 8s) ease-in-out infinite;
+    animation-delay: var(--float-delay, 0s);
+  }
+
+  /* Three gentle bounces, then it rests — a hint, not a distraction. */
+  .scroll-cue-icon {
+    animation: cue-bounce 1.6s ease-in-out 1.2s 3;
+  }
+
+  /* The slideshow pause control stops every moving thing in the hero. */
+  .hero-timeline:has([data-paused="true"]) :is(.hero-kenburns, .hero-float) {
+    animation-play-state: paused;
   }
 
   .reveal-now {
@@ -271,10 +459,20 @@ select optgroup {
     animation-name: reveal-fade;
   }
 
-  @supports (animation-timeline: view()) {
-    .reveal {
-      animation-name: reveal-fade;
-    }
+  .reveal-js .reveal[data-revealed="in"],
+  .reveal-js .reveal[data-revealed="in"][data-reveal="left"],
+  .reveal-js .reveal[data-revealed="in"][data-reveal="right"] {
+    animation-name: reveal-fade;
+  }
+
+  :root {
+    --parallax-distance: 9%;
+  }
+}
+
+@media (max-height: 640px) {
+  .scroll-cue {
+    display: none;
   }
 }
 
@@ -391,7 +589,7 @@ select optgroup {
   @apply items-center justify-center rounded-full bg-igqs-gold px-6 py-3 text-sm font-medium text-igqs-ink;
   box-shadow: 0 10px 24px rgb(196 163 90 / 0.22);
   transition:
-    transform var(--duration-hover) var(--ease-out),
+    transform var(--duration-hover) var(--ease-spring),
     box-shadow var(--duration-hover) var(--ease-out),
     background-color var(--duration-hover) var(--ease-out);
 }
@@ -404,7 +602,7 @@ select optgroup {
 .btn-gold-outline {
   @apply inline-flex items-center justify-center rounded-full border border-igqs-gold/70 px-6 py-3 text-sm text-igqs-cream;
   transition:
-    transform var(--duration-hover) var(--ease-out),
+    transform var(--duration-hover) var(--ease-spring),
     background-color var(--duration-hover) var(--ease-out),
     border-color var(--duration-hover) var(--ease-out);
 }
@@ -417,7 +615,7 @@ select optgroup {
 .btn-ghost {
   @apply inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm text-white;
   transition:
-    transform var(--duration-hover) var(--ease-out),
+    transform var(--duration-hover) var(--ease-spring),
     background-color var(--duration-hover) var(--ease-out),
     border-color var(--duration-hover) var(--ease-out);
 }
@@ -453,7 +651,7 @@ select optgroup {
 .surface-card-hover,
 .hover-lift {
   transition:
-    transform var(--duration-hover) var(--ease-out),
+    transform var(--duration-hover) var(--ease-spring),
     box-shadow var(--duration-hover) var(--ease-out),
     border-color var(--duration-hover) var(--ease-out),
     background-color var(--duration-hover) var(--ease-out);
@@ -462,6 +660,78 @@ select optgroup {
 .icon-well {
   @apply inline-flex h-12 w-12 items-center justify-center rounded-full border border-igqs-gold/40 text-igqs-gold;
   background: rgb(196 163 90 / 0.1);
+  transition:
+    transform 320ms var(--ease-spring),
+    background-color var(--duration-hover) var(--ease-out);
+}
+
+/* Small hover companions, driven by the nearest .group ancestor. */
+.nudge-x,
+.lift-y,
+.stat-icon {
+  transition: transform 260ms var(--ease-spring);
+}
+
+.stat-icon {
+  @apply relative inline-flex size-14 items-center justify-center rounded-full;
+}
+
+.stat-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgb(196 163 90 / 0.28), transparent 70%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--duration-hover) var(--ease-out),
+    transform 320ms var(--ease-spring);
+}
+
+.card-accent {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-igqs-gold), var(--color-igqs-gold-soft));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms var(--ease-out);
+}
+
+/* One slow light sweep across a primary button on hover. */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+
+.notice-row {
+  box-shadow: inset 0 0 0 var(--color-igqs-gold);
+}
+
+.nav-underline {
+  position: relative;
+}
+
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  inset: auto 0.75rem 0.4rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--color-igqs-gold);
+  transform: scaleX(0);
+  transition: transform var(--duration-hover) var(--ease-out);
 }
 
 .img-frame {
@@ -478,7 +748,17 @@ select optgroup {
 
 .link-gold {
   @apply text-sm text-igqs-forest;
-  transition: color var(--duration-micro) var(--ease-out);
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  transition:
+    color var(--duration-micro) var(--ease-out),
+    background-size var(--duration-hover) var(--ease-out);
+}
+
+.link-gold:hover {
+  background-size: 100% 1px;
 }
 
 .link-gold:hover {
@@ -533,6 +813,111 @@ select optgroup {
     linear-gradient(180deg, rgb(8 24 18 / 0.18) 0%, transparent 28%, rgb(8 24 18 / 0.55) 100%);
 }
 
+/* Phones: the copy spans the full width, so a side-lit gradient leaves the
+   right half of every line over bright photo. Darken from the bottom up. */
+@media (max-width: 639px) {
+  .hero-overlay,
+  .dark .hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgb(8 28 22 / 0.55) 0%,
+      rgb(8 28 22 / 0.7) 45%,
+      rgb(8 28 22 / 0.88) 100%
+    );
+  }
+}
+
+/* Branded loader (components/ui/BrandLoader.tsx, [locale]/loading.tsx).
+   Fades in after a short delay so quick navigations never flash it. */
+@keyframes loader-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes loader-trace {
+  0% { stroke-dasharray: 6 94; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 38 62; stroke-dashoffset: -30; }
+  100% { stroke-dasharray: 6 94; stroke-dashoffset: -100; }
+}
+@keyframes loader-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+@keyframes loader-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+  40% { transform: translateY(-5px); opacity: 1; }
+}
+@keyframes loader-bar {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+@keyframes loader-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.loader-in {
+  animation: loader-in 400ms var(--ease-out) 250ms both;
+}
+.loader-arc,
+.loader-orbit,
+.loader-motif {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+.loader-arc {
+  animation:
+    loader-spin 1.4s linear infinite,
+    loader-trace 2.8s ease-in-out infinite;
+}
+.loader-orbit {
+  animation: loader-spin 14s linear infinite reverse;
+}
+.loader-motif {
+  animation: loader-spin 24s linear infinite;
+}
+.loader-crest {
+  animation: loader-breathe 2.8s ease-in-out infinite;
+}
+.loader-dot {
+  animation: loader-dot 1.2s ease-in-out infinite;
+  animation-delay: calc(var(--dot-index, 0) * 160ms);
+}
+.loader-bar {
+  animation: loader-in 200ms linear 250ms both;
+}
+.loader-bar > span {
+  animation: loader-bar 1.3s var(--ease-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-in,
+  .loader-bar {
+    animation: loader-in 1ms linear 250ms both;
+  }
+  .loader-arc,
+  .loader-orbit,
+  .loader-motif,
+  .loader-crest,
+  .loader-dot,
+  .loader-bar > span {
+    animation: none;
+  }
+  .loader-dot {
+    opacity: 0.7;
+  }
+  /* Still signal activity, without movement. */
+  .loader-crest,
+  .loader-bar > span {
+    animation: loader-pulse 2s ease-in-out infinite;
+  }
+  .loader-bar > span {
+    width: 100%;
+  }
+}
+
 .hero-pattern {
   background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c4a35a' stroke-opacity='0.1' stroke-width='0.7'%3E%3Cpath d='M40 8 L47 25 L64 32 L47 39 L40 56 L33 39 L16 32 L33 25 Z'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 80px 80px;
@@ -564,9 +949,56 @@ select optgroup {
   }
 
   a:hover .img-zoom,
-  button:hover .img-zoom {
+  button:hover .img-zoom,
+  .group:hover .img-zoom {
     transform: scale(1.04);
   }
+
+  .group:hover .icon-well {
+    transform: scale(1.1) rotate(-6deg);
+    background: rgb(196 163 90 / 0.2);
+  }
+
+  .group:hover .nudge-x {
+    transform: translateX(4px);
+  }
+
+  .group:hover .lift-y {
+    transform: translateY(-6px);
+  }
+
+  .group:hover .stat-icon {
+    transform: translateY(-4px) rotate(-8deg) scale(1.08);
+  }
+
+  .group:hover .stat-icon::before {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+
+  .group:hover .card-accent {
+    transform: none;
+  }
+
+  .btn-shine:hover::after {
+    transform: translateX(120%);
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .notice-row:hover {
+    box-shadow: inset 3px 0 0 var(--color-igqs-gold);
+  }
+
+  .nav-underline:hover::after {
+    transform: none;
+  }
+}
+
+/* Press feedback works on touch too. */
+.btn-gold:active,
+.btn-gold-outline:active,
+.btn-ghost:active {
+  transform: scale(0.97);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -584,6 +1016,22 @@ select optgroup {
   .fade-status,
   .message-in,
   .photo-in,
+  .rule-draw-now,
+  .hero-kenburns,
+  .hero-float,
+  .hero-parallax-bg,
+  .hero-parallax-fg,
+  .parallax-soft,
+  .scroll-cue-icon,
+  .icon-well,
+  .nudge-x,
+  .lift-y,
+  .stat-icon,
+  .stat-icon::before,
+  .card-accent,
+  .btn-shine::after,
+  .nav-underline::after,
+  .link-gold,
   .img-zoom,
   .btn-gold,
   .btn-gold-outline,
@@ -614,12 +1062,19 @@ select optgroup {
   .fade-swap,
   .fade-status,
   .message-in,
-  .photo-in {
+  .photo-in,
+  .rule-draw-now,
+  .hero-parallax-bg,
+  .hero-parallax-fg {
     opacity: 1 !important;
     transform: none !important;
   }
 
   .btn-gold:hover,
+  .btn-gold:active,
+  .btn-gold-outline:active,
+  .btn-ghost:active,
+  .group:hover :is(.icon-well, .nudge-x, .lift-y, .stat-icon),
   .btn-gold-outline:hover,
   .btn-ghost:hover,
   .btn-solid:hover,
@@ -638,6 +1093,9 @@ select optgroup {
 @media print {
   .page-fade,
   .reveal,
+  .rule-draw-now,
+  .hero-parallax-bg,
+  .hero-parallax-fg,
   .reveal-now,
   .reveal-section,
   .panel-in,

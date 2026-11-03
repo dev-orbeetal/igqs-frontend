@@ -160,7 +160,7 @@ export function AdmissionForm({
       if (!String(form[name] ?? "").trim()) missing[name] = t("requiredField");
     }
     if (!missing.mobile && !isBdPhone(normalizeBdPhone(form.mobile || ""))) {
-      missing.mobile = t("otpInvalidPhone");
+      missing.mobile = t("invalidPhone");
     }
     if (!missing.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form.email ?? "").trim())) {
       missing.email = t("invalidEmail");

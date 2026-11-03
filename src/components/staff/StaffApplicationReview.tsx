@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/staff/ConfirmDialog";
+import { StaffReceiptEditor } from "@/components/staff/StaffReceiptEditor";
 import { StatusBadge } from "@/components/staff/StatusBadge";
 import { btn } from "@/components/staff/buttons";
 import { Link, useRouter } from "@/i18n/navigation";
 import { fieldClass, fieldClassInvalid } from "@/lib/cms";
-import { formatMoney, staffDownload, staffRequest, type StaffApplicationDetail } from "@/lib/staff";
+import { formatMoney, staffDownload, staffOpen, staffRequest, type StaffApplicationDetail } from "@/lib/staff";
 
 function Row({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
@@ -32,6 +33,8 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
   const [saving, setSaving] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<"approved" | "rejected" | "pending" | null>(null);
   const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const [editingReceipt, setEditingReceipt] = useState(false);
+  const [receiptNotice, setReceiptNotice] = useState<"" | "saved" | "openError">("");
 
   useEffect(() => {
     setLoadError(false);
@@ -146,6 +149,19 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           <button
             type="button"
             className={btn.secondary}
+            onClick={() => {
+              setReceiptNotice("");
+              staffOpen(
+                `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/receipt/?inline=1`,
+                `${data.receipt_id}.pdf`
+              ).catch(() => setReceiptNotice("openError"));
+            }}
+          >
+            {t("viewReceipt")}
+          </button>
+          <button
+            type="button"
+            className={btn.secondary}
             onClick={() =>
               staffDownload(
                 `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/receipt/`,
@@ -155,8 +171,30 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           >
             {t("downloadReceipt")}
           </button>
+          <button
+            type="button"
+            className={btn.primary}
+            onClick={() => {
+              setReceiptNotice("");
+              setEditingReceipt(true);
+            }}
+          >
+            {t("editReceipt")}
+          </button>
         </div>
       </div>
+      {receiptNotice && (
+        <p
+          role="status"
+          className={`mt-4 rounded-xl px-4 py-3 text-sm ${
+            receiptNotice === "saved"
+              ? "bg-igqs-green/10 text-igqs-green dark:bg-igqs-gold/15 dark:text-igqs-gold-soft"
+              : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
+          }`}
+        >
+          {receiptNotice === "saved" ? t("receiptUpdated") : t("receiptOpenError")}
+        </p>
+      )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-6">
@@ -297,6 +335,16 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
           </section>
         </div>
       </div>
+      <StaffReceiptEditor
+        open={editingReceipt}
+        data={data}
+        onClose={() => setEditingReceipt(false)}
+        onSaved={(updated) => {
+          setData(updated);
+          setEditingReceipt(false);
+          setReceiptNotice("saved");
+        }}
+      />
       <ConfirmDialog
         open={pendingStatus !== null}
         title={t("confirmTitle")}
