@@ -15,12 +15,12 @@ export function PageHero({
   const brand = useTranslations("brand");
   const a11y = useTranslations("a11y");
   return (
-    <section className="band-green on-dark relative overflow-hidden py-12 text-igqs-cream print:hidden sm:py-16">
+    <section className="band-green on-dark relative overflow-hidden py-7 text-igqs-cream print:hidden sm:py-9">
       {/* Right arch only: the title is left-aligned and would sit on a left one. */}
       <ArchCorner id="page-hero-arch-right" side="right" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 md:pr-[20%] lg:pr-[18%]">
         {crumbs && crumbs.length > 1 && (
-          <nav aria-label={a11y("breadcrumb")} className="mb-4">
+          <nav aria-label={a11y("breadcrumb")} className="mb-2.5">
             <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-igqs-cream/75">
               {crumbs.map((crumb, index) => {
                 const current = index === crumbs.length - 1;
@@ -44,14 +44,14 @@ export function PageHero({
         )}
         <p className="reveal-now eyebrow eyebrow-line">{brand("name")}</p>
         <h1
-          className="reveal-now heading-strong mt-3 text-[2.1rem] leading-tight text-white md:text-5xl"
+          className="reveal-now heading-strong mt-2 text-[1.85rem] leading-tight text-white md:text-4xl"
           style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
         >
           {title}
         </h1>
         {subtitle && (
           <p
-            className="reveal-now mt-3 max-w-2xl text-igqs-cream/80"
+            className="reveal-now mt-2 max-w-2xl text-sm text-igqs-cream/80 sm:text-base"
             style={{ "--reveal-delay": "160ms" } as React.CSSProperties}
           >
             {subtitle}
