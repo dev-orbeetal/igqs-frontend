@@ -245,6 +245,18 @@ export type HomePayload = {
     principal_title: string;
     principal_message: string;
     principal_photo_url: string;
+    chairman_name?: string;
+    chairman_title?: string;
+    chairman_message?: string;
+    chairman_photo_url?: string;
+    goals?: string;
+    beacon?: string;
+    dreams?: string;
+    child_gain?: string;
+    holistic?: string;
+    admission_procedures?: string;
+    tuition?: string;
+    uniform?: string;
   };
   hero_images: string[];
   highlights: { id: number; value: string; label: string; icon: string }[];

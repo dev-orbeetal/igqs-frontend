@@ -92,8 +92,9 @@ function CountValue({ value: authored, delay = 0 }: { value: string; delay?: num
   return <motion.span ref={ref}>{display}</motion.span>;
 }
 
-export function Highlights({ items, label }: { items: Highlight[]; label: string }) {
+export function Highlights({ items, label, title }: { items: Highlight[]; label: string; title?: string }) {
   if (!items.length) return null;
+  const heading = title || label;
 
   return (
     <section
@@ -103,8 +104,11 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
     >
       <ArchCorner id="stats-arch-left" side="left" />
       <ArchCorner id="stats-arch-right" side="right" />
-      <h2 className="sr-only">{label}</h2>
-      <div className="relative mx-auto grid max-w-5xl grid-cols-2 gap-y-5 px-4 py-5 sm:px-6 sm:py-7 md:grid-cols-4 md:gap-y-0 md:[&>*+*]:border-l md:[&>*+*]:border-white/15">
+      <div className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+        <h2 className="heading-strong mb-6 text-center text-[1.7rem] leading-tight text-white md:text-[2.2rem]">
+          {heading}
+        </h2>
+      <div className="grid grid-cols-2 gap-y-5 md:grid-cols-4 md:gap-y-0 md:[&>*+*]:border-l md:[&>*+*]:border-white/15">
         {items.map((item, index) => {
           const Icon = ICONS[item.icon as keyof typeof ICONS] ?? Users;
           return (
@@ -130,6 +134,7 @@ export function Highlights({ items, label }: { items: Highlight[]; label: string
             </div>
           );
         })}
+      </div>
       </div>
     </section>
   );

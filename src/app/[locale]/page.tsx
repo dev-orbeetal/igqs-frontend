@@ -6,18 +6,37 @@ import Image from "next/image";
 import { StaffDashboard } from "@/components/staff/StaffDashboard";
 import { StaffShell } from "@/components/staff/StaffShell";
 import { Highlights } from "@/components/home/Highlights";
+import {
+  FacilityGrid,
+  FeeTable,
+  HomeBand,
+  LeaderMessages,
+  PaymentGrid,
+  ProcedureList,
+  Prose,
+  SplitCopy,
+  VisionMission,
+} from "@/components/home/HomeSections";
 import { HeroIntro } from "@/components/home/HeroIntro";
 import { Testimonials } from "@/components/home/Testimonials";
 import { HeroDecor } from "@/components/home/HeroDecor";
 import { HeroSlides } from "@/components/home/HeroSlides";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { ArchCorner, MosqueWatermark, WaveEdge } from "@/components/ui/Ornaments";
+import { ArchCorner } from "@/components/ui/Ornaments";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
 import { isAdminHost } from "@/lib/admin-paths";
-import { apiGet, type HomePayload, type SiteSettings } from "@/lib/api";
+import { apiGet, type AboutPayload, type AdmissionInfo, type HomePayload, type SiteSettings } from "@/lib/api";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 import { NOINDEX, publicPageMetadata } from "@/lib/seo";
+
+function filled(...values: Array<string | undefined | null>) {
+  for (const value of values) {
+    const text = (value ?? "").trim();
+    if (text) return text;
+  }
+  return "";
+}
 
 const ICONS: Record<string, typeof BookOpen> = {
   "book-open": BookOpen,
@@ -58,9 +77,11 @@ export default async function HomePage({
   }
   const t = await getTranslations();
   const brand = await getTranslations("brand");
-  const [home, site] = await Promise.all([
+  const [home, site, aboutPage, admission] = await Promise.all([
     apiGet<HomePayload>("/api/home/", locale),
     apiGet<SiteSettings>("/api/site/", locale),
+    apiGet<AboutPayload>("/api/about/", locale),
+    apiGet<AdmissionInfo>("/api/admissions/info/", locale),
   ]);
 
   const content = home?.home;
@@ -79,6 +100,28 @@ export default async function HomePage({
     ...(content?.hero_image_url ? [content.hero_image_url] : []),
     ...(home?.hero_images ?? []).filter((url) => url && url !== content?.hero_image_url),
   ];
+  const goals = filled(content?.goals, content?.about_preview, t("home.goalsBody"));
+  const beacon = filled(content?.beacon, content?.welcome, t("home.beaconBody"));
+  const dreams = filled(content?.dreams, t("home.dreamsBody"));
+  const gain = filled(content?.child_gain, t("home.gainBody"));
+  const holistic = filled(content?.holistic, t("home.holisticBody"));
+  const proceduresNote = filled(content?.admission_procedures);
+  const tuition = filled(content?.tuition, t("home.tuitionBody"));
+  const uniform = filled(content?.uniform, t("home.uniformBody"));
+  const vision = filled(aboutPage?.about?.vision, t("home.visionBody"));
+  const mission = filled(aboutPage?.about?.mission, t("home.missionBody"));
+  const facilities = aboutPage?.facilities ?? [];
+  const fees = admission?.fees ?? [];
+  const methods = admission?.methods ?? [];
+  const chairmanShown = Boolean(content?.chairman_message || content?.chairman_name || content?.chairman_photo_url);
+  const principalShown = Boolean(content?.principal_message || content?.principal_name || content?.principal_photo_url);
+  const messageHeading =
+    chairmanShown && principalShown
+      ? t("home.messages")
+      : chairmanShown
+        ? t("home.chairman")
+        : t("home.principal");
+  const procedureSteps = [1, 2, 3, 4, 5].map((step) => t(`home.procedure${step}`));
 
   return (
     <div>
@@ -97,106 +140,56 @@ export default async function HomePage({
           applyLabel={t("common.applyNow")}
           curriculumLabel={t("common.viewCurriculum")}
           fallbackTitle={t("home.heroFallbackTitle")}
-          scrollTarget={highlights.length ? "highlights" : undefined}
+          scrollTarget="goals"
           scrollLabel={t("home.scrollToContent")}
         />
         </div>
       </section>
 
-      <Highlights items={highlights} label={t("home.highlights")} />
+      <HomeBand id="goals" title={t("home.goals")} tone="cream">
+        <Prose>{goals}</Prose>
+      </HomeBand>
 
-      {content?.welcome && (
-        <section className="section-cream relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28">
-          <MosqueWatermark className="pointer-events-none absolute right-[4%] bottom-10 hidden w-[min(30rem,34%)] text-igqs-gold opacity-[0.16] md:block dark:opacity-[0.08]" />
-          <FadeIn className="section-shell relative">
-            <SectionHeading kicker={t("brand.name")} title={t("home.welcome")} />
-            <p className="quote-bar max-w-2xl whitespace-pre-line text-base leading-relaxed text-igqs-ink/85 sm:text-lg dark:text-igqs-sand/85">
-              {content.welcome}
-            </p>
-          </FadeIn>
-          <WaveEdge />
-        </section>
-      )}
+      <SplitCopy
+        id="beacon"
+        title={t("home.beacon")}
+        body={beacon}
+        image={aboutImage}
+        imageAlt={t("home.beacon")}
+      />
 
-      {(content?.about_preview || aboutImage) && (
-        <section className="section-white pt-6 pb-14 sm:pb-16 lg:pb-20">
-          <div className="section-shell grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-            {content?.about_preview && (
-              <FadeIn variant="left">
-                <SectionHeading title={t("home.about")} />
-                <p className="max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-ink/85 sm:text-lg dark:text-igqs-sand/85">
-                  {content.about_preview}
-                </p>
-                <Link href="/about" className="btn-green group mt-7">
-                  {t("common.learnMore")}
-                  <span className="nudge-x" aria-hidden>→</span>
-                </Link>
-              </FadeIn>
-            )}
-            {aboutImage && (
-              <FadeIn delay={0.1} variant="right" className="img-frame-offset ml-4 mb-4 sm:ml-5">
-                <div className="img-frame min-h-64 shadow-[0_18px_40px_rgb(16_35_28/0.14)] sm:min-h-80">
-                  <Image
-                    src={aboutImage}
-                    alt={t("home.about")}
-                    fill
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="parallax-soft object-cover"
-                  />
-                </div>
-              </FadeIn>
-            )}
-          </div>
-        </section>
-      )}
+      <LeaderMessages
+        id="messages"
+        heading={messageHeading}
+        people={[
+          {
+            label: t("home.chairman"),
+            name: content?.chairman_name,
+            title: content?.chairman_title,
+            message: content?.chairman_message,
+            photo: content?.chairman_photo_url,
+          },
+          {
+            label: t("home.principal"),
+            name: content?.principal_name,
+            title: content?.principal_title,
+            message: content?.principal_message,
+            photo: content?.principal_photo_url,
+          },
+        ]}
+      />
 
-      {(content?.principal_message || content?.principal_name || content?.principal_photo_url) && (
-        <section className="section-cream section-pad">
-          <div className="section-shell">
-            <FadeIn>
-              <SectionHeading title={t("home.principal")} align="center" />
-            </FadeIn>
-            <FadeIn
-              className={`surface-card relative mx-auto grid max-w-5xl gap-8 overflow-hidden border-t-4 border-t-igqs-gold bg-white p-6 md:p-10 dark:bg-[#12352b] ${
-                content.principal_photo_url ? "md:grid-cols-[200px_1fr]" : ""
-              }`}
-            >
-              {content.principal_photo_url && (
-                <div
-                  className="img-frame reveal relative h-56 md:h-auto md:min-h-56"
-                  data-reveal="pop"
-                >
-                  <Image
-                    src={content.principal_photo_url}
-                    alt={content.principal_name}
-                    fill
-                    sizes="(min-width: 768px) 200px, 100vw"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              {(content.principal_message || content.principal_name) && (
-                <blockquote>
-                  {content.principal_message && (
-                    <p className="principal-quote whitespace-pre-line text-lg leading-relaxed text-igqs-green sm:text-xl dark:text-igqs-gold-soft">
-                      “{content.principal_message}”
-                    </p>
-                  )}
-                  {content.principal_name && (
-                    <footer className="mt-6 text-sm">
-                      <strong>{content.principal_name}</strong>
-                      <span className="block text-igqs-muted">{content.principal_title}</span>
-                    </footer>
-                  )}
-                </blockquote>
-              )}
-            </FadeIn>
-          </div>
-        </section>
-      )}
+      <Highlights items={highlights} label={t("home.glance")} title={t("home.glance")} />
+
+      <VisionMission
+        visionTitle={t("home.vision")}
+        vision={vision}
+        missionTitle={t("home.mission")}
+        mission={mission}
+      />
 
       {whyChoose.length > 0 && (
-      <section className="band-green on-dark relative overflow-hidden section-pad">
+      <section id="why" className="band-green on-dark relative scroll-mt-28 overflow-hidden section-pad">
         <ArchCorner id="why-arch-left" side="left" fit="corner" className="opacity-80" />
         <ArchCorner id="why-arch-right" side="right" fit="corner" className="opacity-80" />
         <div className="section-shell relative">
@@ -242,59 +235,86 @@ export default async function HomePage({
       </section>
       )}
 
-      <Testimonials items={testimonials} />
+      <HomeBand id="dreams" title={t("home.dreams")} tone="cream">
+        <Prose>{dreams}</Prose>
+      </HomeBand>
 
-      {grades.length > 0 && (
-      <section className="section-cream section-pad">
+      <HomeBand id="gain" title={t("home.gain")} tone="white">
+        <Prose>{gain}</Prose>
+      </HomeBand>
+
+      <HomeBand id="holistic" title={t("home.holistic")} tone="cream">
+        <Prose>{holistic}</Prose>
+      </HomeBand>
+
+      <HomeBand id="facilities" title={t("home.facilities")} tone="white">
+        {facilities.length > 0 ? <FacilityGrid items={facilities} /> : <Prose>{t("home.facilitiesBody")}</Prose>}
+      </HomeBand>
+
+      <HomeBand id="admission" title={t("home.procedures")} tone="cream">
+        {site?.admission_announcement ? <Prose>{site.admission_announcement}</Prose> : null}
+        {proceduresNote ? <div className={site?.admission_announcement ? "mt-6" : ""}><Prose>{proceduresNote}</Prose></div> : null}
+        <div className={site?.admission_announcement || proceduresNote ? "mt-6" : ""}>
+          <ProcedureList steps={procedureSteps} applyHref="/admission" applyLabel={t("common.applyNow")} />
+        </div>
+      </HomeBand>
+
+      <HomeBand id="tuition" title={t("home.tuition")} tone="white">
+        <Prose>{tuition}</Prose>
+      </HomeBand>
+
+      <HomeBand id="payments" title={t("home.payments")} tone="cream">
+        {methods.length > 0 ? <PaymentGrid methods={methods} /> : <Prose>{t("home.paymentsEmpty")}</Prose>}
+      </HomeBand>
+
+      <HomeBand id="uniform" title={t("home.uniform")} tone="white">
+        <Prose>{uniform}</Prose>
+      </HomeBand>
+
+      <HomeBand id="fees" title={t("home.fees")} tone="cream">
+        <Prose>{fees.length > 0 ? t("home.feesIntro") : t("home.feesEmpty")}</Prose>
+        {fees.length > 0 ? (
+          <div className="mt-6">
+            <FeeTable fees={fees} allClassesLabel={t("home.feesAllClasses")} />
+          </div>
+        ) : null}
+      </HomeBand>
+
+      <section id="curriculum" className="section-white section-pad scroll-mt-28">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
-            <SectionHeading title={t("home.academics")} className="mb-0" />
+            <SectionHeading title={t("home.curriculum")} className="mb-0" />
             <Link href="/curriculum" className="link-gold mb-1 shrink-0">
               {t("common.viewAll")}
             </Link>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {grades.map((grade, index) => (
-              <FadeIn key={grade.slug} delay={index * 0.08}>
-                <Link
-                  href={`/curriculum#grade-${grade.slug}`}
-                  className="surface-card surface-card-hover group relative block h-full overflow-hidden bg-white/90 p-5 dark:bg-[#12352b]"
-                >
-                  <span className="card-accent" aria-hidden />
-                  <h3 className="heading-strong flex items-baseline justify-between gap-3 text-[1.4rem] leading-snug text-igqs-green dark:text-igqs-gold-soft">
-                    {grade.name}
-                    <span className="nudge-x text-lg text-igqs-gold" aria-hidden>→</span>
-                  </h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-igqs-muted">
-                    {grade.description}
-                  </p>
-                </Link>
-              </FadeIn>
-            ))}
-          </div>
+          {grades.length === 0 ? (
+            <p className="text-igqs-muted">{t("curriculum.empty")}</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {grades.map((grade, index) => (
+                <FadeIn key={grade.slug} delay={index * 0.08}>
+                  <Link
+                    href={`/curriculum#grade-${grade.slug}`}
+                    className="surface-card surface-card-hover group relative block h-full overflow-hidden bg-white/90 p-5 dark:bg-[#12352b]"
+                  >
+                    <span className="card-accent" aria-hidden />
+                    <h3 className="heading-strong flex items-baseline justify-between gap-3 text-[1.4rem] leading-snug text-igqs-green dark:text-igqs-gold-soft">
+                      {grade.name}
+                      <span className="nudge-x text-lg text-igqs-gold" aria-hidden>→</span>
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-igqs-muted">
+                      {grade.description}
+                    </p>
+                  </Link>
+                </FadeIn>
+              ))}
+            </div>
+          )}
         </div>
       </section>
-      )}
 
-      {site?.admission_open && site.admission_announcement && (
-        <section className="band-green on-dark relative overflow-hidden py-14 sm:py-16">
-          <ArchCorner id="cta-arch-left" side="left" fit="corner" />
-          <ArchCorner id="cta-arch-right" side="right" fit="corner" />
-          <FadeIn className="section-shell relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center md:px-12 lg:px-24">
-            <div>
-              <p className="eyebrow eyebrow-line">{t("home.admission")}</p>
-              <p className="mt-3 max-w-prose whitespace-pre-line text-base leading-relaxed sm:text-lg">
-                {site.admission_announcement}
-              </p>
-            </div>
-            <FadeIn variant="pop" delay={0.16} className="shrink-0">
-              <Link href="/admission" className="btn-gold btn-shine inline-flex">
-                {t("common.applyNow")}
-              </Link>
-            </FadeIn>
-          </FadeIn>
-        </section>
-      )}
+      <Testimonials items={testimonials} />
 
       {events.length > 0 && (
       <section className="section-white section-pad">
