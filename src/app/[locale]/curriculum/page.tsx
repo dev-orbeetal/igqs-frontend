@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FormattedText } from "@/components/content/FormattedText";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { apiGet } from "@/lib/api/client";
@@ -58,7 +59,7 @@ export default async function CurriculumPage({
             <h2 className="font-display text-3xl text-igqs-forest dark:text-igqs-gold-soft">
               {grade.name}
             </h2>
-            <p className="mt-3 max-w-prose whitespace-pre-line text-igqs-muted">{grade.description}</p>
+            <FormattedText text={grade.description} className="mt-3 max-w-prose whitespace-pre-line text-igqs-muted" />
             <div className="mt-8 grid gap-6 md:grid-cols-2">
               {CATEGORY_KEYS.map((key) => {
                 const items = grade.subjects.filter((s) => s.category === key);

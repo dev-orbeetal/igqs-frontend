@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { DetailsText } from "@/features/home/DetailsText";
+import { PersonIdentity } from "@/features/home/HomeSections";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { apiGet } from "@/lib/api/client";
@@ -41,6 +43,17 @@ export default async function AboutPage({
     );
   }
   const { about } = data;
+  const isAdvisor = (role: string) => /advisor|উপদেষ্টা/i.test(role);
+  // The school's own principal has a dedicated message below. Other
+  // "Principal" titles belong to advisors of other institutions.
+  const isSchoolPrincipal = (role: string) =>
+    /principal|অধ্যক্ষ|প্রিন্সিপাল/i.test(role) && !isAdvisor(role);
+  const advisors = data.leadership.filter((person) => isAdvisor(person.role));
+  const principal = data.leadership.find((person) => isSchoolPrincipal(person.role));
+  const leaders = data.leadership.filter(
+    (person) => !isAdvisor(person.role) && person.id !== principal?.id,
+  );
+  const principalMessage = about.principal_message.trim();
 
   return (
     <div>
@@ -53,79 +66,111 @@ export default async function AboutPage({
         ]}
       />
       <div className="mx-auto max-w-7xl space-y-20 px-4 py-16 sm:px-6">
-        <FadeIn>
+        <section>
           <SectionHeading title={t("introduction")} />
-          <p className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80">
-            {about.introduction}
-          </p>
-        </FadeIn>
+          <FadeIn>
+            <DetailsText
+              text={about.introduction}
+              className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
+            />
+          </FadeIn>
+        </section>
 
         <div className="grid gap-6 md:grid-cols-2">
           <FadeIn className="rounded-3xl bg-igqs-forest p-8 text-igqs-cream">
             <h2 className="font-display text-3xl text-igqs-gold">{t("vision")}</h2>
-            <p className="mt-4 max-w-prose whitespace-pre-line leading-relaxed">{about.vision}</p>
+            <DetailsText text={about.vision} className="mt-4 max-w-prose whitespace-pre-line leading-relaxed" />
           </FadeIn>
           <FadeIn delay={0.08} className="rounded-3xl border border-igqs-gold/25 p-8">
             <h2 className="font-display text-3xl text-igqs-forest dark:text-igqs-gold-soft">
               {t("mission")}
             </h2>
-            <p className="mt-4 max-w-prose whitespace-pre-line leading-relaxed text-igqs-muted dark:text-igqs-sand/80">
-              {about.mission}
-            </p>
+            <DetailsText
+              text={about.mission}
+              className="mt-4 max-w-prose whitespace-pre-line leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
+            />
           </FadeIn>
         </div>
 
-        <FadeIn>
+        <section>
           <SectionHeading title={t("history")} />
-          <p className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80">
-            {about.history}
-          </p>
-        </FadeIn>
+          <FadeIn>
+            <DetailsText
+              text={about.history}
+              className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
+            />
+          </FadeIn>
+        </section>
 
-        <FadeIn>
+        <section>
           <SectionHeading title={t("quranic")} />
-          <p className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80">
-            {about.quranic_approach}
-          </p>
-        </FadeIn>
+          <FadeIn>
+            <DetailsText
+              text={about.quranic_approach}
+              className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
+            />
+          </FadeIn>
+        </section>
 
         <section>
           <SectionHeading title={t("leadership")} />
-          {data.leadership.length === 0 && (
+          {leaders.length === 0 && advisors.length === 0 && (
             <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-5 py-10 text-center text-igqs-muted">
               {t("emptyLeadership")}
             </p>
           )}
           <div className="grid gap-6 md:grid-cols-3">
-            {data.leadership.map((person, index) => (
-              <FadeIn key={person.id} delay={index * 0.08} className="overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white dark:bg-[#0d1f18]">
-                <div className="img-frame h-64 rounded-none rounded-t-3xl border-b-0">
-                  {person.photo_url && (
-                    <Image
-                      src={person.photo_url}
-                      alt={person.name}
-                      fill
-                      sizes="(min-width: 768px) 33vw, 100vw"
-                      className="object-cover"
-                    />
-                  )}
-                </div>
-                <div className="p-5">
-                  <h3 className="font-display text-2xl">{person.name}</h3>
-                  <p className="text-sm text-igqs-forest dark:text-igqs-gold">{person.role}</p>
-                  <p className="mt-3 text-sm text-igqs-muted">{person.bio}</p>
-                </div>
+            {leaders.map((person, index) => (
+              <FadeIn key={person.id} delay={index * 0.08} className="hover-lift rounded-3xl border border-igqs-gold/20 bg-white p-5 dark:bg-[#0d1f18]">
+                <PersonIdentity photo={person.photo_url} photoAlt={person.name} name={person.name} designation={person.role} />
+                {person.bio ? <DetailsText text={person.bio} className="mt-4 whitespace-pre-line text-sm leading-relaxed text-igqs-muted" /> : null}
               </FadeIn>
             ))}
           </div>
         </section>
 
-        <FadeIn className="rounded-3xl border border-igqs-gold/25 bg-igqs-sand/40 p-8 dark:bg-white/5">
-          <SectionHeading title={t("principal")} />
-          <p className="max-w-prose whitespace-pre-line font-display text-2xl leading-relaxed text-igqs-forest dark:text-igqs-gold-soft">
-            {about.principal_message}
-          </p>
-        </FadeIn>
+        {advisors.length > 0 ? (
+          <section>
+            <SectionHeading title={t("advisors")} />
+            <div className="grid gap-6">
+              {advisors.map((person, index) => (
+                <FadeIn key={person.id} delay={index * 0.05} className="hover-lift rounded-3xl border border-igqs-gold/20 bg-white p-5 sm:p-6 dark:bg-[#0d1f18]">
+                  <PersonIdentity photo={person.photo_url} photoAlt={person.name} name={person.name} designation={person.role} />
+                  {person.bio ? (
+                    <DetailsText
+                      text={person.bio}
+                      lines={6}
+                      className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
+                    />
+                  ) : null}
+                </FadeIn>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {principal || principalMessage ? (
+          <FadeIn className="rounded-3xl border border-igqs-gold/25 bg-igqs-sand/40 p-8 dark:bg-white/5">
+            <SectionHeading title={t("principal")} rise={false} />
+            {principal ? (
+              <PersonIdentity
+                photo={principal.photo_url}
+                photoAlt={principal.name}
+                name={principal.name}
+                designation={principal.role}
+              />
+            ) : null}
+            {principalMessage ? (
+              <DetailsText
+                text={principalMessage}
+                toggle="more"
+                lines={6}
+                quote
+                className={`${principal ? "mt-5" : ""} principal-quote max-w-prose text-base leading-relaxed text-igqs-forest dark:text-igqs-gold-soft`}
+              />
+            ) : null}
+          </FadeIn>
+        ) : null}
 
         <section>
           <SectionHeading title={t("facilities")} />
@@ -136,7 +181,7 @@ export default async function AboutPage({
           )}
           <div className="grid gap-6 md:grid-cols-2">
             {data.facilities.map((item, index) => (
-              <FadeIn key={item.id} delay={index * 0.08} className="grid overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white md:grid-cols-2 dark:bg-[#0d1f18]">
+              <FadeIn key={item.id} delay={index * 0.08} className="group hover-lift grid overflow-hidden rounded-3xl border border-igqs-gold/20 bg-white md:grid-cols-2 dark:bg-[#0d1f18]">
                 <div className="img-frame min-h-44 rounded-none border-y-0 border-l-0">
                   {item.image_url && (
                     <Image
@@ -144,13 +189,13 @@ export default async function AboutPage({
                       alt={item.title}
                       fill
                       sizes="(min-width: 768px) 25vw, 100vw"
-                      className="object-cover"
+                      className="img-zoom object-cover"
                     />
                   )}
                 </div>
                 <div className="p-6">
                   <h3 className="font-display text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-sm text-igqs-muted">{item.description}</p>
+                  <DetailsText text={item.description} className="mt-2 text-sm leading-relaxed text-igqs-muted" />
                 </div>
               </FadeIn>
             ))}

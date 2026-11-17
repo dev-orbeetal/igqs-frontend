@@ -55,7 +55,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="btn-solid rounded-full bg-igqs-green px-6 py-3 text-sm text-igqs-cream disabled:opacity-60 dark:bg-igqs-gold dark:text-igqs-ink"
+        className="btn-solid btn-shine btn-sparkle rounded-full bg-igqs-green px-6 py-3 text-sm text-igqs-cream disabled:opacity-60 dark:bg-igqs-gold dark:text-igqs-ink"
       >
         {status === "sending" ? tc("sending") : tc("send")}
       </button>

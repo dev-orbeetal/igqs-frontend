@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 
-const STAGGER_MS = 70;
-const MAX_STAGGER_STEPS = 5;
+const STAGGER_MS = 160;
+const MAX_STAGGER_STEPS = 8;
 
 /**
  * Drives every `.reveal` element: it animates once, when it scrolls into

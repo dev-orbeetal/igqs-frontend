@@ -16,7 +16,7 @@ export type CmsField = { section?: string; hint?: string; required?: boolean } &
   // "decimal" is a money amount held as a string all the way to the API, where
   // the matching serializer field is a CharField/DecimalField that accepts "".
   | { type: "text" | "textarea" | "url" | "number" | "decimal"; name: string; label: string }
-  | { type: "pair"; name: string; label: string; textarea?: boolean }
+  | { type: "pair"; name: string; label: string; textarea?: boolean; rich?: boolean }
   | { type: "checkbox"; name: string; label: string }
   | { type: "select"; name: string; label: string; options: Option[] }
   | { type: "datetime"; name: string; label: string }

@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { HideOnStaff } from "@/components/layout/HideOnStaff";
+import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 import { RevealObserver } from "@/components/motion/RevealObserver";
 import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -126,6 +127,7 @@ export default async function LocaleLayout({
             <main id="main">{children}</main>
             <HideOnStaff adminSite={adminSite}>
               <Footer site={site} />
+              <WhatsAppFloat href={site?.whatsapp_url} />
             </HideOnStaff>
           </NextIntlClientProvider>
         </ThemeProvider>

@@ -9,6 +9,7 @@ import type { CmsField } from "@/lib/cms/types";
 import { toDateTimeLocal } from "@/lib/cms/payload";
 import { fieldClassFor } from "@/lib/cms/styles";
 import type { FieldErrors } from "./types";
+import { RichTextEditor } from "./RichTextEditor";
 
 function setValue(
   values: Record<string, unknown>,
@@ -117,7 +118,7 @@ function UploadControl({
   const pendingName = fileValue instanceof File ? fileValue.name : "";
 
   return (
-    <div className="rounded-2xl border border-dashed border-igqs-border-strong bg-white p-4 dark:border-igqs-gold/70 dark:bg-[#10261e]">
+    <div className="rounded-2xl border border-igqs-gold/20 bg-white p-4 dark:bg-[#10261e]">
       <p className="text-sm font-semibold">
         {t(field.label)}
         <RequiredMark required={field.required} />
@@ -138,11 +139,7 @@ function UploadControl({
               })
             }
           />
-        ) : (
-          <p className="mt-3 rounded-xl bg-igqs-sand/60 px-3 py-6 text-center text-sm text-igqs-muted dark:bg-white/5">
-            {t("imageEmpty")}
-          </p>
-        )
+        ) : null
       ) : pendingName ? (
         <p className="mt-3 text-sm">{pendingName}</p>
       ) : preview ? (
@@ -162,6 +159,7 @@ function UploadControl({
           accept={isImage ? "image/*" : (field.type === "file" && field.accept) || undefined}
           invalid={Boolean(error)}
           describedBy={error ? errorId : undefined}
+          filled={Boolean(preview)}
           onChange={(file) =>
             onChange({
               ...values,
@@ -225,7 +223,17 @@ export function CmsControl({
           {(["en", "bn"] as const).map((code) => {
             const key = `${field.name}_${code}`;
             const message = code === "en" ? errorEn : errorBn;
-            return (
+            return field.rich ? (
+              <div key={key} className="text-sm">
+                <LangMark code={code} label={code === "en" ? englishLabel : bengaliLabel} />
+                <RichTextEditor
+                  value={String(values[key] ?? "")}
+                  invalid={Boolean(message)}
+                  onChange={(next) => setValue(values, key, next, onChange)}
+                />
+                <FieldError id={`${key}-error`} message={message} />
+              </div>
+            ) : (
               <PairInput
                 key={key}
                 code={code}

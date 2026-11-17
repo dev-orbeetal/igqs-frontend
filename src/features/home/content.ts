@@ -55,7 +55,6 @@ export function buildHomeContent(
   const events = home?.upcoming_events ?? [];
   const news = home?.latest_news ?? [];
   const albums = home?.gallery ?? [];
-  const aboutImage = albums[0]?.cover_image_url || "";
   const notices = home?.notices ?? [];
   const noticeSlugs = new Set(notices.map((notice) => notice.slug));
   const newsItems = news.filter((item) => !noticeSlugs.has(item.slug));
@@ -88,7 +87,6 @@ export function buildHomeContent(
     grades,
     events,
     albums,
-    aboutImage,
     notices,
     newsItems,
     heroImages,

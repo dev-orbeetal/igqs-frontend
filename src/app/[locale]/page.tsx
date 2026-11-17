@@ -6,7 +6,7 @@ import { StaffDashboard } from "@/features/staff/dashboard/StaffDashboard";
 import { StaffShell } from "@/features/staff/shell/StaffShell";
 import { isAdminHost } from "@/lib/admin-paths";
 import { apiGet } from "@/lib/api/client";
-import type { AboutPayload, AdmissionInfo, HomePayload, SiteSettings } from "@/lib/api/types";
+import type { AboutPayload, HomePayload, SiteSettings } from "@/lib/api/types";
 import { NOINDEX, publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -39,11 +39,10 @@ export default async function Page({
       </StaffShell>
     );
   }
-  const [home, site, aboutPage, admission] = await Promise.all([
+  const [home, site, aboutPage] = await Promise.all([
     apiGet<HomePayload>("/api/home/", locale),
     apiGet<SiteSettings>("/api/site/", locale),
     apiGet<AboutPayload>("/api/about/", locale),
-    apiGet<AdmissionInfo>("/api/admissions/info/", locale),
   ]);
-  return <HomePage locale={locale} home={home} site={site} aboutPage={aboutPage} admission={admission} />;
+  return <HomePage locale={locale} home={home} site={site} aboutPage={aboutPage} />;
 }

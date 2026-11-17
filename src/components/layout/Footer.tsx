@@ -23,7 +23,7 @@ function FooterHeading({ children }: { children: React.ReactNode }) {
 function FooterLink({ href, label }: { href: string; label: string }) {
   return (
     <Link href={href} className="group motion-micro flex min-h-11 items-start gap-1.5 py-1.5 text-white/75 hover:text-white">
-      <ChevronRight className="motion-micro mt-0.5 size-3.5 shrink-0 text-white/55 group-hover:text-white" aria-hidden />
+      <ChevronRight className="nudge-x motion-micro mt-0.5 size-3.5 shrink-0 text-white/55 group-hover:text-white" aria-hidden />
       <span>{label}</span>
     </Link>
   );
@@ -60,7 +60,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
   ];
 
   return (
-    <footer className="footer-green relative mt-4 text-white print:hidden">
+    <footer className="footer-green relative mt-4 pb-24 text-white print:hidden">
       <div className="mx-auto grid max-w-7xl items-start gap-x-6 gap-y-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-12">
         <div className="sm:col-span-2 lg:col-span-3">
           <div className="mb-3">
@@ -161,7 +161,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
                 behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
               })
             }
-            className="motion-control flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-igqs-gold hover:text-igqs-ink sm:absolute sm:right-4"
+            className="motion-control flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-igqs-gold hover:text-igqs-ink sm:absolute sm:right-24"
             aria-label={tf("top")}
           >
             <ArrowUp className="size-4" />

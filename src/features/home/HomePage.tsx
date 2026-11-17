@@ -1,28 +1,26 @@
 import { BookOpen, Heart, Layers, Shield } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
-import { AdmissionNotes } from "@/features/home/DetailsText";
 import { Highlights } from "@/features/home/Highlights";
 import {
   FacilityGrid,
-  FeeTable,
   HomeBand,
   LeaderMessages,
-  PaymentGrid,
-  ProcedureList,
   Prose,
   SplitCopy,
   VisionMission,
 } from "@/features/home/HomeSections";
+import { HeroFeatures } from "@/features/home/HeroFeatures";
 import { HeroIntro } from "@/features/home/HeroIntro";
 import { Testimonials } from "@/features/home/Testimonials";
 import { HeroDecor } from "@/features/home/HeroDecor";
 import { HeroSlides } from "@/features/home/HeroSlides";
+import { FormattedText } from "@/components/content/FormattedText";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ArchCorner } from "@/components/ui/Ornaments";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
-import type { AboutPayload, AdmissionInfo, HomePayload, SiteSettings } from "@/lib/api/types";
+import type { AboutPayload, HomePayload, SiteSettings } from "@/lib/api/types";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 import { buildHomeContent } from "@/features/home/content";
 
@@ -65,7 +63,7 @@ function WhyCard({ item }: { item: WhyItem }) {
         <h3 className={`heading-strong text-[1.4rem] leading-snug text-white ${item.image ? "" : "mt-5"}`}>
           {item.title}
         </h3>
-        <p className="mt-2 text-sm leading-relaxed text-igqs-cream/75">{item.description}</p>
+        <FormattedText text={item.description} className="mt-2 text-sm leading-relaxed text-igqs-cream/75" />
       </div>
     </article>
   );
@@ -76,17 +74,15 @@ export async function HomePage({
   home,
   site,
   aboutPage,
-  admission,
 }: {
   locale: string;
   home: HomePayload | null;
   site: SiteSettings | null;
   aboutPage: AboutPayload | null;
-  admission: AdmissionInfo | null;
 }) {
   const t = await getTranslations();
   const brand = await getTranslations("brand");
-  const view = buildHomeContent(home, site, aboutPage, admission, {
+  const view = buildHomeContent(home, site, aboutPage, null, {
     messages: t("home.messages"),
     chairman: t("home.chairman"),
     principal: t("home.principal"),
@@ -100,7 +96,6 @@ export async function HomePage({
     grades,
     events,
     albums,
-    aboutImage,
     notices,
     newsItems,
     heroImages,
@@ -110,19 +105,12 @@ export async function HomePage({
     dreams,
     gain,
     holistic,
-    proceduresNote,
-    announcement,
-    announcementIsRules,
-    proceduresAreRules,
     tuition,
     uniform,
     vision,
     mission,
     facilities,
-    fees,
-    methods,
     messageHeading,
-    procedureSteps,
   } = view;
 
   return (
@@ -134,21 +122,21 @@ export async function HomePage({
           <div className="hero-pattern absolute inset-0" />
           <HeroDecor />
         </div>
-        <div className="hero-parallax-fg relative flex flex-1 flex-col">
+        <div className="hero-parallax-fg pointer-events-none relative flex flex-1 flex-col">
         <HeroIntro
           kicker={brand("name")}
           title={content?.hero_title}
           subtitle={content?.hero_subtitle}
           applyLabel={t("common.applyNow")}
           curriculumLabel={t("common.viewCurriculum")}
-          whatsappHref={site?.whatsapp_url?.trim() || undefined}
-          whatsappLabel={t("common.whatsapp")}
           fallbackTitle={t("home.heroFallbackTitle")}
           scrollTarget={goals ? "goals" : undefined}
           scrollLabel={t("home.scrollToContent")}
         />
         </div>
       </section>
+
+      <HeroFeatures />
 
       {sections.map((section, index) => (
         <HomeBand
@@ -172,7 +160,7 @@ export async function HomePage({
           id="beacon"
           title={t("home.beacon")}
           body={beacon}
-          image={aboutImage}
+          image="/home/beacon.jpg"
           imageAlt={t("home.beacon")}
         />
       ) : null}
@@ -226,9 +214,9 @@ export async function HomePage({
           </div>
           {whyChoose.length > 4 ? (
             <details className="details-toggle details-center mt-6">
-              <summary>
-                <span className="link-gold details-closed text-igqs-gold!">{t("common.details")}</span>
-                <span className="link-gold details-open text-igqs-gold!">{t("common.closeDetails")}</span>
+              <summary className="details-action link-arrow">
+                <span className="details-closed">{t("common.details")}</span>
+                <span className="details-open">{t("common.closeDetails")}</span>
               </summary>
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 {whyChoose.slice(4).map((item, index) => (
@@ -243,21 +231,27 @@ export async function HomePage({
       </section>
       )}
 
-      {sections.length === 0 && (announcement || proceduresNote) ? (
-        <HomeBand id="admission" title={t("home.procedures")} tone="cream">
-          {announcement ? (
-            announcementIsRules ? <AdmissionNotes text={announcement} /> : <Prose>{announcement}</Prose>
-          ) : null}
-          {proceduresNote ? (
-            <div className={announcement ? "mt-4" : ""}>
-              {proceduresAreRules ? <AdmissionNotes text={proceduresNote} /> : <Prose>{proceduresNote}</Prose>}
-            </div>
-          ) : null}
-          <div className="mt-6">
-            <ProcedureList steps={procedureSteps} applyHref="/admission" applyLabel={t("common.applyNow")} />
-          </div>
-        </HomeBand>
-      ) : null}
+      <section className="section-cream border-y border-igqs-gold/25">
+        <div className="section-shell py-8 sm:py-10">
+          <Link
+            href="/admission"
+            className="surface-card surface-card-hover group flex cursor-pointer items-center justify-between gap-4 bg-white px-6 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-igqs-forest dark:bg-[#12352b] dark:focus-visible:outline-igqs-gold-soft"
+          >
+            <span>
+              <span className="heading-strong block text-2xl text-igqs-green transition-colors duration-200 group-hover:text-igqs-forest dark:text-igqs-gold-soft">
+                {t("home.admissionDetails")}
+              </span>
+              <span className="mt-1 block text-sm text-igqs-muted">{t("home.admissionDetailsHint")}</span>
+            </span>
+            <span
+              aria-hidden
+              className="nudge-x inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-igqs-gold text-xl leading-none text-igqs-ink shadow-[0_8px_18px_rgb(196_163_90/0.35)] transition-colors duration-200 group-hover:bg-[#d4b56a]"
+            >
+              →
+            </span>
+          </Link>
+        </div>
+      </section>
 
       {sections.length === 0 && tuition ? (
         <HomeBand id="tuition" title={t("home.tuition")} tone="white">
@@ -265,24 +259,9 @@ export async function HomePage({
         </HomeBand>
       ) : null}
 
-      {methods.length > 0 ? (
-        <HomeBand id="payments" title={t("home.payments")} tone="cream">
-          <PaymentGrid methods={methods} />
-        </HomeBand>
-      ) : null}
-
       {sections.length === 0 && uniform ? (
         <HomeBand id="uniform" title={t("home.uniform")} tone="white">
           <Prose>{uniform}</Prose>
-        </HomeBand>
-      ) : null}
-
-      {fees.length > 0 ? (
-        <HomeBand id="fees" title={t("home.fees")} tone="cream">
-          <Prose>{t("home.feesIntro")}</Prose>
-          <div className="mt-6">
-            <FeeTable fees={fees} allClassesLabel={t("home.feesAllClasses")} />
-          </div>
         </HomeBand>
       ) : null}
 
@@ -315,7 +294,7 @@ export async function HomePage({
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.curriculum")} className="mb-0" />
-            <Link href="/curriculum" className="link-gold mb-1 shrink-0">
+            <Link href="/curriculum" className="link-gold link-arrow mb-1 shrink-0">
               {t("common.viewAll")}
             </Link>
           </div>
@@ -331,9 +310,7 @@ export async function HomePage({
                       {grade.name}
                       <span className="nudge-x text-lg text-igqs-gold" aria-hidden>→</span>
                     </h3>
-                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-igqs-muted">
-                      {grade.description}
-                    </p>
+                    <FormattedText text={grade.description} className="mt-2 line-clamp-3 text-sm leading-relaxed text-igqs-muted" />
                   </Link>
                 </FadeIn>
               ))}
@@ -349,7 +326,7 @@ export async function HomePage({
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.events")} className="mb-0" />
-            <Link href="/events" className="link-gold mb-1 shrink-0">
+            <Link href="/events" className="link-gold link-arrow mb-1 shrink-0">
               {t("common.viewAll")}
             </Link>
           </div>
@@ -390,7 +367,7 @@ export async function HomePage({
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.news")} className="mb-0" />
-            <Link href="/news" className="link-gold mb-1 shrink-0">
+            <Link href="/news" className="link-gold link-arrow mb-1 shrink-0">
               {t("common.viewAll")}
             </Link>
           </div>
@@ -427,7 +404,7 @@ export async function HomePage({
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.gallery")} className="mb-0" />
-            <Link href="/gallery" className="link-gold mb-1 shrink-0">
+            <Link href="/gallery" className="link-gold link-arrow mb-1 shrink-0">
               {t("common.viewAll")}
             </Link>
           </div>
@@ -465,7 +442,7 @@ export async function HomePage({
           <div className="section-shell">
             <div className="mb-8 flex items-end justify-between gap-4">
               <SectionHeading title={t("home.notices")} className="mb-0" />
-              <Link href="/notices" className="link-gold mb-1 shrink-0">
+              <Link href="/notices" className="link-gold link-arrow mb-1 shrink-0">
                 {t("common.viewAll")}
               </Link>
             </div>

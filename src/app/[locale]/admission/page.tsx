@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AdmissionForm } from "@/features/admission/AdmissionForm";
 import { PageIntro } from "@/components/seo/PageIntro";
+import { AdmissionGuide } from "@/features/home/HomeSections";
+import { buildHomeContent } from "@/features/home/content";
 import { Link } from "@/i18n/navigation";
 import { apiGet } from "@/lib/api/client";
-import { type AdmissionInfo, type SiteSettings } from "@/lib/api/types";
+import { type AdmissionInfo, type HomePayload, type SiteSettings } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -30,11 +32,19 @@ export default async function AdmissionPage({
   setRequestLocale(locale);
   const t = await getTranslations("admission");
   const tn = await getTranslations("nav");
-  const [classes, site, info] = await Promise.all([
+  const homeCopy = await getTranslations("home");
+  const [classes, site, info, home] = await Promise.all([
     apiGet<{ slug: string; name: string }[]>("/api/admissions/classes/", locale),
     apiGet<SiteSettings>("/api/site/", locale),
     apiGet<AdmissionInfo>("/api/admissions/info/", locale),
+    apiGet<HomePayload>("/api/home/", locale),
   ]);
+  const guide = buildHomeContent(home, site, null, info, {
+    messages: "",
+    chairman: "",
+    principal: "",
+    procedureSteps: [1, 2, 3, 4, 5].map((step) => homeCopy(`procedure${step}`)),
+  });
 
   return (
     <div>
@@ -46,7 +56,16 @@ export default async function AdmissionPage({
           { name: t("title"), path: "/admission" },
         ]}
       />
-      <div className="mx-auto max-w-xl px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
+      <AdmissionGuide
+        announcement={guide.announcement}
+        announcementIsRules={guide.announcementIsRules}
+        proceduresNote={guide.proceduresNote}
+        proceduresAreRules={guide.proceduresAreRules}
+        steps={guide.procedureSteps}
+        methods={guide.methods}
+        fees={guide.fees}
+      />
+      <div id="apply" className="mx-auto max-w-xl scroll-mt-28 px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
         {site?.admission_announcement && (
           <p className="mb-6 rounded-2xl border border-igqs-gold/30 bg-igqs-sand/40 p-4 text-sm dark:bg-white/5">
             {site.admission_announcement}

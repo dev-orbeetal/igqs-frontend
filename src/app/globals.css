@@ -45,17 +45,17 @@
 :root {
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --duration-micro: 160ms;
-  --duration-hover: 200ms;
-  --duration-panel: 240ms;
-  --duration-exit: 160ms;
-  --duration-section: 520ms;
-  --duration-hero: 640ms;
-  --duration-page: 180ms;
-  --duration-control: 180ms;
+  --duration-micro: 320ms;
+  --duration-hover: 400ms;
+  --duration-panel: 480ms;
+  --duration-exit: 320ms;
+  --duration-section: 1040ms;
+  --duration-hero: 1280ms;
+  --duration-page: 360ms;
+  --duration-control: 360ms;
   /* Gentle overshoot for hovers and pops — playful without bouncing. */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-reveal: 640ms;
+  --duration-reveal: 1280ms;
   --parallax-distance: 18%;
 }
 
@@ -176,8 +176,10 @@ select optgroup {
    is never server-rendered at opacity:0 (it used to be, which left the page
    blank until hydration and permanently blank with JS off). Scroll reveals
    are triggered once by RevealObserver; see .reveal-js below. */
+/* backwards, not both: a finished transform would stay applied and break
+   position:sticky inside the page (the admission action bar). */
 .page-fade {
-  animation: page-fade-in var(--duration-page) var(--ease-out) both;
+  animation: page-rise 640ms var(--ease-out) backwards;
 }
 
 @keyframes page-fade-in {
@@ -189,10 +191,21 @@ select optgroup {
   }
 }
 
+@keyframes page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes reveal-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -279,6 +292,57 @@ select optgroup {
   }
   to {
     transform: scale(1.08);
+  }
+}
+
+@keyframes hero-enter {
+  from {
+    transform: scale(1.045);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes glow-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(78%, 8%, 0);
+  }
+}
+
+@keyframes shine-pass {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes sparkle-glint {
+  0% {
+    opacity: 0;
+    transform: scale(0.35) rotate(0deg);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1) rotate(14deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.55) rotate(22deg);
+  }
+}
+
+@keyframes press-ripple {
+  0% {
+    box-shadow: inset 0 0 0 0 rgb(255 255 255 / 0.45);
+  }
+  100% {
+    box-shadow: inset 0 0 0 2.25rem rgb(255 255 255 / 0);
   }
 }
 
@@ -411,6 +475,13 @@ select optgroup {
     animation: ken-burns 14s ease-in-out infinite alternate;
   }
 
+  /* Settle the opening photo without hiding it — opacity 0 would delay LCP. */
+  .hero-kenburns.hero-enter {
+    animation:
+      hero-enter 2.3s var(--ease-out) both,
+      ken-burns 14s ease-in-out 2.3s infinite alternate;
+  }
+
   .hero-float {
     animation: float var(--float-duration, 8s) ease-in-out infinite;
     animation-delay: var(--float-delay, 0s);
@@ -422,7 +493,7 @@ select optgroup {
   }
 
   /* The slideshow pause control stops every moving thing in the hero. */
-  .hero-timeline:has([data-paused="true"]) :is(.hero-kenburns, .hero-float) {
+  .hero-timeline:has([data-paused="true"]) :is(.hero-kenburns, .hero-float, .hero-enter) {
     animation-play-state: paused;
   }
 
@@ -454,14 +525,63 @@ select optgroup {
 
   .photo-in {
     animation: page-fade-in var(--duration-section) var(--ease-out) both;
-    animation-delay: calc(var(--photo-index) * 60ms);
+    animation-delay: calc(var(--photo-index) * 120ms);
+  }
+
+  /* The heading box itself stays put; each word rises once. */
+  .reveal-js .reveal[data-revealed="in"][data-reveal="words"] {
+    animation: none;
+  }
+
+  .reveal-js .reveal-words:not([data-revealed]) .text-rise {
+    opacity: 0;
+  }
+
+  .reveal-js .reveal-words[data-revealed="in"] .text-rise,
+  .text-rise-now {
+    animation: reveal-in 1120ms var(--ease-out) backwards;
+    animation-delay: var(--w, 0ms);
+  }
+
+  .drawer-panel[data-open="true"] .drawer-link {
+    animation: reveal-in 840ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  .band-green::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    width: 52%;
+    height: 160%;
+    left: -8%;
+    top: -30%;
+    background: radial-gradient(circle, rgb(232 215 168 / 0.16), transparent 68%);
+    animation: glow-drift 18s ease-in-out infinite alternate;
+  }
+
+  .dark .band-green::after {
+    background: radial-gradient(circle, rgb(196 163 90 / 0.1), transparent 68%);
+  }
+
+  .btn-shine-once::after {
+    animation: shine-pass 2.1s var(--ease-out) 1.7s 1;
+  }
+
+  .btn-gold:active,
+  .btn-green:active,
+  .btn-sparkle:active {
+    animation: press-ripple 920ms var(--ease-out);
   }
 }
 
 @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
   .reveal-now,
   .reveal-section,
-  .photo-in {
+  .photo-in,
+  .text-rise-now,
+  .reveal-js .reveal-words[data-revealed="in"] .text-rise {
     animation-name: reveal-fade;
   }
 
@@ -514,6 +634,7 @@ select optgroup {
   display: grid;
   grid-template-rows: 0fr;
   overflow: hidden;
+  transition: grid-template-rows 680ms var(--ease-out);
 }
 
 .drawer-panel[data-open="true"] {
@@ -583,6 +704,86 @@ select optgroup {
   font-weight: 500;
 }
 
+/* Line clamp. Do not use the lh unit here: on these cards it collapsed the text to nothing. */
+.clamp-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--clamp-lines, 3);
+  line-clamp: var(--clamp-lines, 3);
+  overflow: hidden;
+}
+
+.text-reveal-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+.text-reveal-full,
+.text-reveal .text-reveal-open {
+  display: none;
+}
+
+.text-reveal:has(.text-reveal-toggle:checked) .text-reveal-preview {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+.text-reveal:has(.text-reveal-full):has(.text-reveal-toggle:checked) .text-reveal-preview {
+  display: none;
+}
+
+.text-reveal:has(.text-reveal-toggle:checked) .text-reveal-full {
+  display: block;
+}
+
+.text-reveal:has(.text-reveal-toggle:checked) .text-reveal-closed {
+  display: none;
+}
+
+.text-reveal:has(.text-reveal-toggle:checked) .text-reveal-open {
+  display: inline;
+}
+
+.text-reveal > label.details-action {
+  margin-top: 0.85rem;
+}
+
+.details-action {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 9999px;
+  background: var(--color-igqs-gold);
+  color: var(--color-igqs-ink);
+  padding: 0.45rem 0.95rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: 0 6px 16px rgb(196 163 90 / 0.28);
+  cursor: pointer;
+}
+
+.details-action:hover {
+  background: #d4b56a;
+}
+
+.details-action:focus-visible {
+  outline: 2px solid var(--color-igqs-forest);
+  outline-offset: 3px;
+}
+
+.dark .details-action:focus-visible {
+  outline-color: var(--color-igqs-gold-soft);
+}
+
 .details-toggle > summary::-webkit-details-marker,
 .details-toggle > summary::marker {
   content: "";
@@ -609,6 +810,52 @@ select optgroup {
 .details-toggle[open] > summary {
   order: 2;
   margin-top: 0.75rem;
+}
+
+/* Block flow, not flex. A column flex container was squeezing the preview to nothing.
+   The browser hides everything but summary inside a closed details element.
+   This puts the preview back. */
+.details-reveal {
+  display: block;
+}
+
+.details-reveal:not([open]) > :not(summary) {
+  display: block;
+}
+
+.details-reveal:not([open]) > .clamp-lines {
+  display: -webkit-box;
+}
+
+.details-reveal > summary {
+  margin-top: 0.85rem;
+  list-style: none;
+  cursor: pointer;
+}
+
+.details-reveal > summary::-webkit-details-marker,
+.details-reveal > summary::marker {
+  content: "";
+  display: none;
+}
+
+.details-reveal .details-open {
+  display: none;
+}
+
+.details-reveal[open] .details-closed {
+  display: none;
+}
+
+.details-reveal[open] .details-open {
+  display: inline;
+}
+
+.details-reveal[open] .clamp-lines {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
 }
 
 .details-toggle[open] > :not(summary) {
@@ -658,7 +905,10 @@ select optgroup {
 }
 
 .btn-gold-outline {
-  @apply inline-flex items-center justify-center rounded-full border border-igqs-gold/70 px-6 py-3 text-sm text-igqs-cream;
+  @apply inline-flex items-center justify-center rounded-full border border-igqs-gold/85 px-6 py-3 text-sm text-white;
+  background: rgb(8 28 22 / 0.92);
+  box-shadow: 0 8px 22px rgb(6 20 16 / 0.4);
+  backdrop-filter: blur(8px);
   transition:
     transform var(--duration-hover) var(--ease-spring),
     background-color var(--duration-hover) var(--ease-out),
@@ -666,8 +916,28 @@ select optgroup {
 }
 
 .btn-gold-outline:hover {
-  background: rgb(196 163 90 / 0.14);
-  border-color: var(--color-igqs-gold);
+  background: rgb(6 20 16 / 0.78);
+  border-color: var(--color-igqs-gold-soft);
+}
+
+.whatsapp-float {
+  position: fixed;
+  z-index: 40;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border-radius: 9999px;
+  background: #25d366;
+  color: white;
+  box-shadow: 0 10px 24px rgb(18 140 70 / 0.38);
+}
+
+.whatsapp-float:hover {
+  background: #1daf5a;
+  box-shadow: 0 14px 28px rgb(18 140 70 / 0.45);
 }
 
 .btn-ghost {
@@ -719,7 +989,7 @@ select optgroup {
   @apply inline-flex h-12 w-12 items-center justify-center rounded-xl border border-igqs-gold/40 text-igqs-gold;
   background: rgb(196 163 90 / 0.1);
   transition:
-    transform 320ms var(--ease-spring),
+    transform 640ms var(--ease-spring),
     background-color var(--duration-hover) var(--ease-out);
 }
 
@@ -727,7 +997,7 @@ select optgroup {
 .nudge-x,
 .lift-y,
 .stat-icon {
-  transition: transform 260ms var(--ease-spring);
+  transition: transform 520ms var(--ease-spring);
 }
 
 .stat-icon {
@@ -744,7 +1014,7 @@ select optgroup {
   transform: scale(0.6);
   transition:
     opacity var(--duration-hover) var(--ease-out),
-    transform 320ms var(--ease-spring);
+    transform 640ms var(--ease-spring);
 }
 
 .card-accent {
@@ -754,7 +1024,7 @@ select optgroup {
   background: linear-gradient(90deg, var(--color-igqs-gold), var(--color-igqs-gold-soft));
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 320ms var(--ease-out);
+  transition: transform 640ms var(--ease-out);
 }
 
 /* One slow light sweep across a primary button on hover. */
@@ -771,6 +1041,29 @@ select optgroup {
   z-index: -1;
   background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%);
   transform: translateX(-120%);
+}
+
+/* A few star points, played once on hover — not a looping glitter. */
+.btn-sparkle {
+  position: relative;
+}
+
+.btn-sparkle::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 22%;
+  left: 18%;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: #fff;
+  box-shadow:
+    1.35rem 0.15rem 0 -0.5px #fff,
+    2.05rem 0.9rem 0 -1px rgb(255 255 255 / 0.92),
+    0.15rem 0.85rem 0 -1px rgb(255 255 255 / 0.75);
+  opacity: 0;
 }
 
 .notice-row {
@@ -797,7 +1090,19 @@ select optgroup {
 }
 
 .img-zoom {
-  transition: transform var(--duration-hover) var(--ease-out);
+  transition: transform 1040ms var(--ease-out);
+}
+
+.text-rise,
+.text-rise-now {
+  display: inline-block;
+}
+
+.link-arrow::after {
+  content: "→";
+  display: inline-block;
+  margin-inline-start: 0.3em;
+  transition: transform 520ms var(--ease-spring);
 }
 
 .img-overlay {
@@ -856,19 +1161,51 @@ select optgroup {
   background-size: auto, auto, 80px 80px;
 }
 
+/* The copy is left-aligned and runs well past the midpoint on a typical
+   laptop, so the scrim has to stay dark across that whole block. A side
+   gradient alone left the end of the title and the outline buttons on
+   bright uniforms. */
 .hero-overlay {
-  background: linear-gradient(
-    105deg,
-    rgb(8 28 22 / 0.78) 0%,
-    rgb(15 61 48 / 0.42) 42%,
-    rgb(16 35 28 / 0.18) 100%
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgb(6 20 16 / 0.46) 0%,
+      rgb(6 20 16 / 0.22) 22%,
+      rgb(6 20 16 / 0.58) 58%,
+      rgb(6 20 16 / 0.82) 100%
+    ),
+    linear-gradient(
+      95deg,
+      rgb(6 20 16 / 0.9) 0%,
+      rgb(6 20 16 / 0.8) 32%,
+      rgb(6 20 16 / 0.62) 58%,
+      rgb(6 20 16 / 0.3) 82%,
+      rgb(6 20 16 / 0.14) 100%
+    );
 }
 
 .dark .hero-overlay {
   background:
-    linear-gradient(105deg, rgb(8 28 22 / 0.92) 0%, rgb(15 61 48 / 0.78) 46%, rgb(16 35 28 / 0.38) 100%),
-    linear-gradient(180deg, rgb(8 24 18 / 0.18) 0%, transparent 28%, rgb(8 24 18 / 0.55) 100%);
+    linear-gradient(
+      180deg,
+      rgb(4 14 11 / 0.55) 0%,
+      rgb(4 14 11 / 0.32) 24%,
+      rgb(4 14 11 / 0.68) 62%,
+      rgb(4 14 11 / 0.9) 100%
+    ),
+    linear-gradient(
+      95deg,
+      rgb(4 14 11 / 0.94) 0%,
+      rgb(4 14 11 / 0.84) 36%,
+      rgb(4 14 11 / 0.62) 64%,
+      rgb(4 14 11 / 0.32) 100%
+    );
+}
+
+.hero-copy :is(.eyebrow, h1, p) {
+  text-shadow:
+    0 1px 2px rgb(6 20 16 / 0.9),
+    0 10px 28px rgb(6 20 16 / 0.55);
 }
 
 /* Phones: the copy spans the full width, so a side-lit gradient leaves the
@@ -878,9 +1215,9 @@ select optgroup {
   .dark .hero-overlay {
     background: linear-gradient(
       180deg,
-      rgb(8 28 22 / 0.55) 0%,
-      rgb(8 28 22 / 0.7) 45%,
-      rgb(8 28 22 / 0.88) 100%
+      rgb(6 20 16 / 0.62) 0%,
+      rgb(6 20 16 / 0.78) 42%,
+      rgb(6 20 16 / 0.92) 100%
     );
   }
 }
@@ -990,7 +1327,8 @@ select optgroup {
 @media (hover: hover) and (pointer: fine) {
   .btn-gold:hover,
   .btn-gold-outline:hover,
-  .btn-ghost:hover {
+  .btn-ghost:hover,
+  .btn-green:hover {
     transform: translateY(-1px);
   }
 
@@ -1035,7 +1373,15 @@ select optgroup {
 
   .btn-shine:hover::after {
     transform: translateX(120%);
-    transition: transform 900ms var(--ease-out);
+    transition: transform 1800ms var(--ease-out);
+  }
+
+  .btn-sparkle:hover:not(:disabled)::before {
+    animation: sparkle-glint 1560ms ease-out;
+  }
+
+  .link-arrow:hover::after {
+    transform: translateX(4px);
   }
 
   .notice-row:hover {
@@ -1050,7 +1396,9 @@ select optgroup {
 /* Press feedback works on touch too. */
 .btn-gold:active,
 .btn-gold-outline:active,
-.btn-ghost:active {
+.btn-ghost:active,
+.btn-green:active,
+.btn-sparkle:active {
   transform: scale(0.97);
 }
 
@@ -1071,6 +1419,7 @@ select optgroup {
   .photo-in,
   .rule-draw-now,
   .hero-kenburns,
+  .hero-enter,
   .hero-float,
   .hero-parallax-bg,
   .hero-parallax-fg,
@@ -1083,6 +1432,13 @@ select optgroup {
   .stat-icon::before,
   .card-accent,
   .btn-shine::after,
+  .btn-shine-once::after,
+  .btn-sparkle::before,
+  .band-green::after,
+  .text-rise,
+  .text-rise-now,
+  .drawer-link,
+  .link-arrow::after,
   .nav-underline::after,
   .link-gold,
   .img-zoom,
@@ -1111,6 +1467,8 @@ select optgroup {
   .reveal,
   .reveal-now,
   .reveal-section,
+  .text-rise,
+  .text-rise-now,
   .panel-in,
   .fade-swap,
   .fade-status,
@@ -1125,6 +1483,9 @@ select optgroup {
 
   .btn-gold:hover,
   .btn-gold:active,
+  .btn-green:hover,
+  .btn-green:active,
+  .btn-sparkle:active,
   .btn-gold-outline:active,
   .btn-ghost:active,
   .group:hover :is(.icon-well, .nudge-x, .lift-y, .stat-icon),
@@ -1151,6 +1512,8 @@ select optgroup {
   .hero-parallax-fg,
   .reveal-now,
   .reveal-section,
+  .text-rise,
+  .text-rise-now,
   .panel-in,
   .panel-out,
   .fade-swap,
@@ -1187,6 +1550,147 @@ select optgroup {
   font-family: inherit;
   line-height: 1.4;
 }
+.rich-editor-body {
+  min-height: 9rem;
+  padding: 0.75rem 0.9rem;
+  outline: none;
+}
+
+.rich-editor-body p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-igqs-muted);
+  pointer-events: none;
+}
+
+.rich-prose,
+.reading-prose {
+  overflow-wrap: break-word;
+  line-height: 1.75;
+}
+
+.reading-prose > p {
+  margin: 0;
+}
+
+.reading-prose > p + p {
+  margin-top: 1em;
+}
+
+.is-quote > p:first-child::before {
+  content: "\201C";
+}
+
+.is-quote > p:last-child::after {
+  content: "\201D";
+}
+
+.rich-prose :where(p, ul, ol, blockquote, table, h1, h2, h3) {
+  margin-top: 1em;
+}
+
+.rich-prose :where(p, ul, ol, blockquote, table, h1, h2, h3):first-child {
+  margin-top: 0;
+}
+
+.rich-prose :where(h1, h2, h3) {
+  font-family: var(--font-cormorant), Georgia, serif;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.font-bn .rich-prose :where(h1, h2, h3) {
+  font-family: var(--font-bornomala), var(--font-outfit), sans-serif;
+}
+
+.rich-prose h1 {
+  font-size: 1.6rem;
+}
+
+.rich-prose h2 {
+  font-size: 1.35rem;
+}
+
+.rich-prose h3 {
+  font-size: 1.15rem;
+}
+
+.rich-prose :where(ul, ol) {
+  padding-left: 1.25rem;
+}
+
+.rich-prose li + li {
+  margin-top: 0.35rem;
+}
+
+.rich-prose ul {
+  list-style: disc;
+}
+
+.rich-prose ol {
+  list-style: decimal;
+}
+
+.rich-prose blockquote {
+  border-left: 3px solid var(--color-igqs-gold);
+  padding-left: 0.9rem;
+  font-style: italic;
+}
+
+.font-bn .rich-prose blockquote {
+  font-style: normal;
+}
+
+.rich-prose blockquote :where(p, ul, ol) {
+  margin-top: 0.45em;
+}
+
+.rich-prose blockquote :where(p, ul, ol):first-child {
+  margin-top: 0;
+}
+
+.rich-prose a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rich-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+}
+
+.rich-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.rich-prose :where(th, td) {
+  border: 1px solid rgb(196 163 90 / 0.45);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.rich-editor-body :where(p, ul, ol, blockquote, table, h1, h2, h3) {
+  margin-top: 0.6rem;
+}
+
+.rich-editor-body :where(ul, ol) {
+  padding-left: 1.25rem;
+}
+
+.rich-editor-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rich-editor-body :where(th, td) {
+  border: 1px solid rgb(196 163 90 / 0.45);
+  padding: 0.35rem 0.5rem;
+}
+
 .receipt-doc .receipt-eyebrow {
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1254,6 +1758,8 @@ select optgroup {
    ------------------------------------------------------------------ */
 
 .band-green {
+  position: relative;
+  isolation: isolate;
   background:
     url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 4l5.2 12.8L40 22l-12.8 5.2L22 40l-5.2-12.8L4 22l12.8-5.2z' fill='none' stroke='%23c4a35a' stroke-opacity='0.07' stroke-width='0.8'/%3E%3C/svg%3E"),
     linear-gradient(110deg, #0a3528 0%, #0f4535 55%, #145a43 100%);

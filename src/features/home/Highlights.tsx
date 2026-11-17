@@ -4,6 +4,7 @@ import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransf
 import { Award, GraduationCap, Sparkles, Users } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useEffect, useMemo, useRef } from "react";
+import { TextRise } from "@/components/motion/TextRise";
 import { ArchCorner } from "@/components/ui/Ornaments";
 
 const ICONS = {
@@ -81,7 +82,7 @@ function CountValue({ value: authored, delay = 0 }: { value: string; delay?: num
     }
     motionValue.set(0);
     const controls = animate(motionValue, target, {
-      duration: 1.6,
+      duration: 3.2,
       delay,
       ease: [0.16, 1, 0.3, 1],
     });
@@ -105,9 +106,11 @@ export function Highlights({ items, label, title }: { items: Highlight[]; label:
       <ArchCorner id="stats-arch-left" side="left" />
       <ArchCorner id="stats-arch-right" side="right" />
       <div className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-        <h2 className="heading-strong mb-6 text-center text-[1.7rem] leading-tight text-white md:text-[2.2rem]">
-          {heading}
-        </h2>
+        <TextRise
+          as="h2"
+          text={heading}
+          className="heading-strong mb-6 text-center text-[1.7rem] leading-tight text-white md:text-[2.2rem]"
+        />
       <div className="grid grid-cols-2 gap-y-5 md:grid-cols-4 md:gap-y-0 md:[&>*+*]:border-l md:[&>*+*]:border-white/15">
         {items.map((item, index) => {
           const Icon = ICONS[item.icon as keyof typeof ICONS] ?? Users;

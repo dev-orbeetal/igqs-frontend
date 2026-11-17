@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { FormattedText } from "@/components/content/FormattedText";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PageIntro } from "@/components/seo/PageIntro";
@@ -78,7 +79,7 @@ export default async function NewsDetailPage({
             </div>
           )}
           <p className="mt-6 text-sm text-igqs-forest dark:text-igqs-gold">{formatDate(post.published_at, locale)}</p>
-          <div className="mt-6 max-w-prose whitespace-pre-line text-lg leading-relaxed">{post.description}</div>
+          <FormattedText text={post.description} className="mt-6 max-w-prose whitespace-pre-line text-lg leading-relaxed" />
         </FadeIn>
       </article>
     </div>

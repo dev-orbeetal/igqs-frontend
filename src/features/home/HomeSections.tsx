@@ -1,6 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { DetailsText, Disclosure, HOME_PROSE } from "@/features/home/DetailsText";
+import { AdmissionNotes, DetailsText, Disclosure, HOME_PROSE } from "@/features/home/DetailsText";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
@@ -24,17 +25,15 @@ export function HomeBand({
   return (
     <section id={id} className={`${surface} section-pad scroll-mt-28`}>
       <div className="section-shell">
-        <FadeIn>
-          <SectionHeading title={title} align={align} />
-        </FadeIn>
+        <SectionHeading title={title} align={align} />
         <FadeIn delay={0.05}>{children}</FadeIn>
       </div>
     </section>
   );
 }
 
-export function Prose({ children, preview = 1 }: { children: string; preview?: number }) {
-  return <DetailsText text={children} className={HOME_PROSE} preview={preview} />;
+export function Prose({ children }: { children: string }) {
+  return <DetailsText text={children} className={HOME_PROSE} />;
 }
 
 export function SplitCopy({
@@ -53,13 +52,15 @@ export function SplitCopy({
   return (
     <section id={id} className="section-white section-pad scroll-mt-28">
       <div className={`section-shell grid items-center gap-10 ${image ? "lg:grid-cols-2 lg:gap-14" : ""}`}>
-        <FadeIn variant="left">
+        <div>
           <SectionHeading title={title} />
-          <DetailsText text={body} className={HOME_PROSE} preview={3} />
-        </FadeIn>
+          <FadeIn variant="left">
+            <DetailsText text={body} className={HOME_PROSE} />
+          </FadeIn>
+        </div>
         {image ? (
           <FadeIn delay={0.1} variant="right" className="img-frame-offset ml-4 mb-4 sm:ml-5">
-            <div className="img-frame min-h-64 shadow-[0_18px_40px_rgb(16_35_28/0.14)] sm:min-h-80">
+            <div className="img-frame aspect-[3/2] shadow-[0_18px_40px_rgb(16_35_28/0.14)]">
               <Image
                 src={image}
                 alt={imageAlt}
@@ -83,6 +84,42 @@ type Speaker = {
   photo?: string;
 };
 
+export function PersonIdentity({
+  photo,
+  photoAlt,
+  name,
+  designation,
+  kicker,
+}: {
+  photo?: string;
+  photoAlt: string;
+  name?: string;
+  designation?: string;
+  kicker?: string;
+}) {
+  if (!photo && !name && !designation && !kicker) return null;
+  return (
+    <div className="flex items-start gap-3.5">
+      {photo ? (
+        <div className="relative h-28 w-[4.75rem] shrink-0 overflow-hidden rounded-xl sm:h-36 sm:w-24">
+          <Image src={photo} alt={photoAlt} fill sizes="96px" className="object-cover object-top" />
+        </div>
+      ) : null}
+      <div className="min-w-0 flex-1 pt-0.5">
+        {kicker ? <p className="eyebrow">{kicker}</p> : null}
+        {name ? (
+          <p className={`font-display text-xl leading-tight text-igqs-green dark:text-igqs-gold-soft ${kicker ? "mt-1.5" : ""}`}>
+            {name}
+          </p>
+        ) : null}
+        {designation ? (
+          <p className="mt-1 whitespace-pre-line text-sm leading-snug text-igqs-muted">{designation}</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function LeaderMessages({
   id,
   heading,
@@ -98,46 +135,27 @@ export function LeaderMessages({
   return (
     <section id={id} className="section-cream section-pad scroll-mt-28">
       <div className="section-shell">
-        <FadeIn>
-          <SectionHeading title={heading} align="center" />
-        </FadeIn>
+        <SectionHeading title={heading} align="center" />
         <div className={`mx-auto grid max-w-5xl gap-6 ${shown.length > 1 ? "lg:grid-cols-2" : ""}`}>
           {shown.map((person) => (
             <FadeIn key={person.label}>
-              <article
-                className={`surface-card grid gap-6 overflow-hidden border-t-4 border-t-igqs-gold bg-white p-6 md:p-8 dark:bg-[#12352b] ${
-                  person.photo ? "sm:grid-cols-[160px_1fr]" : ""
-                }`}
-              >
-                {person.photo ? (
-                  <div className="img-frame relative h-48 sm:h-auto sm:min-h-44">
-                    <Image
-                      src={person.photo}
-                      alt={person.name || person.label}
-                      fill
-                      sizes="160px"
-                      className="object-cover"
-                    />
-                  </div>
+              <article className="surface-card overflow-hidden border-t-4 border-t-igqs-gold bg-white p-5 sm:p-6 dark:bg-[#12352b]">
+                <PersonIdentity
+                  photo={person.photo}
+                  photoAlt={person.name || person.label}
+                  name={person.name}
+                  designation={person.title}
+                  kicker={person.label}
+                />
+                {person.message ? (
+                  <DetailsText
+                    text={person.message}
+                    toggle="more"
+                    lines={6}
+                    quote
+                    className="principal-quote mt-4 whitespace-pre-line text-base leading-relaxed text-igqs-green dark:text-igqs-gold-soft"
+                  />
                 ) : null}
-                <div>
-                  <p className="eyebrow">{person.label}</p>
-                  {person.message ? (
-                    <DetailsText
-                      text={person.message}
-                      unit="paragraphs"
-                      preview={1}
-                      quote
-                      className="principal-quote mt-3 whitespace-pre-line text-base leading-relaxed text-igqs-green dark:text-igqs-gold-soft"
-                    />
-                  ) : null}
-                  {person.name ? (
-                    <footer className="mt-5 text-sm">
-                      <strong>{person.name}</strong>
-                      {person.title ? <span className="block text-igqs-muted">{person.title}</span> : null}
-                    </footer>
-                  ) : null}
-                </div>
               </article>
             </FadeIn>
           ))}
@@ -164,7 +182,7 @@ export function VisionMission({
         {vision ? (
           <FadeIn id="vision" className="surface-card bg-igqs-green p-7 text-igqs-cream sm:p-8">
             <h2 className="heading-strong text-[1.9rem] leading-tight text-white md:text-[2.4rem]">{visionTitle}</h2>
-            <p className="mt-4 max-w-prose whitespace-pre-line text-sm leading-relaxed text-igqs-cream/90">{vision}</p>
+            <DetailsText text={vision} className="mt-4 max-w-prose whitespace-pre-line text-sm leading-relaxed text-igqs-cream/90" />
           </FadeIn>
         ) : null}
         {mission ? (
@@ -172,7 +190,7 @@ export function VisionMission({
             <h2 className="heading-strong text-[1.9rem] leading-tight text-igqs-green md:text-[2.4rem] dark:text-igqs-gold-soft">
               {missionTitle}
             </h2>
-            <p className={`mt-4 ${HOME_PROSE}`}>{mission}</p>
+            <DetailsText text={mission} className={`mt-4 ${HOME_PROSE}`} />
           </FadeIn>
         ) : null}
       </div>
@@ -203,7 +221,6 @@ export function FacilityGrid({
               {item.description ? (
                 <DetailsText
                   text={item.description}
-                  preview={1}
                   className="mt-2 whitespace-pre-line text-sm leading-relaxed text-igqs-muted"
                 />
               ) : null}
@@ -230,7 +247,8 @@ export function ProcedureList({
         {steps.map((step, index) => (
           <li
             key={step}
-            className="flex gap-3 rounded-2xl border border-igqs-gold/25 bg-white px-4 py-3 text-sm leading-relaxed sm:text-base dark:bg-[#12352b]"
+            className="reveal flex gap-3 rounded-2xl border border-igqs-gold/25 bg-white px-4 py-3 text-sm leading-relaxed sm:text-base dark:bg-[#12352b]"
+            suppressHydrationWarning
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-igqs-gold text-sm text-igqs-ink">
               {index + 1}
@@ -239,7 +257,7 @@ export function ProcedureList({
           </li>
         ))}
       </ol>
-      <Link href={applyHref} className="btn-green mt-7 inline-flex">
+      <Link href={applyHref} className="btn-green btn-shine btn-sparkle mt-7 inline-flex">
         {applyLabel}
       </Link>
     </div>
@@ -296,6 +314,57 @@ function PaymentFacts({ method }: { method: PaymentMethodInfo }) {
         </Disclosure>
       ) : null}
     </div>
+  );
+}
+
+export async function AdmissionGuide({
+  announcement,
+  announcementIsRules,
+  proceduresNote,
+  proceduresAreRules,
+  steps,
+  methods,
+  fees,
+}: {
+  announcement: string;
+  announcementIsRules: boolean;
+  proceduresNote: string;
+  proceduresAreRules: boolean;
+  steps: string[];
+  methods: PaymentMethodInfo[];
+  fees: AdmissionFeeInfo[];
+}) {
+  const t = await getTranslations("home");
+  const common = await getTranslations("common");
+  return (
+    <>
+      <HomeBand id="procedures" title={t("procedures")} tone="cream">
+        {announcement ? (
+          announcementIsRules ? <AdmissionNotes text={announcement} /> : <Prose>{announcement}</Prose>
+        ) : null}
+        {proceduresNote ? (
+          <div className={announcement ? "mt-4" : ""}>
+            {proceduresAreRules ? <AdmissionNotes text={proceduresNote} /> : <Prose>{proceduresNote}</Prose>}
+          </div>
+        ) : null}
+        <div className={announcement || proceduresNote ? "mt-6" : ""}>
+          <ProcedureList steps={steps} applyHref="/admission#apply" applyLabel={common("applyNow")} />
+        </div>
+      </HomeBand>
+      {fees.length > 0 ? (
+        <HomeBand id="fees" title={t("fees")} tone="white">
+          <Prose>{t("feesIntro")}</Prose>
+          <div className="mt-6">
+            <FeeTable fees={fees} allClassesLabel={t("feesAllClasses")} />
+          </div>
+        </HomeBand>
+      ) : null}
+      {methods.length > 0 ? (
+        <HomeBand id="payments" title={t("payments")} tone="cream">
+          <PaymentGrid methods={methods} />
+        </HomeBand>
+      ) : null}
+    </>
   );
 }
 

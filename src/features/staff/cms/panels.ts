@@ -1,4 +1,4 @@
-export const HOME_PANELS = ["highlights", "page", "why", "testimonials"] as const;
+export const HOME_PANELS = ["story", "practical", "highlights", "page", "people", "why", "testimonials"] as const;
 export type HomePanel = (typeof HOME_PANELS)[number];
 
 export const ABOUT_PANELS = ["leadership", "facilities"] as const;

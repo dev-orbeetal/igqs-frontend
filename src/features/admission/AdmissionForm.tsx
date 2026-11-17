@@ -107,7 +107,7 @@ export function AdmissionForm({
         </p>
       </div>
       {step < 3 && (
-        <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-igqs-gold/20 bg-white/95 px-4 py-4 backdrop-blur dark:bg-[#0d1f18]/95 sm:flex-row sm:justify-between sm:px-7">
+        <div data-sticky-actions className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-igqs-gold/20 bg-white/95 px-4 py-4 backdrop-blur dark:bg-[#0d1f18]/95 sm:flex-row sm:justify-between sm:px-7">
           {step > 0 ? (
             <button
               type="button"
@@ -134,7 +134,7 @@ export function AdmissionForm({
               type="button"
               disabled={sending}
               onClick={submitPayment}
-              className="btn-solid min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
+              className="btn-solid btn-shine btn-sparkle min-h-12 rounded-full bg-igqs-green px-5 text-sm text-igqs-cream disabled:opacity-40 dark:bg-igqs-gold dark:text-igqs-ink"
             >
               {sending ? t("processingPayment") : t("payWithBkash")}
             </button>

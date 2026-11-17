@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { FormattedText } from "@/components/content/FormattedText";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PageIntro } from "@/components/seo/PageIntro";
@@ -86,7 +87,7 @@ export default async function EventDetailPage({
           <p className="mt-1 text-sm text-igqs-muted">
             {t("location")}: {event.location}
           </p>
-          <div className="mt-8 max-w-prose whitespace-pre-line text-lg leading-relaxed">{event.description}</div>
+          <FormattedText text={event.description} className="mt-8 max-w-prose whitespace-pre-line text-lg leading-relaxed" />
         </FadeIn>
       </article>
     </div>

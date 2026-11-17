@@ -13,19 +13,35 @@ export const heroContentFields: CmsField[] = [
 
 export const homeSectionFields: CmsField[] = [
   { type: "pair", name: "title", label: "fTitle", required: true },
-  { type: "pair", name: "description", label: "fDescription", textarea: true, required: true },
+  { type: "pair", name: "description", label: "fDescription", textarea: true, rich: true, required: true },
   { type: "number", name: "order", label: "fOrder" },
 ];
 
-export const homeFields: CmsField[] = [
-  { type: "pair", name: "chairman_name", label: "fChairmanName", section: "sectionChairman" },
-  { type: "pair", name: "chairman_title", label: "fChairmanTitle", section: "sectionChairman" },
-  { type: "pair", name: "chairman_message", label: "fChairmanMessage", textarea: true, section: "sectionChairman" },
+export const homeStoryFields: CmsField[] = [
+  { type: "pair", name: "goals", label: "fDescription", textarea: true, rich: true, section: "sectionGoals", hint: "storyHint" },
+  { type: "pair", name: "about_preview", label: "fAboutPreview", textarea: true, rich: true, section: "sectionGoals", hint: "fallbackHint" },
+  { type: "pair", name: "beacon", label: "fDescription", textarea: true, rich: true, section: "sectionBeacon" },
+  { type: "pair", name: "welcome", label: "fWelcome", textarea: true, rich: true, section: "sectionBeacon", hint: "fallbackHint" },
+  { type: "pair", name: "dreams", label: "fDescription", textarea: true, rich: true, section: "sectionDreams" },
+  { type: "pair", name: "child_gain", label: "fDescription", textarea: true, rich: true, section: "sectionGain" },
+  { type: "pair", name: "holistic", label: "fDescription", textarea: true, rich: true, section: "sectionHolistic" },
+];
+
+export const homePracticalFields: CmsField[] = [
+  { type: "pair", name: "admission_procedures", label: "fAdmissionProcedures", textarea: true, rich: true, section: "sectionPractical" },
+  { type: "pair", name: "tuition", label: "fTuition", textarea: true, rich: true, section: "sectionPractical" },
+  { type: "pair", name: "uniform", label: "fUniform", textarea: true, rich: true, section: "sectionPractical" },
+];
+
+export const homePeopleFields: CmsField[] = [
   { type: "image", name: "chairman_photo_url", fileName: "chairman_photo", label: "fChairmanPhoto", section: "sectionChairman" },
-  { type: "pair", name: "principal_name", label: "fPrincipalName", required: true, section: "sectionPrincipal" },
-  { type: "pair", name: "principal_title", label: "fPrincipalTitle", required: true, section: "sectionPrincipal" },
-  { type: "pair", name: "principal_message", label: "fPrincipalMessage", textarea: true, required: true, section: "sectionPrincipal" },
+  { type: "pair", name: "chairman_name", label: "fChairmanName", section: "sectionChairman" },
+  { type: "pair", name: "chairman_title", label: "fDesignation", textarea: true, hint: "designationHint", section: "sectionChairman" },
+  { type: "pair", name: "chairman_message", label: "fChairmanMessage", textarea: true, rich: true, section: "sectionChairman" },
   { type: "image", name: "principal_photo_url", fileName: "principal_photo", label: "fPrincipalPhoto", section: "sectionPrincipal" },
+  { type: "pair", name: "principal_name", label: "fPrincipalName", required: true, section: "sectionPrincipal" },
+  { type: "pair", name: "principal_title", label: "fDesignation", textarea: true, hint: "designationHint", required: true, section: "sectionPrincipal" },
+  { type: "pair", name: "principal_message", label: "fPrincipalMessage", textarea: true, rich: true, required: true, section: "sectionPrincipal" },
 ];
 
 export const highlightFields = (icons: Option[]): CmsField[] => [
@@ -40,7 +56,7 @@ export const highlightFields = (icons: Option[]): CmsField[] => [
 export const testimonialFields = (roles: Option[]): CmsField[] => [
   { type: "pair", name: "name", label: "fName", required: true },
   { type: "select", name: "role", label: "fWhoIsSpeaking", options: roles },
-  { type: "pair", name: "quote", label: "fQuote", textarea: true, required: true },
+  { type: "pair", name: "quote", label: "fQuote", textarea: true, rich: true, required: true },
   { type: "datetime", name: "spoken_on", label: "fSpokenOn" },
   { type: "number", name: "rating", label: "fRating" },
   { type: "url", name: "facebook_url", label: "fFacebookProfile" },
@@ -50,32 +66,32 @@ export const testimonialFields = (roles: Option[]): CmsField[] => [
 
 export const whyFields = (icons: Option[]): CmsField[] => [
   { type: "pair", name: "title", label: "fTitle", required: true },
-  { type: "pair", name: "description", label: "fDescription", textarea: true, required: true },
+  { type: "pair", name: "description", label: "fDescription", textarea: true, rich: true, required: true },
   { type: "image", name: "image_url", fileName: "image", label: "fPhoto" },
   { type: "select", name: "icon", label: "fIcon", options: icons },
   { type: "number", name: "order", label: "fOrder" },
 ];
 
 export const aboutFields: CmsField[] = [
-  { type: "pair", name: "introduction", label: "fIntroduction", textarea: true, required: true, section: "sectionStory" },
-  { type: "pair", name: "history", label: "fHistory", textarea: true, required: true, section: "sectionStory" },
-  { type: "pair", name: "vision", label: "fVision", textarea: true, required: true, section: "sectionPurpose" },
-  { type: "pair", name: "mission", label: "fMission", textarea: true, required: true, section: "sectionPurpose" },
-  { type: "pair", name: "quranic_approach", label: "fQuranicApproach", textarea: true, required: true, section: "sectionPurpose" },
-  { type: "pair", name: "principal_message", label: "fPrincipalMessage", textarea: true, required: true, section: "sectionPrincipal" },
+  { type: "pair", name: "introduction", label: "fIntroduction", textarea: true, rich: true, required: true, section: "sectionStory" },
+  { type: "pair", name: "history", label: "fHistory", textarea: true, rich: true, required: true, section: "sectionStory" },
+  { type: "pair", name: "vision", label: "fVision", textarea: true, rich: true, required: true, section: "sectionPurpose" },
+  { type: "pair", name: "mission", label: "fMission", textarea: true, rich: true, required: true, section: "sectionPurpose" },
+  { type: "pair", name: "quranic_approach", label: "fQuranicApproach", textarea: true, rich: true, required: true, section: "sectionPurpose" },
+  { type: "pair", name: "principal_message", label: "fPrincipalMessage", textarea: true, rich: true, required: true, section: "sectionPrincipal" },
 ];
 
 export const leaderFields: CmsField[] = [
+  { type: "image", name: "photo_url", fileName: "photo", label: "fPhoto", section: "sectionDetails" },
   { type: "pair", name: "name", label: "fName", required: true, section: "sectionDetails" },
-  { type: "pair", name: "role", label: "fRole", required: true, section: "sectionDetails" },
-  { type: "pair", name: "bio", label: "fBio", textarea: true, section: "sectionDetails" },
-  { type: "image", name: "photo_url", fileName: "photo", label: "fPhoto", section: "sectionMedia" },
+  { type: "pair", name: "role", label: "fDesignation", textarea: true, hint: "designationHint", required: true, section: "sectionDetails" },
+  { type: "pair", name: "bio", label: "fBio", textarea: true, rich: true, section: "sectionDetails" },
   { type: "number", name: "order", label: "fOrder", section: "sectionPublishing" },
 ];
 
 export const facilityFields: CmsField[] = [
   { type: "pair", name: "title", label: "fTitle", required: true, section: "sectionDetails" },
-  { type: "pair", name: "description", label: "fDescription", textarea: true, required: true, section: "sectionDetails" },
+  { type: "pair", name: "description", label: "fDescription", textarea: true, rich: true, required: true, section: "sectionDetails" },
   { type: "image", name: "image_url", fileName: "image", label: "fImage", section: "sectionMedia" },
   { type: "number", name: "order", label: "fOrder", section: "sectionPublishing" },
 ];
@@ -102,21 +118,21 @@ export const admissionInfoFields: CmsField[] = [
 ];
 
 export const eventFields: CmsField[] = [
-  { type: "text", name: "slug", label: "fSlug", hint: "slugHint", section: "sectionDetails" },
+  { type: "image", name: "image_url", fileName: "image", label: "fImage", hint: "eventImageHint" },
   { type: "pair", name: "title", label: "fTitle", required: true, section: "sectionDetails" },
   { type: "pair", name: "location", label: "fLocation", required: true, section: "sectionDetails" },
-  { type: "pair", name: "description", label: "fDescription", textarea: true, required: true, section: "sectionDetails" },
-  { type: "datetime", name: "start_at", label: "fStartAt", required: true, section: "sectionSchedule" },
-  { type: "datetime", name: "end_at", label: "fEndAt", section: "sectionSchedule" },
-  { type: "image", name: "image_url", fileName: "image", label: "fImage", section: "sectionPublishing" },
+  { type: "datetime", name: "start_at", label: "fStartAt", required: true, hint: "startAtHint", section: "sectionSchedule" },
+  { type: "datetime", name: "end_at", label: "fEndAt", hint: "endAtHint", section: "sectionSchedule" },
+  { type: "pair", name: "description", label: "fDescription", textarea: true, rich: true, required: true, section: "sectionAboutEvent" },
   { type: "checkbox", name: "is_published", label: "fPublished", section: "sectionPublishing" },
+  { type: "text", name: "slug", label: "fSlug", hint: "slugHint", section: "sectionPublishing" },
 ];
 
 export const newsFields = (categories: Option[]): CmsField[] => [
   { type: "text", name: "slug", label: "fSlug", hint: "slugHint", section: "sectionDetails" },
   { type: "pair", name: "title", label: "fTitle", required: true, section: "sectionDetails" },
   { type: "select", name: "category", label: "fCategory", options: categories, required: true, section: "sectionDetails" },
-  { type: "pair", name: "description", label: "fDescription", textarea: true, required: true, section: "sectionDetails" },
+  { type: "pair", name: "description", label: "fDescription", textarea: true, rich: true, required: true, section: "sectionDetails" },
   { type: "image", name: "featured_image_url", fileName: "featured_image", label: "fImage", section: "sectionMedia" },
   { type: "datetime", name: "published_at", label: "fPublishedAt", required: true, section: "sectionPublishing" },
   { type: "checkbox", name: "is_published", label: "fPublished", section: "sectionPublishing" },
@@ -126,7 +142,7 @@ export const newsFields = (categories: Option[]): CmsField[] => [
 export const gradeFields: CmsField[] = [
   { type: "text", name: "slug", label: "fSlug", hint: "slugHint", section: "sectionDetails" },
   { type: "pair", name: "name", label: "fName", required: true, section: "sectionDetails" },
-  { type: "pair", name: "description", label: "fDescription", textarea: true, required: true, section: "sectionDetails" },
+  { type: "pair", name: "description", label: "fDescription", textarea: true, rich: true, required: true, section: "sectionDetails" },
   { type: "checkbox", name: "listed_on_curriculum", label: "fListedOnCurriculum", section: "sectionPublishing" },
   { type: "number", name: "order", label: "fOrder", section: "sectionPublishing" },
   { type: "checkbox", name: "open_for_admission", label: "fOpenForAdmission", section: "sectionAdmission" },

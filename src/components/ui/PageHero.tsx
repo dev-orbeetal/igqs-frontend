@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { TextRise } from "@/components/motion/TextRise";
 import type { Crumb } from "@/lib/seo";
 import { ArchCorner, BookMark, Swoosh } from "./Ornaments";
 
@@ -43,16 +44,17 @@ export function PageHero({
           </nav>
         )}
         <p className="reveal-now eyebrow eyebrow-line">{brand("name")}</p>
-        <h1
-          className="reveal-now heading-strong mt-2 text-[1.85rem] leading-tight text-white md:text-4xl"
-          style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-        >
-          {title}
-        </h1>
+        <TextRise
+          as="h1"
+          immediate
+          delay={180}
+          text={title}
+          className="heading-strong mt-2 text-[1.85rem] leading-tight text-white md:text-4xl"
+        />
         {subtitle && (
           <p
             className="reveal-now mt-2 max-w-2xl text-sm text-igqs-cream/80 sm:text-base"
-            style={{ "--reveal-delay": "160ms" } as React.CSSProperties}
+            style={{ "--reveal-delay": "320ms" } as React.CSSProperties}
           >
             {subtitle}
           </p>
@@ -75,6 +77,7 @@ export function SectionHeading({
   align = "left",
   className = "",
   id,
+  rise = true,
 }: {
   kicker?: string;
   title: string;
@@ -82,19 +85,33 @@ export function SectionHeading({
   align?: "left" | "center";
   className?: string;
   id?: string;
+  /** Word-by-word entrance. Turn off when the heading sits inside another reveal. */
+  rise?: boolean;
 }) {
   const onDark = tone === "onDark";
   const titleColor = onDark ? "text-igqs-cream" : "text-igqs-green dark:text-igqs-gold-soft";
+  const titleClass = `heading-strong text-[1.9rem] leading-tight md:text-[2.75rem] ${titleColor}`;
+  const heading = rise ? (
+    <TextRise as="h2" id={id} text={title} className={align === "left" ? `mt-2 ${titleClass}` : titleClass} />
+  ) : align === "left" ? (
+    <h2 id={id} className={`mt-2 ${titleClass}`}>
+      {title}
+    </h2>
+  ) : (
+    <h2 id={id} className={titleClass}>
+      {title}
+    </h2>
+  );
   if (align === "center") {
     return (
       <div className={`mb-10 text-center ${className}`}>
-        <BookMark className="mx-auto h-8 w-14 text-igqs-gold sm:h-9 sm:w-16" />
+        <div className="reveal mx-auto w-fit" data-reveal="pop" suppressHydrationWarning>
+          <BookMark className="mx-auto h-8 w-14 text-igqs-gold sm:h-9 sm:w-16" />
+        </div>
         {kicker && <p className="eyebrow mt-2">{kicker}</p>}
         <div className="mt-1 flex items-center justify-center gap-4 sm:gap-6">
           <span className="heading-side-line reveal" data-reveal="draw" suppressHydrationWarning aria-hidden />
-          <h2 id={id} className={`heading-strong text-[1.9rem] leading-tight md:text-[2.75rem] ${titleColor}`}>
-            {title}
-          </h2>
+          {heading}
           <span className="heading-side-line heading-side-line-end reveal" data-reveal="draw" suppressHydrationWarning aria-hidden />
         </div>
       </div>
@@ -102,10 +119,8 @@ export function SectionHeading({
   }
   return (
     <div className={`mb-8 ${className}`}>
-      {kicker && <p className="eyebrow eyebrow-line">{kicker}</p>}
-      <h2 id={id} className={`heading-strong mt-2 text-[1.9rem] leading-tight md:text-[2.75rem] ${titleColor}`}>
-        {title}
-      </h2>
+      {kicker && <p className="reveal eyebrow eyebrow-line" suppressHydrationWarning>{kicker}</p>}
+      {heading}
       <Swoosh draw className="heading-swoosh mt-1.5 h-3 w-28 sm:h-3.5 sm:w-36" />
     </div>
   );

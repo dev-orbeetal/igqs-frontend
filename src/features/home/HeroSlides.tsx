@@ -55,7 +55,7 @@ export function HeroSlides({ images }: { images: string[] }) {
   useEffect(() => {
     if (previous === null) return;
     window.clearTimeout(previousTimer.current);
-    previousTimer.current = window.setTimeout(() => setPrevious(null), 700);
+    previousTimer.current = window.setTimeout(() => setPrevious(null), 1400);
     return () => window.clearTimeout(previousTimer.current);
   }, [previous]);
 
@@ -88,14 +88,14 @@ export function HeroSlides({ images }: { images: string[] }) {
             fill
             priority={slideIndex === 0}
             sizes="100vw"
-            className={`hero-kenburns object-cover transition-opacity duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              slideIndex === index ? "opacity-100" : "opacity-0"
-            }`}
+            className={`hero-kenburns object-cover transition-opacity duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              slideIndex === 0 && previous === null ? "hero-enter" : ""
+            } ${slideIndex === index ? "opacity-100" : "opacity-0"}`}
           />
         );
       })}
       {(images.length > 1 || !reduced) && (
-        <div className="pointer-events-auto absolute right-3 bottom-4 z-10 flex items-center gap-1 sm:right-6 sm:bottom-6 sm:gap-2">
+        <div className="pointer-events-auto absolute right-[5.25rem] bottom-4 z-10 flex items-center gap-1 sm:right-24 sm:bottom-6 sm:gap-2">
           {images.length > 1 && (
             <>
               <button type="button" className={controlClass} onClick={() => step(-1)} aria-label={t("previousPhoto")}>

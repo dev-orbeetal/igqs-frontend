@@ -209,6 +209,7 @@ export function ItemTable({
   titleField,
   extra,
   badge,
+  thumb,
   rowActions,
 }: {
   path: string;
@@ -216,6 +217,7 @@ export function ItemTable({
   titleField: string;
   extra?: (row: Record<string, unknown>) => string;
   badge?: (row: Record<string, unknown>) => RowBadge | null;
+  thumb?: (row: Record<string, unknown>) => string;
   rowActions?: (
     row: Record<string, unknown>,
     patchRow: (next: Record<string, unknown>) => void,
@@ -293,13 +295,22 @@ export function ItemTable({
             {visible.length === 0 && empty}
             {visible.map((row) => {
               const mark = badge?.(row);
+              const photo = thumb?.(row);
               return (
                 <article key={String(row.id)} className="rounded-2xl border border-igqs-gold/25 bg-white p-4 dark:bg-[#0d1f18]">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <p className="font-medium">{String(row[titleField] || row.id)}</p>
-                    {mark && <StatusBadge status={mark.status} label={mark.label} />}
+                  <div className="flex items-start gap-3">
+                    {photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- admin list thumbnail
+                      <img src={photo} alt="" className="h-16 w-24 shrink-0 rounded-xl object-cover" />
+                    ) : null}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="font-medium">{String(row[titleField] || row.id)}</p>
+                        {mark && <StatusBadge status={mark.status} label={mark.label} />}
+                      </div>
+                      {extra && <p className="mt-1 text-sm text-igqs-muted">{extra(row)}</p>}
+                    </div>
                   </div>
-                  {extra && <p className="mt-1 text-sm text-igqs-muted">{extra(row)}</p>}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {rowActions?.(row, (next) => patchRow(row.id, next))}
                     <Link href={`${hrefBase}/${row.id}`} className={`${btn.secondary} min-h-11`}>
@@ -322,9 +333,18 @@ export function ItemTable({
               <tbody>
                 {visible.map((row) => {
                   const mark = badge?.(row);
+                  const photo = thumb?.(row);
                   return (
                     <tr key={String(row.id)} className="border-t border-igqs-gold/10">
-                      <td className="px-4 py-3 font-medium">{String(row[titleField] || row.id)}</td>
+                      <td className="px-4 py-3 font-medium">
+                        <span className="flex items-center gap-3">
+                          {photo ? (
+                            // eslint-disable-next-line @next/next/no-img-element -- admin list thumbnail
+                            <img src={photo} alt="" className="h-12 w-16 shrink-0 rounded-lg object-cover" />
+                          ) : null}
+                          <span>{String(row[titleField] || row.id)}</span>
+                        </span>
+                      </td>
                       <td className="px-4 py-3">
                         <span className="flex flex-wrap items-center gap-2">
                           {mark && <StatusBadge status={mark.status} label={mark.label} />}

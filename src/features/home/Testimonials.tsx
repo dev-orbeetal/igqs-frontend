@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FacebookIcon } from "@/components/icons/Social";
 import { formatDate } from "@/lib/format";
+import { FormattedText } from "@/components/content/FormattedText";
 import { SectionHeading } from "@/components/ui/PageHero";
 
 export type TestimonialItem = {
@@ -86,14 +87,12 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   return (
     <section className="section-white section-pad" aria-labelledby="home-testimonials">
       <div className="section-shell">
-        <div className="reveal" suppressHydrationWarning>
-          <SectionHeading
-            id="home-testimonials"
-            kicker={t("testimonialsKicker")}
-            title={t("testimonials")}
-            align="center"
-          />
-        </div>
+        <SectionHeading
+          id="home-testimonials"
+          kicker={t("testimonialsKicker")}
+          title={t("testimonials")}
+          align="center"
+        />
 
         <div className="relative">
           {pageCount > 1 && (
@@ -147,7 +146,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
                   </div>
                 </div>
                 <Stars count={item.rating} />
-                <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-igqs-ink/80 dark:text-igqs-sand/80">{item.quote}</p>
+                <FormattedText text={item.quote} className="mt-3 whitespace-pre-line text-sm leading-relaxed text-igqs-ink/80 dark:text-igqs-sand/80" />
               </article>
             ))}
           </div>

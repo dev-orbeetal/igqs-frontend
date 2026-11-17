@@ -10,6 +10,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { isAdminPath } from "@/lib/admin-paths";
 
 const LINKS = [
+  { href: "/admission", key: "admission" },
   { href: "/about", key: "about" },
   { href: "/curriculum", key: "curriculum" },
   { href: "/events", key: "events" },
@@ -143,7 +144,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
             </Link>
             <Link
               href="/admission"
-              className={`${compact ? "hidden" : "hidden md:inline-flex"} btn-solid min-h-11 items-center rounded-md bg-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-white dark:bg-igqs-gold dark:text-igqs-ink`}
+              className={`${compact ? "hidden" : "hidden md:inline-flex"} btn-solid btn-shine btn-sparkle min-h-11 items-center rounded-md bg-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-white dark:bg-igqs-gold dark:text-igqs-ink`}
             >
               {t("apply")}
             </Link>
@@ -200,16 +201,23 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
       >
         <div className="drawer-panel-inner">
           <div className="grid gap-1 px-4 py-4">
-            <Link href="/" tabIndex={drawerOpen ? undefined : -1} onClick={() => setDrawerOpen(false)} className={linkClass(isActive("/"))}>
+            <Link
+              href="/"
+              tabIndex={drawerOpen ? undefined : -1}
+              onClick={() => setDrawerOpen(false)}
+              className={`drawer-link ${linkClass(isActive("/"))}`}
+              style={{ "--i": 0 } as React.CSSProperties}
+            >
               {t("home")}
             </Link>
-            {LINKS.map((item) => (
+            {LINKS.map((item, index) => (
               <Link
                 key={item.href}
                 href={item.href}
                 tabIndex={drawerOpen ? undefined : -1}
                 onClick={() => setDrawerOpen(false)}
-                className={linkClass(isActive(item.href))}
+                className={`drawer-link ${linkClass(isActive(item.href))}`}
+                style={{ "--i": index + 1 } as React.CSSProperties}
               >
                 {t(item.key)}
               </Link>
@@ -218,7 +226,8 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
               href="/notices"
               tabIndex={drawerOpen ? undefined : -1}
               onClick={() => setDrawerOpen(false)}
-              className="motion-hover mt-2 inline-flex min-h-12 items-center justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink"
+              className="drawer-link motion-hover mt-2 inline-flex min-h-12 items-center justify-center rounded-md border border-igqs-green px-3 py-2 text-sm font-semibold text-igqs-green hover:bg-igqs-green hover:text-white dark:border-igqs-gold dark:text-igqs-gold dark:hover:bg-igqs-gold dark:hover:text-igqs-ink"
+              style={{ "--i": LINKS.length + 1 } as React.CSSProperties}
             >
               {t("notices")}
             </Link>
@@ -226,7 +235,8 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
               href="/admission"
               tabIndex={drawerOpen ? undefined : -1}
               onClick={() => setDrawerOpen(false)}
-              className="btn-solid inline-flex min-h-12 items-center justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
+              className="drawer-link btn-solid btn-shine btn-sparkle inline-flex min-h-12 items-center justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
+              style={{ "--i": LINKS.length + 2 } as React.CSSProperties}
             >
               {t("apply")}
             </Link>

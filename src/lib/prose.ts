@@ -54,7 +54,9 @@ export function previewParts(
         hidden: paragraphs.slice(take).join("\n\n"),
       };
     }
-    if (source.length <= 360) return { visible: source, hidden: "" };
+    // Several short paragraphs are already the whole speech. Only a single
+    // long block, with no blank lines, falls through to sentences.
+    if (paragraphs.length > 1 || source.length <= 360) return { visible: source, hidden: "" };
   }
 
   const sentences = splitSentences(source);
