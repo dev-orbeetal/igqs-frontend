@@ -14,5 +14,5 @@ export const GALLERY_PANELS = ["images"] as const;
 export type GalleryPanel = (typeof GALLERY_PANELS)[number];
 
 export function isPanel<T extends string>(value: string, allowed: readonly T[]): value is T {
-  return allowed.includes(value);
+  return (allowed as readonly string[]).includes(value);
 }
