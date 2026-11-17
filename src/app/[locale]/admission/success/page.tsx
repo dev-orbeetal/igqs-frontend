@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { SuccessPanel } from "@/components/admission/SuccessPanel";
+import { SuccessPanel } from "@/features/admission/SuccessPanel";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
 import { publicPageMetadata } from "@/lib/seo";

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { apiGet, type EventItem, type NewsItem } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type EventItem, type NewsItem } from "@/lib/api/types";
 import { absoluteUrl, PUBLIC_PATHS } from "@/lib/seo";
 
 function lastModified(value: string | null | undefined) {

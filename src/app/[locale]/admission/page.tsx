@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { AdmissionForm } from "@/components/admission/AdmissionForm";
+import { AdmissionForm } from "@/features/admission/AdmissionForm";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { Link } from "@/i18n/navigation";
-import { apiGet, type AdmissionInfo, type SiteSettings } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type AdmissionInfo, type SiteSettings } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({

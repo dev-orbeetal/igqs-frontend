@@ -58,6 +58,7 @@ export default function middleware(request: NextRequest) {
 
   const headers = new Headers(request.headers);
   headers.set("accept-language", routing.defaultLocale);
+  if (onAdmin || isAdminPath(canonical)) headers.set("x-igqs-staff", "1");
   return handleI18nRouting(new NextRequest(request, { headers }));
 }
 

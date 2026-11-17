@@ -4,7 +4,8 @@ import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { SectionHeading } from "@/components/ui/PageHero";
-import { apiGet, type AboutPayload } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type AboutPayload } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({

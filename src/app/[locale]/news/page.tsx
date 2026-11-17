@@ -1,24 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Image from "next/image";
-import { FadeIn } from "@/components/motion/FadeIn";
+import { NewsGrid } from "@/features/content/NewsGrid";
+import { NEWS_CATEGORIES } from "@/features/content/categories";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { FilterChips } from "@/components/ui/FilterChips";
-import { Link } from "@/i18n/navigation";
-import { apiGet, type NewsItem } from "@/lib/api";
-import { formatDate, newsCategoryKey } from "@/lib/format";
+import { apiGet } from "@/lib/api/client";
+import type { NewsItem } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
-
-const CATEGORIES = [
-  "",
-  "news",
-  "announcement",
-  "notice",
-  "admission",
-  "holiday",
-  "exam",
-  "update",
-] as const;
 
 export async function generateMetadata({
   params,
@@ -63,42 +51,9 @@ export default async function NewsPage({
         <FilterChips
           param="category"
           selected={category}
-          chips={CATEGORIES.map((key) => ({ value: key, label: key ? t(key) : t("all") }))}
+          chips={NEWS_CATEGORIES.map((key) => ({ value: key, label: key ? t(key) : t("all") }))}
         />
-        {(posts?.length ?? 0) === 0 && (
-          <p className="rounded-2xl border border-dashed border-igqs-gold/40 px-5 py-10 text-center text-igqs-muted">
-            {t("empty")}
-          </p>
-        )}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {posts?.map((post, index) => (
-            <FadeIn key={post.slug} delay={index * 0.08}>
-              <Link
-                href={`/news/${post.slug}`}
-                className="surface-card surface-card-hover group block overflow-hidden bg-white dark:bg-[#0d1f18]"
-              >
-                <div className="relative h-48">
-                  {post.image && (
-                    <Image
-                      src={post.image}
-                      alt={post.title}
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                      className="img-zoom object-cover"
-                    />
-                  )}
-                </div>
-                <div className="p-5">
-                  <p className="text-xs uppercase tracking-wide text-igqs-forest dark:text-igqs-gold">{t(newsCategoryKey(post.category))}</p>
-                  <h2 className="mt-2 font-display text-2xl">{post.title}</h2>
-                  <p className="mt-2 text-sm text-igqs-muted">
-                    {formatDate(post.published_at, locale)}
-                  </p>
-                </div>
-              </Link>
-            </FadeIn>
-          ))}
-        </div>
+        <NewsGrid posts={posts} locale={locale} />
       </div>
     </div>
   );

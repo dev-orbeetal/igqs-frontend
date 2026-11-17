@@ -5,7 +5,8 @@ import { FadeIn } from "@/components/motion/FadeIn";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
-import { apiGet, type EventItem } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type EventItem } from "@/lib/api/types";
 import { formatDate } from "@/lib/format";
 import { publicPageMetadata } from "@/lib/seo";
 

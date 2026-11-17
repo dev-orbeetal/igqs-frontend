@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { GalleryGrid } from "@/components/gallery/GalleryGrid";
+import { GalleryGrid } from "@/features/content/GalleryGrid";
 import { PageIntro } from "@/components/seo/PageIntro";
-import { apiGet, type GalleryAlbum } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type GalleryAlbum } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({

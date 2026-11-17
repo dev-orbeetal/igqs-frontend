@@ -1,8 +1,8 @@
 /**
  * Decorative pieces of the site's visual language (all aria-hidden):
  * gold-edged arch corners with a faint star lattice for green bands, the
- * open-book mark for centred headings, a brush-stroke underline, a mosque
- * watermark and a wave edge between sections. Same shapes as the receipt.
+ * open-book mark for centred headings, and a brush-stroke underline.
+ * Same shapes as the receipt.
  */
 
 const STAR = "M11 2l2.6 6.4L20 11l-6.4 2.6L11 20l-2.6-6.4L2 11l6.4-2.6z";
@@ -97,53 +97,6 @@ export function Swoosh({ className = "", draw = false }: { className?: string; d
       aria-hidden
     >
       <path d="M2 15C46 5 120 1 198 4c-62 3-126 8-186 14-6 .6-12 0-10-3z" fill="#c4a35a" />
-    </svg>
-  );
-}
-
-/** Faint mosque silhouette (domes and minarets) for light sections. */
-export function MosqueWatermark({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 320 200" className={className} fill="currentColor" aria-hidden>
-      {/* minarets */}
-      {/* tall outer minarets: shaft, balcony, cone and finial */}
-      <path d="M31 200V100h14v100zM275 200V100h14v100z" />
-      <path d="M27 96h22v7H27zM271 96h22v7h-22zM29 140h18v5H29zM273 140h18v5h-18z" />
-      <path d="M38 62l9 34H29zM282 62l9 34h-18z" />
-      <path d="M37 52h2v10h-2zM281 52h2v10h-2z" />
-      {/* inner minarets */}
-      <path d="M74 200v-62h10v62zM236 200v-62h10v62z" />
-      <path d="M71 134h16v5H71zM233 134h16v5h-16z" />
-      <path d="M79 112l7 22H72zM241 112l7 22h-14z" />
-      {/* main dome and drum */}
-      <path d="M160 18c2 6 6 9 6 14-2-1-4-1-6-1s-4 0-6 1c0-5 4-8 6-14z" />
-      <path d="M160 34c-38 6-58 34-56 66h112c2-32-18-60-56-66z" />
-      <path d="M100 100h120v12H100z" />
-      {/* hall with arches */}
-      <path
-        d="M70 112h180v88H70zm22 22a12 12 0 0 0-12 12v54h24v-54a12 12 0 0 0-12-12zm68-4a18 18 0 0 0-18 18v52h36v-52a18 18 0 0 0-18-18zm68 4a12 12 0 0 0-12 12v54h24v-54a12 12 0 0 0-12-12z"
-        fillRule="evenodd"
-      />
-      {/* side domes */}
-      <path d="M112 112c0-14 9-22 20-24 11 2 20 10 20 24zM168 112c0-14 9-22 20-24 11 2 20 10 20 24z" opacity="0.85" />
-    </svg>
-  );
-}
-
-/**
- * Wave edge with a gold line, placed at the bottom of a section so it
- * flows into the next one. `fill` is the next section's background.
- */
-export function WaveEdge({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 1440 70"
-      preserveAspectRatio="none"
-      className={`pointer-events-none absolute inset-x-0 bottom-0 h-10 w-full sm:h-14 ${className}`}
-      aria-hidden
-    >
-      <path d="M0 70V44C300 4 560 66 900 40c220-17 380-34 540-40v70z" className="fill-white dark:fill-[#0d2119]" />
-      <path d="M0 44C300 4 560 66 900 40c220-17 380-34 540-40" fill="none" stroke="#c4a35a" strokeWidth="2" strokeOpacity="0.8" />
     </svg>
   );
 }

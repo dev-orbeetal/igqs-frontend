@@ -1,0 +1,295 @@
+"use client";
+
+import { AdminPhoto } from "@/components/ui/AdminPhoto";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { StaffReceiptEditor } from "@/features/staff/applications/StaffReceiptEditor";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { btn } from "@/components/ui/button-styles";
+import { Link } from "@/i18n/navigation";
+import { fieldClass, fieldClassInvalid } from "@/lib/cms/styles";
+import { formatMoney, staffDownload, staffOpen } from "@/lib/staff/client";
+import { useStaffApplication } from "./useStaffApplication";
+
+function Row({ label, value }: { label: string; value?: string | null }) {
+  if (!value) return null;
+  return (
+    <div>
+      <dt className="text-xs uppercase tracking-[0.14em] text-igqs-label">{label}</dt>
+      <dd className="mt-1 text-sm">{value}</dd>
+    </div>
+  );
+}
+
+export function StaffApplicationReview({ applicationId }: { applicationId: string }) {
+  const {
+    t,
+    ta,
+    locale,
+    data,
+    setData,
+    reason,
+    setReason,
+    error,
+    setError,
+    loadError,
+    setReloadTick,
+    saving,
+    pendingStatus,
+    setPendingStatus,
+    reasonRef,
+    editingReceipt,
+    setEditingReceipt,
+    receiptNotice,
+    setReceiptNotice,
+    askStatus,
+    confirmMessage,
+    changeStatus,
+  } = useStaffApplication(applicationId);
+
+  if (loadError) {
+    return (
+      <div className="rounded-3xl border border-red-300 bg-red-50 p-6 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+        <p>{t("loadError")}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="font-semibold underline"
+            onClick={() => setReloadTick((value) => value + 1)}
+          >
+            {t("retry")}
+          </button>
+          <Link href="/payments/applications" className="font-semibold underline">
+            ← {t("applicationsPage")}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  if (!data) return <p className="text-sm text-igqs-muted">{t("loading")}</p>;
+
+  const amount = formatMoney(data.payment_amount || data.transaction.payment_amount, locale);
+
+  return (
+    <div>
+      <Link href="/payments/applications" className={btn.secondary}>
+        ← {t("applicationsPage")}
+      </Link>
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-mono text-sm text-igqs-label">{data.application_id}</p>
+          <p className="mt-1 font-display text-4xl">{data.student_name}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-igqs-muted">
+            <StatusBadge
+              status={data.status}
+              label={data.status === "approved" ? ta("approved") : data.status === "rejected" ? ta("rejected") : ta("pending")}
+            />
+            <span>{data.receipt_id}</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className={btn.secondary}
+            onClick={() => {
+              setReceiptNotice("");
+              staffOpen(
+                `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/receipt/?inline=1`,
+                `${data.receipt_id}.pdf`
+              ).catch(() => setReceiptNotice("openError"));
+            }}
+          >
+            {t("viewReceipt")}
+          </button>
+          <button
+            type="button"
+            className={btn.secondary}
+            onClick={() =>
+              staffDownload(
+                `/api/admissions/staff/applications/${encodeURIComponent(data.application_id)}/receipt/`,
+                `${data.receipt_id}.pdf`
+              )
+            }
+          >
+            {t("downloadReceipt")}
+          </button>
+          <button
+            type="button"
+            className={btn.primary}
+            onClick={() => {
+              setReceiptNotice("");
+              setEditingReceipt(true);
+            }}
+          >
+            {t("editReceipt")}
+          </button>
+        </div>
+      </div>
+      {receiptNotice && (
+        <p
+          role="status"
+          className={`mt-4 rounded-xl px-4 py-3 text-sm ${
+            receiptNotice === "saved"
+              ? "bg-igqs-green/10 text-igqs-green dark:bg-igqs-gold/15 dark:text-igqs-gold-soft"
+              : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
+          }`}
+        >
+          {receiptNotice === "saved" ? t("receiptUpdated") : t("receiptOpenError")}
+        </p>
+      )}
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <div className="space-y-6">
+          <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
+            <h2 className="font-display text-2xl">{ta("studentInfo")}</h2>
+            <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Row label={ta("studentName")} value={data.student_name} />
+              <Row label={ta("studentNameBn")} value={data.student_name_bn} />
+              <Row label={ta("dob")} value={data.date_of_birth} />
+              <Row label={ta("gender")} value={data.gender === "female" ? ta("female") : ta("male")} />
+              <Row label={ta("previousClass")} value={data.previous_class} />
+              <Row label={ta("applyingClass")} value={data.applying_class} />
+              <Row label={ta("address")} value={data.student_address} />
+            </dl>
+            {data.student_photo && <AdminPhoto src={data.student_photo} />}
+            {data.birth_certificate && (
+              <a href={data.birth_certificate} className={`mt-3 ${btn.secondary}`} target="_blank" rel="noreferrer">
+                {t("viewBirthCertificate")}
+              </a>
+            )}
+          </section>
+
+          <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
+            <h2 className="font-display text-2xl">{ta("guardianInfo")}</h2>
+            <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Row label={ta("guardianName")} value={data.guardian_name} />
+              <Row label={ta("fatherName")} value={data.father_name} />
+              <Row label={ta("motherName")} value={data.mother_name} />
+              <Row label={ta("fatherOccupation")} value={data.father_occupation} />
+              <Row label={ta("motherOccupation")} value={data.mother_occupation} />
+              <Row label={ta("mobile")} value={data.mobile} />
+              <Row label={ta("email")} value={data.email} />
+              <Row label={ta("emergency")} value={data.emergency_contact} />
+              <Row label={ta("guardianAddress")} value={data.guardian_address} />
+            </dl>
+          </section>
+
+          <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
+            <h2 className="font-display text-2xl">{ta("moreInfo")}</h2>
+            <dl className="mt-4 grid gap-4">
+              <Row label={ta("previousAcademic")} value={data.previous_academic_info} />
+              <Row label={ta("special")} value={data.special_requirements} />
+            </dl>
+          </section>
+        </div>
+
+        <div className="space-y-6">
+          <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
+            <h2 className="font-display text-2xl">{t("verifyPayment")}</h2>
+            <dl className="mt-4 grid gap-4">
+              <Row
+                label={ta("paymentMethod")}
+                value={data.payment_method_label || data.transaction.payment_method}
+              />
+              <Row
+                label={ta("transactionId")}
+                value={data.transaction_id || data.transaction.transaction_id}
+              />
+              <Row label={ta("admissionFee")} value={amount} />
+              <Row label={ta("paymentDate")} value={data.transaction.payment_date} />
+              <Row label={ta("payerMobile")} value={data.transaction.payer_mobile} />
+            </dl>
+            {data.transaction.payment_screenshot && <AdminPhoto src={data.transaction.payment_screenshot} />}
+          </section>
+
+          <section className="rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
+            <h2 className="font-display text-2xl">{t("decision")}</h2>
+            <p className="mt-2 text-sm text-igqs-muted">{t("decisionHint")}</p>
+            <label className="mt-4 block text-sm font-medium">
+              {t("rejectionReason")}
+              <span className="mt-1 block text-xs font-normal leading-relaxed text-igqs-muted">
+                {t("rejectionReasonHint")}
+              </span>
+              <textarea
+                ref={reasonRef}
+                className={`${error ? fieldClassInvalid : fieldClass} min-h-28`}
+                rows={4}
+                value={reason}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? "decision-error" : undefined}
+                onChange={(event) => {
+                  setReason(event.target.value);
+                  if (error) setError("");
+                }}
+              />
+            </label>
+            {error && (
+              <p id="decision-error" role="alert" className="mt-3 text-sm font-medium text-red-700 dark:text-red-300">
+                {error}
+              </p>
+            )}
+            <div className="mt-4 grid gap-2">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => askStatus("approved")}
+                className={`${btn.primary} w-full`}
+              >
+                {t("approve")}
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => askStatus("rejected")}
+                className={`${btn.danger} w-full`}
+              >
+                {t("reject")}
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => askStatus("pending")}
+                className={`${btn.secondary} w-full`}
+              >
+                {t("markPending")}
+              </button>
+            </div>
+            {data.reviewed_by && (
+              <p className="mt-4 text-xs text-igqs-muted">
+                {t("reviewedBy", { name: data.reviewed_by })}
+                {data.reviewed_at
+                  ? ` · ${new Date(data.reviewed_at).toLocaleString(locale === "bn" ? "bn-BD" : "en-GB")}`
+                  : ""}
+              </p>
+            )}
+          </section>
+        </div>
+      </div>
+      <StaffReceiptEditor
+        open={editingReceipt}
+        data={data}
+        onClose={() => setEditingReceipt(false)}
+        onSaved={(updated) => {
+          setData(updated);
+          setEditingReceipt(false);
+          setReceiptNotice("saved");
+        }}
+      />
+      <ConfirmDialog
+        open={pendingStatus !== null}
+        title={t("confirmTitle")}
+        message={confirmMessage}
+        confirmLabel={
+          pendingStatus === "approved" ? t("approve") : pendingStatus === "rejected" ? t("reject") : t("markPending")
+        }
+        cancelLabel={t("cancel")}
+        tone={pendingStatus === "rejected" ? "danger" : "primary"}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={() => {
+          const next = pendingStatus;
+          setPendingStatus(null);
+          if (next) void changeStatus(next);
+        }}
+      />
+    </div>
+  );
+}

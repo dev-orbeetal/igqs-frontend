@@ -1,0 +1,9 @@
+export { AboutEditor } from "./AboutEditor";
+export { AdmissionEditor } from "./AdmissionEditor";
+export { ContactEditor } from "./ContactEditor";
+export { CurriculumManager } from "./CurriculumManager";
+export { EventsManager } from "./EventsManager";
+export { GalleryManager } from "./GalleryManager";
+export { HomeEditor } from "./HomeEditor";
+export { MessagesManager } from "./MessagesManager";
+export { NewsManager } from "./NewsManager";

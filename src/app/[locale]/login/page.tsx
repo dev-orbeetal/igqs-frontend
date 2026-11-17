@@ -1,10 +1,10 @@
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Logo } from "@/components/brand/Logo";
-import { StaffLoginForm } from "@/components/staff/StaffLoginForm";
+import { StaffLoginForm } from "@/features/staff/shell/StaffLoginForm";
 import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { adminLoginDisabled } from "@/lib/staff";
+import { adminLoginDisabled } from "@/lib/staff/client";
 
 export default async function StaffLoginPage({
   params,

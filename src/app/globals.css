@@ -549,7 +549,8 @@ select optgroup {
 }
 
 .dark .section-cream {
-  background: #0a1a14;
+  background: #07140f;
+  box-shadow: inset 0 1px 0 rgb(196 163 90 / 0.2);
 }
 
 .section-white {
@@ -557,7 +558,8 @@ select optgroup {
 }
 
 .dark .section-white {
-  background: #0d2119;
+  background: #1a4034;
+  box-shadow: inset 0 1px 0 rgb(196 163 90 / 0.2);
 }
 
 .section-cream-alt {
@@ -565,7 +567,57 @@ select optgroup {
 }
 
 .dark .section-cream-alt {
-  background: #0d2119;
+  background: #1a4034;
+  box-shadow: inset 0 1px 0 rgb(196 163 90 / 0.2);
+}
+
+.details-toggle:not([open]) > :not(summary) {
+  display: none !important;
+}
+
+.details-toggle > summary {
+  display: inline-flex;
+  width: fit-content;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 500;
+}
+
+.details-toggle > summary::-webkit-details-marker,
+.details-toggle > summary::marker {
+  content: "";
+  display: none;
+}
+
+.details-toggle .details-open {
+  display: none;
+}
+
+.details-toggle[open] .details-closed {
+  display: none;
+}
+
+.details-toggle[open] .details-open {
+  display: inline;
+}
+
+.details-toggle[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.details-toggle[open] > summary {
+  order: 2;
+  margin-top: 0.75rem;
+}
+
+.details-toggle[open] > :not(summary) {
+  order: 1;
+}
+
+.details-center > summary {
+  display: flex;
+  margin-inline: auto;
 }
 
 .section-forest {

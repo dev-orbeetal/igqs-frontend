@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/components/icons/Social";
 import { Link } from "@/i18n/navigation";
-import type { SiteSettings } from "@/lib/api";
+import type { SiteSettings } from "@/lib/api/types";
 
 function digitsOnly(value: string) {
   return value.replace(/\D/g, "");

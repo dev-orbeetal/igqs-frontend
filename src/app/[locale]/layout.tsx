@@ -15,7 +15,8 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { isAdminHost } from "@/lib/admin-paths";
-import { apiGet, type SiteSettings } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type SiteSettings } from "@/lib/api/types";
 import { SITE_ORIGIN, siteGraph } from "@/lib/seo";
 import "../globals.css";
 
@@ -99,8 +100,10 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const messages = await getMessages();
   const a11y = await getTranslations({ locale, namespace: "a11y" });
-  const adminSite = isAdminHost(await headers());
-  const site = await apiGet<SiteSettings>("/api/site/", locale);
+  const headerList = await headers();
+  const adminSite = isAdminHost(headerList);
+  const staffRoute = headerList.get("x-igqs-staff") === "1";
+  const site = adminSite || staffRoute ? null : await apiGet<SiteSettings>("/api/site/", locale);
 
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">

@@ -1,11 +1,12 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ContactForm } from "@/components/contact/ContactForm";
+import { ContactForm } from "@/features/content/ContactForm";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/components/icons/Social";
 import { PageIntro } from "@/components/seo/PageIntro";
-import { apiGet, type SiteSettings } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type SiteSettings } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({

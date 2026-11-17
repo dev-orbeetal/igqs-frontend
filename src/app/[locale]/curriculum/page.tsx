@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageIntro } from "@/components/seo/PageIntro";
-import { apiGet, type Grade } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type Grade } from "@/lib/api/types";
 import { publicPageMetadata } from "@/lib/seo";
 
 const CATEGORY_KEYS = ["quranic", "islamic", "general", "cocurricular"] as const;

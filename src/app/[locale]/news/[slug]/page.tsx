@@ -6,7 +6,8 @@ import { FadeIn } from "@/components/motion/FadeIn";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PageIntro } from "@/components/seo/PageIntro";
 import { Link } from "@/i18n/navigation";
-import { apiGet, type NewsItem } from "@/lib/api";
+import { apiGet } from "@/lib/api/client";
+import { type NewsItem } from "@/lib/api/types";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 import { articleJsonLd, NOINDEX, publicPageMetadata } from "@/lib/seo";
 

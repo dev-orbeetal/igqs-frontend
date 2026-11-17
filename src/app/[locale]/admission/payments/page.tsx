@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { MyPaymentsPanel } from "@/components/admission/MyPaymentsPanel";
+import { MyPaymentsPanel } from "@/features/admission/MyPaymentsPanel";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { PageHero } from "@/components/ui/PageHero";
 import { publicPageMetadata } from "@/lib/seo";
