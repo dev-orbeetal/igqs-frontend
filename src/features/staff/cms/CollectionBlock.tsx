@@ -27,12 +27,14 @@ export function CollectionBlock({
   fields,
   titleField,
   defaults,
+  match,
 }: {
   path: string;
   query?: string;
   fields: CmsField[];
   titleField: string;
   defaults?: Record<string, unknown>;
+  match?: (row: Record<string, unknown>) => boolean;
 }) {
   const copy = useCmsCopy();
   const router = useRouter();
@@ -110,7 +112,8 @@ export function CollectionBlock({
     }
   }
 
-  const visible = rows.filter((row) =>
+  const scoped = match ? rows.filter(match) : rows;
+  const visible = scoped.filter((row) =>
     rowLabel(row, titleField).toLowerCase().includes(listQuery.trim().toLowerCase())
   );
   const selectedId = state.values?.id;

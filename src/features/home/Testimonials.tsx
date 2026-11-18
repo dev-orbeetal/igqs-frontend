@@ -85,7 +85,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
   }
 
   return (
-    <section className="section-white section-pad" aria-labelledby="home-testimonials">
+    <section className="band section-pad" aria-labelledby="home-testimonials">
       <div className="section-shell">
         <SectionHeading
           id="home-testimonials"
@@ -99,7 +99,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             <button
               type="button"
               onClick={() => step(-1)}
-              className="motion-control absolute top-1/2 left-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm hover:bg-igqs-gold/10 lg:-translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
+              className="motion-control absolute top-1/2 left-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm hover:bg-igqs-gold/10 lg:-translate-x-1/2 night-card dark:text-igqs-gold-soft"
               aria-label={t("testimonialsPrevious")}
             >
               <ChevronLeft className="size-5" />
@@ -111,7 +111,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
               <article
                 key={item.id}
                 suppressHydrationWarning
-                className={`${paged ? "photo-in" : "reveal"} hover-lift flex h-full flex-col rounded-2xl border border-igqs-gold/20 bg-white p-5 dark:bg-[#12352b]`}
+                className={`${paged ? "photo-in" : "reveal"} hover-lift flex h-full flex-col rounded-2xl border border-igqs-gold/20 bg-white p-5 night-card`}
                 style={paged ? ({ "--photo-index": index * 2 } as React.CSSProperties) : undefined}
               >
                 <div className="flex items-start gap-3">
@@ -155,7 +155,7 @@ export function Testimonials({ items }: { items: TestimonialItem[] }) {
             <button
               type="button"
               onClick={() => step(1)}
-              className="motion-control absolute top-1/2 right-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm hover:bg-igqs-gold/10 lg:translate-x-1/2 dark:bg-[#12352b] dark:text-igqs-gold-soft"
+              className="motion-control absolute top-1/2 right-0 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-igqs-gold/40 bg-white text-igqs-green shadow-sm hover:bg-igqs-gold/10 lg:translate-x-1/2 night-card dark:text-igqs-gold-soft"
               aria-label={t("testimonialsNext")}
             >
               <ChevronRight className="size-5" />

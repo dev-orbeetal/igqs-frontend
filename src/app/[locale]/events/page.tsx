@@ -95,14 +95,18 @@ export default async function EventsPage({
           { name: t("title"), path: "/events" },
         ]}
       />
-      <div className="mx-auto max-w-7xl space-y-16 px-4 py-16 sm:px-6">
-        <section>
-          <SectionHeading title={t("upcoming")} />
-          <EventGrid items={data?.upcoming ?? []} locale={locale} empty={t("emptyUpcoming")} />
+      <div>
+        <section className="section-cream section-pad">
+          <div className="section-shell">
+            <SectionHeading title={t("upcoming")} />
+            <EventGrid items={data?.upcoming ?? []} locale={locale} empty={t("emptyUpcoming")} />
+          </div>
         </section>
-        <section>
-          <SectionHeading title={t("previous")} />
-          <EventGrid items={data?.previous ?? []} locale={locale} empty={t("emptyPrevious")} />
+        <section className="section-white section-pad">
+          <div className="section-shell">
+            <SectionHeading title={t("previous")} />
+            <EventGrid items={data?.previous ?? []} locale={locale} empty={t("emptyPrevious")} />
+          </div>
         </section>
       </div>
     </div>

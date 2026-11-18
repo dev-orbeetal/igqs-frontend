@@ -1,11 +1,13 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { Compass, Eye } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { AdmissionNotes, DetailsText, Disclosure, HOME_PROSE } from "@/features/home/DetailsText";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { ArchCorner } from "@/components/ui/Ornaments";
 import { SectionHeading } from "@/components/ui/PageHero";
 import { Link } from "@/i18n/navigation";
-import type { AdmissionFeeInfo, PaymentMethodInfo } from "@/lib/api/types";
+import type { AdmissionFeeInfo, FeeSchedule, PaymentMethodInfo } from "@/lib/api/types";
 import { isNoteLabel } from "@/lib/prose";
 
 export function HomeBand({
@@ -177,22 +179,44 @@ export function VisionMission({
   mission: string;
 }) {
   return (
-    <section className="section-white section-pad scroll-mt-28">
-      <div className={`section-shell grid gap-6 ${vision && mission ? "md:grid-cols-2" : ""}`}>
-        {vision ? (
-          <FadeIn id="vision" className="surface-card bg-igqs-green p-7 text-igqs-cream sm:p-8">
-            <h2 className="heading-strong text-[1.9rem] leading-tight text-white md:text-[2.4rem]">{visionTitle}</h2>
-            <DetailsText text={vision} className="mt-4 max-w-prose whitespace-pre-line text-sm leading-relaxed text-igqs-cream/90" />
-          </FadeIn>
-        ) : null}
-        {mission ? (
-          <FadeIn id="mission" delay={0.08} className="surface-card bg-white p-7 sm:p-8 dark:bg-[#12352b]">
-            <h2 className="heading-strong text-[1.9rem] leading-tight text-igqs-green md:text-[2.4rem] dark:text-igqs-gold-soft">
-              {missionTitle}
-            </h2>
-            <DetailsText text={mission} className={`mt-4 ${HOME_PROSE}`} />
-          </FadeIn>
-        ) : null}
+    <section className="section-cream section-pad scroll-mt-28">
+      <div className="section-shell">
+        <div className="paired-frame overflow-hidden rounded-[2rem] border border-igqs-gold/30 bg-white shadow-[0_24px_60px_-36px_rgba(15,61,46,0.55)]">
+          <div className={`grid ${vision && mission ? "lg:grid-cols-2" : ""}`}>
+            {vision ? (
+              <FadeIn id="vision" className="vision-panel relative bg-igqs-forest px-7 py-10 text-igqs-cream sm:px-10 sm:py-14">
+                <ArchCorner id="vision-arch" side="right" fit="corner" className="opacity-70" />
+                <div className="relative">
+                  <span className="inline-flex size-12 items-center justify-center rounded-2xl border border-igqs-gold/50 bg-igqs-gold/15 text-igqs-gold">
+                    <Eye className="size-5" strokeWidth={1.5} />
+                  </span>
+                  <p className="mt-6 text-xs font-semibold tracking-[0.28em] text-igqs-gold uppercase">01</p>
+                  <h2 className="heading-strong mt-2 text-[2rem] leading-tight text-white md:text-[2.6rem]">{visionTitle}</h2>
+                  <span className="mt-4 block h-px w-16 bg-igqs-gold" aria-hidden />
+                  <DetailsText
+                    text={vision}
+                    className="mt-5 max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-cream/90"
+                  />
+                </div>
+              </FadeIn>
+            ) : null}
+            {mission ? (
+              <FadeIn id="mission" className="mission-panel relative bg-igqs-sand/50 px-7 py-10 sm:px-10 sm:py-14">
+                <div className="relative">
+                  <span className="inline-flex size-12 items-center justify-center rounded-2xl border border-igqs-gold/40 bg-white text-igqs-forest dark:bg-[#3a3124] dark:text-igqs-gold">
+                    <Compass className="size-5" strokeWidth={1.5} />
+                  </span>
+                  <p className="mt-6 text-xs font-semibold tracking-[0.28em] text-igqs-gold uppercase">02</p>
+                  <h2 className="heading-strong mt-2 text-[2rem] leading-tight text-igqs-forest md:text-[2.6rem] dark:text-igqs-gold-soft">
+                    {missionTitle}
+                  </h2>
+                  <span className="mt-4 block h-px w-16 bg-igqs-gold" aria-hidden />
+                  <DetailsText text={mission} className="mt-5 max-w-prose whitespace-pre-line text-base leading-relaxed text-igqs-ink/90 dark:text-igqs-sand/90" />
+                </div>
+              </FadeIn>
+            ) : null}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -247,7 +271,7 @@ export function ProcedureList({
         {steps.map((step, index) => (
           <li
             key={step}
-            className="reveal flex gap-3 rounded-2xl border border-igqs-gold/25 bg-white px-4 py-3 text-sm leading-relaxed sm:text-base dark:bg-[#12352b]"
+            className="night-card reveal flex gap-3 rounded-2xl border border-igqs-gold/25 bg-white px-4 py-3 text-sm leading-relaxed sm:text-base"
             suppressHydrationWarning
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-igqs-gold text-sm text-igqs-ink">
@@ -260,6 +284,99 @@ export function ProcedureList({
       <Link href={applyHref} className="btn-green btn-shine btn-sparkle mt-7 inline-flex">
         {applyLabel}
       </Link>
+    </div>
+  );
+}
+
+function formatFee(amount: number | null, locale: string) {
+  if (amount == null) return "—";
+  return new Intl.NumberFormat(locale === "bn" ? "bn-BD" : "en-BD").format(amount);
+}
+
+async function FeeScheduleTables({ schedules }: { schedules: FeeSchedule[] }) {
+  const t = await getTranslations("home");
+  const shown = await getLocale();
+  return (
+    <div className="space-y-10">
+      {schedules.map((schedule) => {
+        const showHifz = schedule.classes.some((item) => item.hifz != null);
+        return (
+          <section key={schedule.track} className="space-y-6">
+            <h3 className="font-display text-2xl text-igqs-forest dark:text-igqs-gold-soft">{schedule.title}</h3>
+            <FeeGrid
+              title={t("feeAdmissionSession")}
+              columns={schedule.classes.map((item) => item.name)}
+              rows={[
+                { label: t("feeAdmissionOnce"), values: schedule.classes.map((item) => item.admission) },
+                { label: t("feeSessionAnnual"), values: schedule.classes.map((item) => item.session) },
+                {
+                  label: t("feeTotal"),
+                  values: schedule.classes.map((item) => item.admission + item.session),
+                },
+              ]}
+              locale={shown}
+            />
+            <FeeGrid
+              title={t("feeMonthly")}
+              columns={schedule.classes.map((item) => item.name)}
+              rows={[
+                { label: t("feeMonthlyRow"), values: schedule.classes.map((item) => item.monthly) },
+                ...(showHifz
+                  ? [{ label: t("feeHifz"), values: schedule.classes.map((item) => item.hifz) }]
+                  : []),
+              ]}
+              locale={shown}
+            />
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function FeeGrid({
+  title,
+  columns,
+  rows,
+  locale,
+}: {
+  title: string;
+  columns: string[];
+  rows: { label: string; values: (number | null)[] }[];
+  locale: string;
+}) {
+  const t = { details: locale === "bn" ? "বিবরণ" : "Details" };
+  return (
+    <div>
+      <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-igqs-forest dark:text-igqs-gold">
+        {title}
+      </h4>
+      <div className="overflow-x-auto rounded-2xl border border-igqs-gold/25">
+        <table className="w-full min-w-[720px] border-collapse text-sm">
+          <thead className="bg-igqs-forest text-igqs-cream">
+            <tr>
+              <th className="px-3 py-3 text-left font-medium">{t.details}</th>
+              {columns.map((column) => (
+                <th key={column} className="px-3 py-3 text-right font-medium">
+                  {column}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.label} className="border-t border-igqs-gold/15 odd:bg-white even:bg-igqs-sand/40 dark:odd:bg-transparent dark:even:bg-white/5">
+                <th className="px-3 py-3 text-left font-medium">{row.label}</th>
+                {row.values.map((value, index) => (
+                  <td key={`${row.label}-${columns[index]}`} className="px-3 py-3 text-right tabular-nums">
+                    {formatFee(value, locale)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -325,6 +442,7 @@ export async function AdmissionGuide({
   steps,
   methods,
   fees,
+  schedules = [],
 }: {
   announcement: string;
   announcementIsRules: boolean;
@@ -333,6 +451,7 @@ export async function AdmissionGuide({
   steps: string[];
   methods: PaymentMethodInfo[];
   fees: AdmissionFeeInfo[];
+  schedules?: FeeSchedule[];
 }) {
   const t = await getTranslations("home");
   const common = await getTranslations("common");
@@ -351,11 +470,43 @@ export async function AdmissionGuide({
           <ProcedureList steps={steps} applyHref="/admission#apply" applyLabel={common("applyNow")} />
         </div>
       </HomeBand>
-      {fees.length > 0 ? (
+      <HomeBand id="instructions" title={t("admissionInstructions")} tone="white">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <article className="surface-card bg-white p-5 sm:p-6 dark:bg-[#12352b]">
+            <h3 className="heading-strong text-2xl text-igqs-green dark:text-igqs-gold-soft">{t("admissionTest")}</h3>
+            <p className="mt-1 text-sm text-igqs-muted">Admission Test · <span dir="rtl" lang="ar">اختبار القبول</span></p>
+            <ul className="mt-4 space-y-3">
+              {(["admissionTest1", "admissionTest2", "admissionTest3"] as const).map((key) => (
+                <li key={key} className="flex gap-2.5 text-sm leading-relaxed">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-igqs-gold" aria-hidden />
+                  <span>{t(key)}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article className="surface-card bg-white p-5 sm:p-6 dark:bg-[#12352b]">
+            <h3 className="heading-strong text-2xl text-igqs-green dark:text-igqs-gold-soft">{t("admissionRequirements")}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-igqs-muted">{t("admissionRequirementsLead")}</p>
+            <ul className="mt-4 space-y-3">
+              {(["admissionDoc1", "admissionDoc2", "admissionDoc3", "admissionDoc4", "admissionDoc5"] as const).map((key) => (
+                <li key={key} className="flex gap-2.5 text-sm leading-relaxed">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-igqs-gold" aria-hidden />
+                  <span>{t(key)}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </HomeBand>
+      {schedules.length > 0 || fees.length > 0 ? (
         <HomeBand id="fees" title={t("fees")} tone="white">
-          <Prose>{t("feesIntro")}</Prose>
+          <Prose>{schedules.length > 0 ? t("feeScheduleIntro") : t("feesIntro")}</Prose>
           <div className="mt-6">
-            <FeeTable fees={fees} allClassesLabel={t("feesAllClasses")} />
+            {schedules.length > 0 ? (
+              <FeeScheduleTables schedules={schedules} />
+            ) : (
+              <FeeTable fees={fees} allClassesLabel={t("feesAllClasses")} />
+            )}
           </div>
         </HomeBand>
       ) : null}

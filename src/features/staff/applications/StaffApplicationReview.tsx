@@ -150,11 +150,34 @@ export function StaffApplicationReview({ applicationId }: { applicationId: strin
               <Row label={ta("applyingClass")} value={data.applying_class} />
               <Row label={ta("address")} value={data.student_address} />
             </dl>
-            {data.student_photo && <AdminPhoto src={data.student_photo} />}
-            {data.birth_certificate && (
-              <a href={data.birth_certificate} className={`mt-3 ${btn.secondary}`} target="_blank" rel="noreferrer">
-                {t("viewBirthCertificate")}
-              </a>
+            {data.student_photo && (
+              <div className="mt-4">
+                <p className="text-xs uppercase tracking-[0.14em] text-igqs-label">{ta("photo")}</p>
+                <AdminPhoto src={data.student_photo} />
+              </div>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              {data.birth_certificate && (
+                <a href={data.birth_certificate} className={btn.secondary} target="_blank" rel="noreferrer">
+                  {t("viewBirthCertificate")}
+                </a>
+              )}
+              {data.guardian_nid && (
+                <a href={data.guardian_nid} className={btn.secondary} target="_blank" rel="noreferrer">
+                  {t("viewGuardianNid")}
+                </a>
+              )}
+              {data.academic_documents && (
+                <a href={data.academic_documents} className={btn.secondary} target="_blank" rel="noreferrer">
+                  {t("viewAcademicDocuments")}
+                </a>
+              )}
+            </div>
+            {data.guardian_photo && (
+              <div className="mt-4">
+                <p className="text-xs uppercase tracking-[0.14em] text-igqs-label">{ta("guardianPhoto")}</p>
+                <AdminPhoto src={data.guardian_photo} />
+              </div>
             )}
           </section>
 

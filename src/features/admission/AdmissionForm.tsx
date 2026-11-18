@@ -66,7 +66,13 @@ export function AdmissionForm({
             form={form}
             errors={fieldErrors}
             classLabel={classLabel || form.applying_class || ""}
-            filesReady={{ photo: Boolean(files.photo), birth: Boolean(files.birth) }}
+            filesReady={{
+              photo: Boolean(files.photo),
+              birth: Boolean(files.birth),
+              guardianNid: Boolean(files.guardianNid),
+              guardianPhoto: Boolean(files.guardianPhoto),
+              academic: Boolean(files.academic),
+            }}
             onChange={setField}
             onPhoto={(file) => {
               setFiles((prev) => ({ ...prev, photo: file }));
@@ -75,6 +81,18 @@ export function AdmissionForm({
             onBirth={(file) => {
               setFiles((prev) => ({ ...prev, birth: file }));
               setFieldErrors((prev) => ({ ...prev, birth_certificate: "" }));
+            }}
+            onGuardianNid={(file) => {
+              setFiles((prev) => ({ ...prev, guardianNid: file }));
+              setFieldErrors((prev) => ({ ...prev, guardian_nid: "" }));
+            }}
+            onGuardianPhoto={(file) => {
+              setFiles((prev) => ({ ...prev, guardianPhoto: file }));
+              setFieldErrors((prev) => ({ ...prev, guardian_photo: "" }));
+            }}
+            onAcademic={(file) => {
+              setFiles((prev) => ({ ...prev, academic: file }));
+              setFieldErrors((prev) => ({ ...prev, academic_documents: "" }));
             }}
           />
         )}

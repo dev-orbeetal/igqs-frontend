@@ -47,7 +47,7 @@ export default async function ContactPage({
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2">
         <div className="space-y-6">
           <FadeIn>
-          <div className="rounded-3xl border border-igqs-gold/20 bg-white p-6 dark:bg-[#0d1f18]">
+          <div className="rounded-3xl border border-igqs-gold/20 bg-white p-6 night-card">
             <p className="flex gap-3 text-sm">
               <MapPin className="mt-0.5 h-5 w-5 text-igqs-gold" />
               <span>
@@ -119,8 +119,9 @@ export default async function ContactPage({
             <iframe
               title={t("map")}
               src={site.map_embed_url}
-              className="h-72 w-full rounded-3xl border-0"
+              className="h-80 w-full rounded-3xl border-0 sm:h-96"
               loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
             />
           )}
         </div>

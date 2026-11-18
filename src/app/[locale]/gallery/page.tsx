@@ -41,9 +41,11 @@ export default async function GalleryPage({
           { name: t("title"), path: "/gallery" },
         ]}
       />
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <GalleryGrid albums={albums} />
-      </div>
+      <section className="section-cream section-pad">
+        <div className="section-shell">
+          <GalleryGrid albums={albums} />
+        </div>
+      </section>
     </div>
   );
 }

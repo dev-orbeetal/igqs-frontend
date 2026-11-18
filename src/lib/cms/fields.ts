@@ -81,10 +81,19 @@ export const aboutFields: CmsField[] = [
   { type: "pair", name: "principal_message", label: "fPrincipalMessage", textarea: true, rich: true, required: true, section: "sectionPrincipal" },
 ];
 
+export const personPanelOptions = [
+  { value: "chairman", label: "panelChairman" },
+  { value: "principal", label: "panelPrincipal" },
+  { value: "director", label: "panelDirector" },
+  { value: "teacher", label: "panelTeacher" },
+  { value: "advisor", label: "panelAdvisor" },
+];
+
 export const leaderFields: CmsField[] = [
   { type: "image", name: "photo_url", fileName: "photo", label: "fPhoto", section: "sectionDetails" },
   { type: "pair", name: "name", label: "fName", required: true, section: "sectionDetails" },
   { type: "pair", name: "role", label: "fDesignation", textarea: true, hint: "designationHint", required: true, section: "sectionDetails" },
+  { type: "select", name: "panel", label: "fPanel", options: personPanelOptions, required: true, section: "sectionDetails" },
   { type: "pair", name: "bio", label: "fBio", textarea: true, rich: true, section: "sectionDetails" },
   { type: "number", name: "order", label: "fOrder", section: "sectionPublishing" },
 ];

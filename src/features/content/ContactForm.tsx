@@ -24,7 +24,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-3xl border border-igqs-gold/25 bg-white p-6 dark:bg-[#0d1f18]">
+    <form onSubmit={onSubmit} className="night-card space-y-4 rounded-3xl border border-igqs-gold/25 bg-white p-6">
       <h2 className="font-display text-3xl">{t("formTitle")}</h2>
       <label className="block text-sm">
         {t("name")}

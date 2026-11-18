@@ -16,7 +16,14 @@ export function useAdmissionWizard(info: AdmissionInfo | null) {
   const tc = useTranslations("common");
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<WizardForm>({});
-  const [files, setFiles] = useState<{ photo?: File; birth?: File; screenshot?: File }>({});
+  const [files, setFiles] = useState<{
+    photo?: File;
+    birth?: File;
+    guardianNid?: File;
+    guardianPhoto?: File;
+    academic?: File;
+    screenshot?: File;
+  }>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [sending, setSending] = useState(false);
@@ -79,6 +86,9 @@ export function useAdmissionWizard(info: AdmissionInfo | null) {
     data.set("payment_method", effectiveMethod || "bkash");
     if (files.photo) data.append("student_photo", files.photo);
     if (files.birth) data.append("birth_certificate", files.birth);
+    if (files.guardianNid) data.append("guardian_nid", files.guardianNid);
+    if (files.guardianPhoto) data.append("guardian_photo", files.guardianPhoto);
+    if (files.academic) data.append("academic_documents", files.academic);
     if (files.screenshot) data.append("payment_screenshot", files.screenshot);
     try {
       setProcessing(true);
@@ -147,6 +157,8 @@ export function useAdmissionWizard(info: AdmissionInfo | null) {
     }
     if (!files.photo) missing.student_photo = t("fileMissing");
     if (!files.birth) missing.birth_certificate = t("fileMissing");
+    if (!files.guardianNid) missing.guardian_nid = t("fileMissing");
+    if (!files.guardianPhoto) missing.guardian_photo = t("fileMissing");
     return missing;
   }
 

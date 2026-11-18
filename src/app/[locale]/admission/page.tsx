@@ -64,6 +64,7 @@ export default async function AdmissionPage({
         steps={guide.procedureSteps}
         methods={guide.methods}
         fees={guide.fees}
+        schedules={info?.schedules ?? []}
       />
       <div id="apply" className="mx-auto max-w-xl scroll-mt-28 px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
         {site?.admission_announcement && (

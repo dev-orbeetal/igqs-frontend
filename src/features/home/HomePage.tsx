@@ -23,6 +23,7 @@ import { Link } from "@/i18n/navigation";
 import type { AboutPayload, HomePayload, SiteSettings } from "@/lib/api/types";
 import { formatDate, newsCategoryKey } from "@/lib/format";
 import { buildHomeContent } from "@/features/home/content";
+import { CulturalSection } from "@/features/home/CulturalSection";
 
 const ICONS: Record<string, typeof BookOpen> = {
   "book-open": BookOpen,
@@ -104,7 +105,6 @@ export async function HomePage({
     beacon,
     dreams,
     gain,
-    holistic,
     tuition,
     uniform,
     vision,
@@ -283,14 +283,11 @@ export async function HomePage({
         </HomeBand>
       ) : null}
 
-      {sections.length === 0 && holistic ? (
-        <HomeBand id="holistic" title={t("home.holistic")} tone="cream">
-          <Prose>{holistic}</Prose>
-        </HomeBand>
-      ) : null}
+      <CulturalSection />
 
+      <div className="band-flow">
       {grades.length > 0 ? (
-      <section id="curriculum" className="section-white section-pad scroll-mt-28">
+      <section id="curriculum" className="band section-pad scroll-mt-28">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.curriculum")} className="mb-0" />
@@ -322,7 +319,7 @@ export async function HomePage({
       <Testimonials items={testimonials} />
 
       {events.length > 0 && (
-      <section className="section-white section-pad">
+      <section className="band section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.events")} className="mb-0" />
@@ -363,7 +360,7 @@ export async function HomePage({
       )}
 
       {newsItems.length > 0 && (
-      <section className="section-cream section-pad">
+      <section className="band section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.news")} className="mb-0" />
@@ -400,7 +397,7 @@ export async function HomePage({
       )}
 
       {albums.length > 0 && (
-      <section className="section-white section-pad">
+      <section className="band section-pad">
         <div className="section-shell">
           <div className="mb-8 flex items-end justify-between gap-4">
             <SectionHeading title={t("home.gallery")} className="mb-0" />
@@ -438,7 +435,7 @@ export async function HomePage({
       )}
 
       {notices.length > 0 && (
-        <section id="notices" className="section-cream scroll-mt-28 py-10 sm:py-12">
+        <section id="notices" className="band scroll-mt-28 py-10 sm:py-12">
           <div className="section-shell">
             <div className="mb-8 flex items-end justify-between gap-4">
               <SectionHeading title={t("home.notices")} className="mb-0" />
@@ -466,6 +463,7 @@ export async function HomePage({
           </div>
         </section>
       )}
+      </div>
     </div>
   );
 }

@@ -43,6 +43,9 @@ export type StaffApplicationDetail = StaffApplicationListItem & {
   student_address: string;
   student_photo: string;
   birth_certificate: string;
+  guardian_nid: string;
+  guardian_photo: string;
+  academic_documents: string;
   father_name: string;
   mother_name: string;
   father_occupation: string;

@@ -22,14 +22,26 @@ export function StudentInfoStep({
   onChange,
   onPhoto,
   onBirth,
+  onGuardianNid,
+  onGuardianPhoto,
+  onAcademic,
 }: {
   form: WizardForm;
   errors: Record<string, string>;
   classLabel: string;
-  filesReady: { photo: boolean; birth: boolean };
+  filesReady: {
+    photo: boolean;
+    birth: boolean;
+    guardianNid: boolean;
+    guardianPhoto: boolean;
+    academic: boolean;
+  };
   onChange: (name: string, value: string) => void;
   onPhoto: (file?: File) => void;
   onBirth: (file?: File) => void;
+  onGuardianNid: (file?: File) => void;
+  onGuardianPhoto: (file?: File) => void;
+  onAcademic: (file?: File) => void;
 }) {
   const t = useTranslations("admission");
   const tc = useTranslations("common");
@@ -122,18 +134,13 @@ export function StudentInfoStep({
           />
           <FieldError id="error-student_address" message={errors.student_address} />
         </label>
-        <label className="text-sm">
-          {t("photo")}
-          <ImageFileInput
-            dataField="student_photo"
-            invalid={Boolean(errors.student_photo)}
-            onChange={onPhoto}
-          />
-          <span className="mt-1 block text-xs text-igqs-muted">
-            {filesReady.photo ? t("fileHint") : t("reattachFiles")}
-          </span>
-          <FieldError id="error-student_photo" message={errors.student_photo} />
-        </label>
+      </section>
+
+      <section className="grid gap-4">
+        <div>
+          <h3 className="font-display text-xl">{t("requiredDocuments")}</h3>
+          <p className="mt-2 text-sm text-igqs-muted">{t("requiredDocumentsHint")}</p>
+        </div>
         <label className="text-sm">
           {t("birthCertificate")}
           <input
@@ -141,11 +148,74 @@ export function StudentInfoStep({
             aria-invalid={Boolean(errors.birth_certificate)}
             aria-describedby={errors.birth_certificate ? "error-birth_certificate" : undefined}
             type="file"
+            accept="application/pdf,image/jpeg,image/png"
             className={`${controlClass(Boolean(errors.birth_certificate))} min-h-12`}
             onChange={(event) => onBirth(event.target.files?.[0])}
           />
-          <span className="mt-1 block text-xs text-igqs-muted">{t("fileHint")}</span>
+          <span className="mt-1 block text-xs text-igqs-muted">
+            {filesReady.birth ? t("fileAttached") : t("fileHint")}
+          </span>
           <FieldError id="error-birth_certificate" message={errors.birth_certificate} />
+        </label>
+        <label className="text-sm">
+          {t("photo")}
+          <ImageFileInput
+            dataField="student_photo"
+            invalid={Boolean(errors.student_photo)}
+            onChange={onPhoto}
+          />
+          <span className="mt-1 block text-xs text-igqs-muted">{t("photoHint")}</span>
+          <span className="mt-1 block text-xs text-igqs-muted">
+            {filesReady.photo ? t("fileAttached") : t("fileHint")}
+          </span>
+          <FieldError id="error-student_photo" message={errors.student_photo} />
+        </label>
+        <label className="text-sm">
+          {t("guardianNid")}
+          <input
+            data-field="guardian_nid"
+            aria-invalid={Boolean(errors.guardian_nid)}
+            aria-describedby={errors.guardian_nid ? "error-guardian_nid" : undefined}
+            type="file"
+            accept="application/pdf,image/jpeg,image/png"
+            className={`${controlClass(Boolean(errors.guardian_nid))} min-h-12`}
+            onChange={(event) => onGuardianNid(event.target.files?.[0])}
+          />
+          <span className="mt-1 block text-xs text-igqs-muted">{t("guardianNidHint")}</span>
+          <span className="mt-1 block text-xs text-igqs-muted">
+            {filesReady.guardianNid ? t("fileAttached") : t("fileHint")}
+          </span>
+          <FieldError id="error-guardian_nid" message={errors.guardian_nid} />
+        </label>
+        <label className="text-sm">
+          {t("guardianPhoto")}
+          <ImageFileInput
+            dataField="guardian_photo"
+            invalid={Boolean(errors.guardian_photo)}
+            onChange={onGuardianPhoto}
+          />
+          <span className="mt-1 block text-xs text-igqs-muted">{t("guardianPhotoHint")}</span>
+          <span className="mt-1 block text-xs text-igqs-muted">
+            {filesReady.guardianPhoto ? t("fileAttached") : t("fileHint")}
+          </span>
+          <FieldError id="error-guardian_photo" message={errors.guardian_photo} />
+        </label>
+        <label className="text-sm">
+          {t("marksheetTc")} <span className="text-igqs-muted">({tc("optional")})</span>
+          <input
+            data-field="academic_documents"
+            aria-invalid={Boolean(errors.academic_documents)}
+            aria-describedby={errors.academic_documents ? "error-academic_documents" : undefined}
+            type="file"
+            accept="application/pdf,image/jpeg,image/png"
+            className={`${controlClass(Boolean(errors.academic_documents))} min-h-12`}
+            onChange={(event) => onAcademic(event.target.files?.[0])}
+          />
+          <span className="mt-1 block text-xs text-igqs-muted">{t("marksheetTcHint")}</span>
+          <span className="mt-1 block text-xs text-igqs-muted">
+            {filesReady.academic ? t("fileAttached") : t("fileHint")}
+          </span>
+          <FieldError id="error-academic_documents" message={errors.academic_documents} />
         </label>
       </section>
 

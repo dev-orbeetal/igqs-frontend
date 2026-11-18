@@ -84,9 +84,24 @@ export function paymentMethodRows(
   return rows;
 }
 
+export type FeeScheduleClass = {
+  name: string;
+  admission: number;
+  session: number;
+  monthly: number;
+  hifz: number | null;
+};
+
+export type FeeSchedule = {
+  track: string;
+  title: string;
+  classes: FeeScheduleClass[];
+};
+
 export type AdmissionInfo = {
   default_fee: AdmissionFeeInfo | null;
   fees: AdmissionFeeInfo[];
+  schedules?: FeeSchedule[];
   methods: PaymentMethodInfo[];
 };
 
@@ -183,6 +198,7 @@ export type AboutPayload = {
     history: string;
     quranic_approach: string;
     principal_message: string;
+    chairman_message?: string;
   };
   leadership: {
     id: number;
@@ -190,6 +206,7 @@ export type AboutPayload = {
     role: string;
     bio: string;
     photo_url: string;
+    panel: "chairman" | "principal" | "director" | "teacher" | "advisor";
   }[];
   facilities: {
     id: number;

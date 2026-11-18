@@ -80,15 +80,22 @@ body {
 }
 
 .dark body {
-  @apply bg-[#07140f] text-igqs-sand;
+  color: #f4ecdc;
+  background-color: #0c1411;
+  background-image:
+    radial-gradient(ellipse 88% 42% at 50% -10%, rgb(212 176 106 / 0.16), transparent 58%),
+    radial-gradient(ellipse 36% 28% at 100% 0%, rgb(20 90 67 / 0.34), transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='88' height='88' viewBox='0 0 88 88' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23e4c98a' stroke-opacity='0.09' stroke-width='0.8'%3E%3Cpath d='M44 10 L51 28 L70 35 L51 42 L44 60 L37 42 L18 35 L37 28 Z'/%3E%3Cpath d='M44 24 L48 34 L58 38 L48 42 L44 52 L40 42 L30 38 L40 34 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 88px 88px;
 }
 
 /* Muted text is 5.0:1 on cream but only 3.0:1 on the dark surfaces, which
    fails AA for body copy. Re-point the token in dark mode so every
    text-igqs-muted usage lifts at once; explicit dark: overrides still win. */
 .dark {
-  --color-igqs-muted: #9fb0a8;
-  --color-igqs-label: #c4a35a;
+  --color-igqs-muted: #c9d4cc;
+  --color-igqs-label: #e4c98a;
+  --color-igqs-gold-soft: #f0e2bc;
 }
 
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
@@ -424,11 +431,9 @@ select optgroup {
 
   /* Scroll-triggered reveals, played once. RevealObserver adds .reveal-js
      to <html> only after it is watching the page, then sets
-     data-revealed="in" (with a per-batch --reveal-delay stagger) as each
-     element enters the viewport. Without JS, or if setup fails, the class
-     is never added and everything stays visible as server-rendered.
-     Content already on screen at startup is marked "done" and never
-     hidden, so nothing blinks. */
+     data-revealed="in" (with a per-batch --reveal-delay stagger) when that
+     element enters the visible screen. Without JS, or if setup fails, the
+     class is never added and everything stays visible as server-rendered. */
   .reveal-js .reveal:not([data-revealed]) {
     opacity: 0;
   }
@@ -670,8 +675,8 @@ select optgroup {
 }
 
 .dark .section-cream {
-  background: #07140f;
-  box-shadow: inset 0 1px 0 rgb(196 163 90 / 0.2);
+  background: transparent;
+  box-shadow: inset 0 1px 0 rgb(228 201 138 / 0.16);
 }
 
 .section-white {
@@ -679,8 +684,45 @@ select optgroup {
 }
 
 .dark .section-white {
-  background: #1a4034;
-  box-shadow: inset 0 1px 0 rgb(196 163 90 / 0.2);
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(228 201 138 / 0.1), transparent 38%),
+    linear-gradient(180deg, #16382c 0%, #10261e 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 236 196 / 0.2),
+    inset 0 -1px 0 rgb(0 0 0 / 0.28);
+}
+
+/* Homepage bands after the cultural section. Odd bands are the plain
+   field, even bands keep the star lattice, so curriculum, comments,
+   events and gallery stay distinct whichever of them is on the page. */
+.band-flow > .band:nth-child(odd) {
+  background: #fff;
+}
+
+.band-flow > .band:nth-child(even) {
+  background-color: #f8f4ec;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c4a35a' stroke-opacity='0.16' stroke-width='0.8'%3E%3Cpath d='M40 8 L47 25 L64 32 L47 39 L40 56 L33 39 L16 32 L33 25 Z'/%3E%3Cpath d='M40 20 L44 30 L54 34 L44 38 L40 48 L36 38 L26 34 L36 30 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+.dark .band-flow > .band:nth-child(odd) {
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(228 201 138 / 0.1), transparent 38%),
+    linear-gradient(180deg, #16382c 0%, #10261e 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 236 196 / 0.2),
+    inset 0 -1px 0 rgb(0 0 0 / 0.28);
+}
+
+.dark .band-flow > .band:nth-child(even) {
+  background: transparent;
+  box-shadow: inset 0 1px 0 rgb(228 201 138 / 0.16);
+}
+
+/* White cards disappear on a white band. Cream panels keep the same
+   gold edge, and dark mode keeps the bronze card treatment. */
+html:not(.dark) :is(.section-white, .band-flow > .band:nth-child(odd)) :is(.surface-card, .night-card) {
+  background-color: #f6f1e7;
 }
 
 .section-cream-alt {
@@ -688,8 +730,12 @@ select optgroup {
 }
 
 .dark .section-cream-alt {
-  background: #1a4034;
-  box-shadow: inset 0 1px 0 rgb(196 163 90 / 0.2);
+  background:
+    radial-gradient(ellipse at 0% 0%, rgb(228 201 138 / 0.08), transparent 36%),
+    linear-gradient(180deg, #143228 0%, #0e221c 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 236 196 / 0.16),
+    inset 0 -1px 0 rgb(0 0 0 / 0.28);
 }
 
 .details-toggle:not([open]) > :not(summary) {
@@ -878,8 +924,9 @@ select optgroup {
 
 .dark .section-forest {
   background:
-    linear-gradient(180deg, rgb(11 36 28 / 0.96), rgb(7 20 15 / 0.98)),
-    #0b241c;
+    radial-gradient(ellipse at 50% 0%, rgb(228 201 138 / 0.12), transparent 46%),
+    linear-gradient(180deg, #145a43 0%, #0c3024 100%);
+  box-shadow: inset 0 1px 0 rgb(255 236 196 / 0.2);
 }
 
 .section-shell {
@@ -972,8 +1019,15 @@ select optgroup {
   box-shadow: 0 10px 28px rgb(16 35 28 / 0.05);
 }
 
-.dark .surface-card {
-  box-shadow: none;
+.dark .surface-card,
+.dark .night-card {
+  background:
+    linear-gradient(180deg, rgb(255 236 196 / 0.1), transparent 32%),
+    linear-gradient(165deg, #3a3124 0%, #241c14 100%);
+  border-color: rgb(228 201 138 / 0.42);
+  box-shadow:
+    0 22px 44px -28px rgb(0 0 0 / 0.8),
+    inset 0 1px 0 rgb(255 236 196 / 0.22);
 }
 
 .surface-card-hover,
@@ -1337,6 +1391,14 @@ select optgroup {
     transform: translateY(-3px);
     border-color: rgb(196 163 90 / 0.5);
     box-shadow: 0 18px 36px rgb(16 35 28 / 0.1);
+  }
+
+  .dark .surface-card-hover:hover,
+  .dark .hover-lift:hover {
+    border-color: rgb(240 217 160 / 0.7);
+    box-shadow:
+      0 22px 40px -24px rgb(0 0 0 / 0.85),
+      inset 0 1px 0 rgb(255 236 196 / 0.28);
   }
 
   a:hover .img-zoom,
@@ -1770,9 +1832,14 @@ select optgroup {
 
 .dark .band-green {
   background:
-    url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 4l5.2 12.8L40 22l-12.8 5.2L22 40l-5.2-12.8L4 22l12.8-5.2z' fill='none' stroke='%23c4a35a' stroke-opacity='0.06' stroke-width='0.8'/%3E%3C/svg%3E"),
-    linear-gradient(110deg, #061a13 0%, #0a2a1f 55%, #0e3a2b 100%);
-  background-size: 44px 44px, auto;
+    url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 4l5.2 12.8L40 22l-12.8 5.2L22 40l-5.2-12.8L4 22l12.8-5.2z' fill='none' stroke='%23e4c98a' stroke-opacity='0.14' stroke-width='0.8'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 18% 0%, rgb(240 217 160 / 0.2), transparent 46%),
+    radial-gradient(ellipse at 90% 100%, rgb(8 28 22 / 0.45), transparent 42%),
+    linear-gradient(128deg, #0c3d2e 0%, #1a6b4e 46%, #0e4634 100%);
+  background-size: 44px 44px, auto, auto, auto;
+  box-shadow:
+    inset 0 1px 0 rgb(255 236 196 / 0.28),
+    inset 0 -18px 40px rgb(4 16 12 / 0.28);
 }
 
 /* Eyebrow with a short gold lead line ("— IDEAL GLOBAL QURANIC SCHOOL"). */
@@ -1847,8 +1914,15 @@ select optgroup {
 }
 
 .dark .btn-green {
-  background: var(--color-igqs-gold);
-  color: var(--color-igqs-ink);
+  background: linear-gradient(180deg, #f3e0b0 0%, #c4a35a 100%);
+  color: #1c1508;
+  box-shadow:
+    0 10px 24px rgb(196 163 90 / 0.22),
+    inset 0 1px 0 rgb(255 255 255 / 0.55);
+}
+
+.dark .btn-green:hover {
+  background: linear-gradient(180deg, #fff1cc 0%, #d4b56a 100%);
 }
 
 /* Photo with a gold frame offset behind it. */
@@ -1922,8 +1996,43 @@ select optgroup {
 
 .dark .footer-green {
   background:
-    url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 4l5.2 12.8L40 22l-12.8 5.2L22 40l-5.2-12.8L4 22l12.8-5.2z' fill='none' stroke='%23c4a35a' stroke-opacity='0.04' stroke-width='0.8'/%3E%3C/svg%3E"),
-    #04140f;
-  background-size: 44px 44px, auto;
+    url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 4l5.2 12.8L40 22l-12.8 5.2L22 40l-5.2-12.8L4 22l12.8-5.2z' fill='none' stroke='%23e4c98a' stroke-opacity='0.1' stroke-width='0.8'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 0%, rgb(228 201 138 / 0.12), transparent 42%),
+    linear-gradient(180deg, #10281f 0%, #070f0c 100%);
+  background-size: 44px 44px, auto, auto;
+}
+
+.dark .site-header,
+.dark .drawer-panel {
+  background:
+    linear-gradient(180deg, rgb(18 28 24 / 0.94), rgb(10 18 15 / 0.9));
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.28);
+}
+
+.dark .vision-panel {
+  background:
+    radial-gradient(ellipse at 100% 110%, rgb(240 217 160 / 0.22), transparent 48%),
+    radial-gradient(ellipse at 0% 0%, rgb(255 236 196 / 0.1), transparent 36%),
+    linear-gradient(155deg, #1f7a58 0%, #0f4a36 52%, #0a2e22 100%);
+  box-shadow: inset 0 1px 0 rgb(255 236 196 / 0.24);
+}
+
+.dark .mission-panel {
+  background:
+    radial-gradient(ellipse at 0% 0%, rgb(240 217 160 / 0.16), transparent 42%),
+    url("data:image/svg+xml,%3Csvg width='88' height='88' viewBox='0 0 88 88' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23e4c98a' stroke-opacity='0.1' stroke-width='0.8'%3E%3Cpath d='M44 10 L51 28 L70 35 L51 42 L44 60 L37 42 L18 35 L37 28 Z'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, #3d3426 0%, #241c14 100%);
+  background-size: auto, 88px 88px, auto;
+}
+
+.dark .paired-frame {
+  background:
+    linear-gradient(180deg, rgb(255 236 196 / 0.08), transparent 30%),
+    #14110d;
+  border-color: rgb(228 201 138 / 0.5);
+  box-shadow:
+    0 28px 60px -32px rgb(0 0 0 / 0.75),
+    inset 0 1px 0 rgb(255 236 196 / 0.2);
 }
 

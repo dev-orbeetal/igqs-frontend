@@ -148,6 +148,18 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
         )}
       </div>
 
+      {site?.map_embed_url && (
+        <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6">
+          <iframe
+            title={tf("map")}
+            src={site.map_embed_url}
+            className="h-64 w-full rounded-2xl border-0 sm:h-72"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      )}
+
       <div className="border-t border-white/10">
         <div className="relative mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-4 py-5 sm:flex-row">
           <p className="text-center text-sm text-white/60">

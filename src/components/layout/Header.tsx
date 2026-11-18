@@ -108,7 +108,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-igqs-cream transition-shadow duration-200 print:hidden dark:bg-[#07140f] ${
+      className={`site-header sticky top-0 z-50 bg-igqs-cream transition-shadow duration-200 print:hidden dark:bg-[#07140f] ${
         scrolled ? "shadow-[0_4px_20px_rgba(15,23,42,0.08)]" : ""
       }`}
     >
