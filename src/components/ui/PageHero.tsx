@@ -6,22 +6,19 @@ import { ArchCorner, BookMark, Swoosh } from "./Ornaments";
 
 export function PageHero({
   title,
-  subtitle,
   crumbs,
 }: {
   title: string;
   subtitle?: string;
   crumbs?: Crumb[];
 }) {
-  const brand = useTranslations("brand");
   const a11y = useTranslations("a11y");
   return (
-    <section className="band-green on-dark relative overflow-hidden py-7 text-igqs-cream print:hidden sm:py-9">
-      {/* Right arch only: the title is left-aligned and would sit on a left one. */}
+    <section className="band-green on-dark relative overflow-hidden py-4 text-igqs-cream print:hidden sm:py-5">
       <ArchCorner id="page-hero-arch-right" side="right" />
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 md:pr-[20%] lg:pr-[18%]">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         {crumbs && crumbs.length > 1 && (
-          <nav aria-label={a11y("breadcrumb")} className="mb-2.5">
+          <nav aria-label={a11y("breadcrumb")}>
             <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-igqs-cream/75">
               {crumbs.map((crumb, index) => {
                 const current = index === crumbs.length - 1;
@@ -43,22 +40,7 @@ export function PageHero({
             </ol>
           </nav>
         )}
-        <p className="reveal-now eyebrow eyebrow-line">{brand("name")}</p>
-        <TextRise
-          as="h1"
-          immediate
-          delay={180}
-          text={title}
-          className="heading-strong mt-2 text-[1.85rem] leading-tight text-white md:text-4xl"
-        />
-        {subtitle && (
-          <p
-            className="reveal-now mt-2 max-w-2xl text-sm text-igqs-cream/80 sm:text-base"
-            style={{ "--reveal-delay": "320ms" } as React.CSSProperties}
-          >
-            {subtitle}
-          </p>
-        )}
+        <h1 className="sr-only">{title}</h1>
       </div>
     </section>
   );

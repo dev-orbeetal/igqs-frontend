@@ -279,9 +279,12 @@
     "map": "School location map"
   },
   "admission": {
-    "title": "Online Admission",
-    "subtitle": "Apply for a place at Ideal Global Qur'anic School",
-    "metaDescription": "Apply online to Ideal Global Quranic School in Dhaka for Hifz and a full academic programme.",
+    "title": "Admission",
+    "subtitle": "Procedures, fees, and what you need to apply",
+    "metaDescription": "Admission procedures, fees, and requirements at Ideal Global Quranic School in Dhaka.",
+    "applyTitle": "Apply for Admission",
+    "applySubtitle": "Apply for a place at Ideal Global Qur'anic School",
+    "applyMetaDescription": "Apply online to Ideal Global Quranic School in Dhaka for Hifz and a full academic programme.",
     "stepClass": "Class",
     "stepInformation": "Information",
     "stepVerify": "Verify",

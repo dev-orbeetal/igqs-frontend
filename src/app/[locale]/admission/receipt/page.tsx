@@ -31,10 +31,18 @@ export default async function DownloadReceiptPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admission");
+  const tn = await getTranslations("nav");
 
   return (
     <div>
-      <PageHero title={t("downloadPageTitle")} subtitle={t("downloadPageSubtitle")} />
+      <PageHero
+        title={t("downloadPageTitle")}
+        crumbs={[
+          { name: tn("home"), path: "/" },
+          { name: t("title"), path: "/admission" },
+          { name: t("downloadPageTitle"), path: "/admission/receipt" },
+        ]}
+      />
       <FadeIn className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <Suspense>
           <ReceiptLookupPanel />

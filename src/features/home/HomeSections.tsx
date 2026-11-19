@@ -467,14 +467,14 @@ export async function AdmissionGuide({
           </div>
         ) : null}
         <div className={announcement || proceduresNote ? "mt-6" : ""}>
-          <ProcedureList steps={steps} applyHref="/admission#apply" applyLabel={common("applyNow")} />
+          <ProcedureList steps={steps} applyHref="/admission/apply" applyLabel={common("applyNow")} />
         </div>
       </HomeBand>
       <HomeBand id="instructions" title={t("admissionInstructions")} tone="white">
         <div className="grid gap-6 lg:grid-cols-2">
           <article className="surface-card bg-white p-5 sm:p-6 dark:bg-[#12352b]">
             <h3 className="heading-strong text-2xl text-igqs-green dark:text-igqs-gold-soft">{t("admissionTest")}</h3>
-            <p className="mt-1 text-sm text-igqs-muted">Admission Test · <span dir="rtl" lang="ar">اختبار القبول</span></p>
+            <p className="mt-1 text-sm text-igqs-muted">Admission Test</p>
             <ul className="mt-4 space-y-3">
               {(["admissionTest1", "admissionTest2", "admissionTest3"] as const).map((key) => (
                 <li key={key} className="flex gap-2.5 text-sm leading-relaxed">

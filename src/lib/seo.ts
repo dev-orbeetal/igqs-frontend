@@ -15,6 +15,7 @@ export const PUBLIC_PATHS = [
   "/gallery",
   "/contact",
   "/admission",
+  "/admission/apply",
 ] as const;
 
 /** Paths that must not be crawled or treated as the public site. */

@@ -7,6 +7,7 @@ import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/compon
 import { PageIntro } from "@/components/seo/PageIntro";
 import { apiGet } from "@/lib/api/client";
 import { type SiteSettings } from "@/lib/api/types";
+import { telHref } from "@/lib/format";
 import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -66,7 +67,7 @@ export default async function ContactPage({
                   .map((phone) => (
                     <a
                       key={phone}
-                      href={`tel:${phone.replace(/\D/g, "") ? `+${phone.replace(/\D/g, "")}` : phone}`}
+                      href={telHref(phone)}
                       className="flex min-h-11 items-center underline-offset-2 hover:underline"
                     >
                       {phone}

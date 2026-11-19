@@ -65,13 +65,26 @@ export default async function AboutPage({
         ]}
       />
       <div className="mx-auto max-w-7xl space-y-20 px-4 py-16 sm:px-6">
-        <section>
-          <SectionHeading title={t("introduction")} />
-          <FadeIn>
-            <DetailsText
-              text={about.introduction}
-              className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
-            />
+        <section className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+          <div>
+            <SectionHeading title={t("introduction")} />
+            <FadeIn>
+              <DetailsText
+                text={about.introduction}
+                className="max-w-prose whitespace-pre-line text-lg leading-relaxed text-igqs-muted dark:text-igqs-sand/80"
+              />
+            </FadeIn>
+          </div>
+          <FadeIn delay={0.1} variant="right" className="img-frame-offset mb-4 ml-4 sm:ml-5">
+            <div className="img-frame aspect-[3/2] shadow-[0_18px_40px_rgb(16_35_28/0.14)]">
+              <Image
+                src="/home/beacon.jpg"
+                alt={t("introduction")}
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover"
+              />
+            </div>
           </FadeIn>
         </section>
 
@@ -119,7 +132,9 @@ export default async function AboutPage({
           </div>
         </section>
 
-        <PeoplePanel title={t("directors")} people={directors} empty={t("emptyDirectors")} />
+        {directors.length > 0 && (
+          <PeoplePanel title={t("directors")} people={directors} empty={t("emptyDirectors")} />
+        )}
         <PeoplePanel title={t("teachers")} people={teachers} empty={t("emptyTeachers")} />
         <PeoplePanel title={t("advisors")} people={advisors} empty={t("emptyAdvisors")} />
 

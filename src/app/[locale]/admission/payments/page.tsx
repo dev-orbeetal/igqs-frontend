@@ -30,10 +30,18 @@ export default async function MyPaymentsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admission");
+  const tn = await getTranslations("nav");
 
   return (
     <div>
-      <PageHero title={t("myPaymentsTitle")} subtitle={t("myPaymentsSubtitle")} />
+      <PageHero
+        title={t("myPaymentsTitle")}
+        crumbs={[
+          { name: tn("home"), path: "/" },
+          { name: t("title"), path: "/admission" },
+          { name: t("myPaymentsTitle"), path: "/admission/payments" },
+        ]}
+      />
       <FadeIn className="mx-auto max-w-xl px-4 py-8 sm:max-w-2xl sm:px-6 sm:py-12">
         <MyPaymentsPanel />
       </FadeIn>

@@ -3,13 +3,10 @@
 import { ArrowUp, ChevronRight, Mail, MapPin, Phone } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
-import { FacebookIcon, InstagramIcon, WhatsAppIcon, YoutubeIcon } from "@/components/icons/Social";
+import { FacebookIcon, WhatsAppIcon } from "@/components/icons/Social";
 import { Link } from "@/i18n/navigation";
 import type { SiteSettings } from "@/lib/api/types";
-
-function digitsOnly(value: string) {
-  return value.replace(/\D/g, "");
-}
+import { telHref } from "@/lib/format";
 
 function FooterHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -39,14 +36,13 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
   const emails = site?.email ? [site.email] : [];
   const social = [
     site?.facebook_url ? { href: site.facebook_url, label: "Facebook", icon: FacebookIcon } : null,
-    site?.youtube_url ? { href: site.youtube_url, label: "YouTube", icon: YoutubeIcon } : null,
-    site?.instagram_url ? { href: site.instagram_url, label: "Instagram", icon: InstagramIcon } : null,
     site?.whatsapp_url ? { href: site.whatsapp_url, label: "WhatsApp", icon: WhatsAppIcon } : null,
   ].filter((item): item is { href: string; label: string; icon: typeof FacebookIcon } => Boolean(item));
 
   const quickLinks = [
     { label: t("home"), href: "/" },
     { label: t("admission"), href: "/admission" },
+    { label: t("apply"), href: "/admission/apply" },
     { label: t("curriculum"), href: "/curriculum" },
     { label: t("events"), href: "/events" },
   ];
@@ -124,7 +120,7 @@ export function Footer({ site }: { site?: SiteSettings | null }) {
               {phones.map((phone, index) => (
                 <li key={phone}>
                   <a
-                    href={`tel:${digitsOnly(phone) ? `+${digitsOnly(phone)}` : phone}`}
+                    href={telHref(phone)}
                     className="motion-micro flex min-h-11 items-center gap-2.5 hover:text-white"
                   >
                     {index === 0 ? <Phone className="size-4 shrink-0 text-white" /> : <span className="size-4 shrink-0" />}

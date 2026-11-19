@@ -31,10 +31,18 @@ export default async function AdmissionSuccessPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admission");
+  const tn = await getTranslations("nav");
 
   return (
     <div>
-      <PageHero title={t("successTitle")} subtitle={t("successBody")} />
+      <PageHero
+        title={t("successTitle")}
+        crumbs={[
+          { name: tn("home"), path: "/" },
+          { name: t("title"), path: "/admission" },
+          { name: t("successTitle"), path: "/admission/success" },
+        ]}
+      />
       <FadeIn className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <Suspense>
           <SuccessPanel />

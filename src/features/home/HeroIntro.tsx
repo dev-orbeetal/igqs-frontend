@@ -50,7 +50,7 @@ export function HeroIntro({
         data-reveal="pop"
         style={{ "--reveal-delay": "640ms" } as React.CSSProperties}
       >
-        <Link href="/admission" className="btn-gold btn-shine btn-shine-once btn-sparkle inline-flex">
+        <Link href="/admission/apply" className="btn-gold btn-shine btn-shine-once btn-sparkle inline-flex">
           {applyLabel}
         </Link>
         <Link href="/curriculum" className="btn-gold-outline">

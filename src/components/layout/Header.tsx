@@ -143,7 +143,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
               {t("notices")}
             </Link>
             <Link
-              href="/admission"
+              href="/admission/apply"
               className={`${compact ? "hidden" : "hidden md:inline-flex"} btn-solid btn-shine btn-sparkle min-h-11 items-center rounded-md bg-igqs-green px-3 py-2 text-xs font-semibold whitespace-nowrap text-white dark:bg-igqs-gold dark:text-igqs-ink`}
             >
               {t("apply")}
@@ -232,7 +232,7 @@ export function Header({ adminSite = false }: { adminSite?: boolean }) {
               {t("notices")}
             </Link>
             <Link
-              href="/admission"
+              href="/admission/apply"
               tabIndex={drawerOpen ? undefined : -1}
               onClick={() => setDrawerOpen(false)}
               className="drawer-link btn-solid btn-shine btn-sparkle inline-flex min-h-12 items-center justify-center rounded-md bg-igqs-green px-3 py-2 text-sm font-semibold text-white dark:bg-igqs-gold dark:text-igqs-ink"
